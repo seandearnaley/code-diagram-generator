@@ -7,7 +7,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-python-code-outline = "^0.1.4"
+folder-tree-generator = "^0.1.13"
+python-code-outline = "^0.1.7"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.2"
@@ -16,7 +17,7 @@ pytest = "^7.3.0"
 ruff = "^0.0.272"
 black = "^23.3.0"
 pytest-mock = "^3.10.0"
-coverage = "^7.2.3"
+pytest-cov = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core"]
