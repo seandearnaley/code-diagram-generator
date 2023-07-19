@@ -9,6 +9,9 @@ readme = "README.md"
 python = "^3.10"
 folder-tree-generator = "^0.1.13"
 python-code-outline = "^0.1.7"
+fastapi = "^0.100.0"
+requests = "^2.31.0"
+uvicorn = "^0.23.1"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.2"
@@ -18,6 +21,7 @@ ruff = "^0.0.272"
 black = "^23.3.0"
 pytest-mock = "^3.10.0"
 pytest-cov = "^4.1.0"
+types-requests = "^2.31.0.1"
 
 [build-system]
 requires = ["poetry-core"]
