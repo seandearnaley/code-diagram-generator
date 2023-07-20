@@ -9,4 +9,6 @@ RUN pnpm install
 
 COPY . .
 
-CMD [ "npm", "run", "dev" ]
+VOLUME [ "/usr/src/app/node_modules" ]
+
+CMD [ "pnpm", "run", "dev" ]

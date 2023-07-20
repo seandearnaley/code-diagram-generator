@@ -4,11 +4,16 @@ services:
     build: ./fastapi
     volumes:
       - ./fastapi/app:/app
+      - /Users/seandearnaley/Documents/GitHub/:/source-repos
     ports:
       - 8000:8000
   nextjs:
     build: ./nextjs
     volumes:
       - ./nextjs:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
     ports:
       - 3000:3000
+
+volumes:
+  node_modules:
