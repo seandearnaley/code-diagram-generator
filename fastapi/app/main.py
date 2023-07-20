@@ -36,18 +36,14 @@ class MermaidScript(BaseModel):
 
 @app.post("/mermaid/")
 async def create_mermaid_diagram(mermaid_script: MermaidScript):
-    """Create a mermaid diagram from a mermaid script."""
-
-    script = mermaid_script.mermaid_script
-    print("mermaid_script=", script)
-
+    """Generate a mermaid diagram from a mermaid script."""
     try:
         # Create temporary files for mermaid script and output svg
         with NamedTemporaryFile(
             delete=False, suffix=".mmd"
         ) as temp_in, NamedTemporaryFile(delete=False, suffix=".svg") as temp_out:
             # Write mermaid script to temporary input file
-            temp_in.write(script.encode())
+            temp_in.write(mermaid_script.mermaid_script.encode())
             temp_in.close()
             temp_out.close()
 
