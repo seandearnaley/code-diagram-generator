@@ -1,19 +1,26 @@
 {
-  "name": "nextjs",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "auto-interview",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
-    "build": "next build -p 3001",
-    "start": "next start -p 3001"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "next": "^13.4.10",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@types/node": "20.4.0",
+    "@types/react": "18.2.14",
+    "@types/react-dom": "18.2.6",
+    "eslint": "8.44.0",
+    "eslint-config-next": "13.4.8",
+    "html-to-image": "^1.11.11",
+    "next": "13.4.8",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.1.6"
+  },
+  "devDependencies": {
+    "prettier": "3.0.0"
   }
 }

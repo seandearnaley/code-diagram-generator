@@ -4,7 +4,6 @@ import subprocess
 import traceback
 from tempfile import NamedTemporaryFile
 
-import requests
 from folder_tree_generator import generate_tree
 from pydantic import BaseModel
 from python_code_outline import get_report
@@ -17,7 +16,7 @@ app = FastAPI()
 
 # Set up CORS
 origins = [
-    "http://localhost:3001",  # Allow requests from the Next.js app
+    "http://localhost:3000",  # Allow requests from the Next.js app
 ]
 
 app.add_middleware(
@@ -29,31 +28,10 @@ app.add_middleware(
 )
 
 
-class Item(BaseModel):
-    """Item model."""
-
-    data: str
-
-
 class MermaidScript(BaseModel):
     """MermaidScript model."""
 
     mermaid_script: str
-
-
-@app.post("/query/")
-async def query(item: Item):
-    """Query the node-express server."""
-    print("hello", item.data)
-    response = requests.post(
-        "http://node-express:3000/query",
-        json=item.dict(),
-        timeout=5,
-        headers={"Content-Type": "application/json"},
-    )
-    print("response.json()", response.json())
-
-    return response.json()
 
 
 @app.post("/mermaid/")

@@ -1,0 +1,10 @@
+# Ignore artifacts:
+build
+coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
