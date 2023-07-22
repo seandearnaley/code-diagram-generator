@@ -1,1 +1,6 @@
 .DS_Store
+.mypy_cache/
+.pytest_cache/
+
+.next/
+node_modules/

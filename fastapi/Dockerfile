@@ -4,6 +4,9 @@ FROM python:3.10-slim
 # Set the working directory
 WORKDIR /app
 
+# Set the PYTHONPATH environment variable
+ENV PYTHONPATH=/app
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y curl gnupg wget libxss1 fonts-liberation chromium
 
@@ -49,7 +52,7 @@ COPY pyproject.toml poetry.lock /app/
 RUN pip install poetry && poetry config virtualenvs.create false && poetry install
 
 # Copy the rest of the application code
-COPY ./app /app
+COPY ./ /app
 
 # Start the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -3,7 +3,7 @@ services:
   fastapi:
     build: ./fastapi
     volumes:
-      - ./fastapi/app:/app
+      - ./fastapi:/app
       - /Users/seandearnaley/Documents/GitHub/:/source-repos
     ports:
       - 8000:8000

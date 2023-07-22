@@ -32,7 +32,7 @@
     },
     {
       "type": "Data Generation Sequence",
-      "description": "Illustrates the flow of data generation and processing, including steps like retrieving Reddit data, applying data summarization algorithms, and generating summaries."
+      "description": "Illustrates the flow of data generation and processing, including steps like retrieving data, applying data algorithms, and generating outputs."
     },
     {
       "type": "Service Integration Sequence",

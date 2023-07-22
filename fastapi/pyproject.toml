@@ -15,15 +15,19 @@ uvicorn = "^0.23.1"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.2"
-mypy = "^1.2.0"
-pytest = "^7.3.0"
-ruff = "^0.0.272"
-black = "^23.3.0"
+mypy = "^1.4.1"
+pytest = "^7.4.0"
+ruff = "^0.0.280"
+black = "^23.7.0"
 pytest-mock = "^3.10.0"
 pytest-cov = "^4.1.0"
 types-requests = "^2.31.0.1"
+pylist = "^1.4.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.mypy]
+strict = true
+files = "app"

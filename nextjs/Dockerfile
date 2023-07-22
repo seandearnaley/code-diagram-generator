@@ -11,4 +11,6 @@ COPY . .
 
 VOLUME [ "/usr/src/app/node_modules" ]
 
+RUN pnpm run build
+
 CMD [ "pnpm", "run", "dev" ]
