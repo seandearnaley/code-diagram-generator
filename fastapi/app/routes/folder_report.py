@@ -1,17 +1,17 @@
 """Folder report endpoint."""
+from typing import Optional
+
 from fastapi import APIRouter
 
-from ..models import FolderReportRequest
 from ..services.folder_report_service import folder_report
 
 router = APIRouter()
 
 
-@router.post("/folder_report/")
-async def folder_report_endpoint(folder_report_request: FolderReportRequest):
+@router.get("/folder_report/")
+async def folder_report_endpoint(
+    root_folder: str,
+    ignore_file_path: Optional[str] = None,
+):
     """Folder report endpoint."""
-    return await folder_report(
-        folder_report_request.root_folder,
-        folder_report_request.report_file_path,
-        folder_report_request.ignore_file_path,
-    )
+    return await folder_report(root_folder, ignore_file_path)
