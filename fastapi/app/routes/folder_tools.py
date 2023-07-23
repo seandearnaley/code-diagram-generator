@@ -1,9 +1,9 @@
 """Folder report endpoint."""
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter
 
-from ..services.folder_tools_service import folder_report, folder_tree
+from ..services.folder_tools_service import folder_report, folder_tree, read_folder
 
 router = APIRouter()
 
@@ -24,3 +24,9 @@ async def folder_tree_endpoint(
 ):
     """Folder report endpoint."""
     return await folder_tree(root_folder, ignore_file_path)
+
+
+@router.get("/folders/{folder_path:path}", response_model=List[str])
+async def read_folder_endpoint(folder_path: str):
+    """Get all folders in a folder."""
+    return await read_folder(folder_path)
