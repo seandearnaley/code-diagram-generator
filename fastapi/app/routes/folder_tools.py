@@ -1,9 +1,14 @@
 """Folder report endpoint."""
 from typing import List, Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
-from ..services.folder_tools_service import folder_report, folder_tree, read_folder
+from ..services.folder_tools_service import (
+    FolderNotFoundException,
+    folder_report,
+    folder_tree,
+    read_folder,
+)
 
 router = APIRouter()
 
@@ -29,4 +34,7 @@ async def folder_tree_endpoint(
 @router.get("/folders/{folder_path:path}", response_model=List[str])
 async def read_folder_endpoint(folder_path: str):
     """Get all folders in a folder."""
-    return await read_folder(folder_path)
+    try:
+        return await read_folder(folder_path)
+    except FolderNotFoundException as ex:
+        raise HTTPException(status_code=404, detail=str(ex)) from ex

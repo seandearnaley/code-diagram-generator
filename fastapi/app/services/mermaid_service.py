@@ -3,10 +3,17 @@ import subprocess
 import traceback
 from tempfile import NamedTemporaryFile
 
-from fastapi import HTTPException
 from fastapi.responses import FileResponse
 
 from ..models import MermaidScript
+
+
+class MermaidCliError(Exception):
+    """Exception raised when the mermaid-cli fails."""
+
+
+class MermaidUnexpectedError(Exception):
+    """Exception raised when an unexpected error occurs."""
 
 
 async def create_mermaid_diagram(mermaid_script: MermaidScript):
@@ -35,16 +42,11 @@ async def create_mermaid_diagram(mermaid_script: MermaidScript):
             return FileResponse(temp_out.name, media_type="image/svg+xml")
 
     except subprocess.CalledProcessError as err:
-        # If mermaid-cli failed, raise an HTTPException that includes the error message
         print("Exception Details:")
         print(err.stderr.decode())
         traceback.print_exc()
-        raise HTTPException(
-            status_code=500, detail=f"Mermaid CLI failed: {err.stderr.decode()}"
-        ) from err
+        raise MermaidCliError(f"Mermaid CLI failed: {err.stderr.decode()}") from err
     except Exception as err:
         print("Unexpected Exception:")
         traceback.print_exc()
-        raise HTTPException(
-            status_code=500, detail=f"Unexpected error occurred: {str(err)}"
-        ) from err
+        raise MermaidUnexpectedError(f"Unexpected error occurred: {str(err)}") from err

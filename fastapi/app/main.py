@@ -1,8 +1,9 @@
 """Main module for FastAPI app."""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routes import folder_tools, mermaid
+from .routes import diagram, folder_tools, mermaid
 
 app = FastAPI()
 
@@ -20,3 +21,4 @@ app.add_middleware(
 
 app.include_router(mermaid.router)
 app.include_router(folder_tools.router)
+app.include_router(diagram.router)

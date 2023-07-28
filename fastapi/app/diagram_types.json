@@ -1,0 +1,26 @@
+{
+  "flowchart": [
+    {
+      "id": "1",
+      "name": "Flowchart Option 1",
+      "description": "This is a description"
+    },
+    {
+      "id": "2",
+      "name": "Flowchart Option 2",
+      "description": "This is a description"
+    }
+  ],
+  "sequenceDiagram": [
+    {
+      "id": "1",
+      "name": "Sequence Diagram Option 1",
+      "description": "This is a description"
+    },
+    {
+      "id": "2",
+      "name": "Sequence Diagram Option 2",
+      "description": "This is a description"
+    }
+  ]
+}

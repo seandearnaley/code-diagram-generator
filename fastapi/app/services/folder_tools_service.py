@@ -6,7 +6,9 @@ from typing import List, Optional
 from folder_tree_generator import generate_tree
 from python_code_outline import get_report
 
-from fastapi import HTTPException
+
+class FolderNotFoundException(Exception):
+    """Exception raised when a folder is not found."""
 
 
 async def folder_tree(
@@ -30,11 +32,11 @@ async def folder_report(
 async def read_folder(
     folder_path: str,
 ) -> List[str]:
-    """Get all folders in a folders."""
+    """Get all folders in a folder."""
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
         folders = [
             entry.name for entry in Path(folder_path).iterdir() if entry.is_dir()
         ]
         return folders
 
-    raise HTTPException(status_code=404, detail="Folder not found")
+    raise FolderNotFoundException(f"Folder {folder_path} not found")
