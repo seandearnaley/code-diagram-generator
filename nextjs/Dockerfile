@@ -9,8 +9,8 @@ RUN pnpm install
 
 COPY . .
 
-VOLUME [ "/usr/src/app/node_modules" ]
+# VOLUME [ "/usr/src/app/node_modules" ]
 
-RUN pnpm run build
+# RUN pnpm run build
 
 CMD [ "pnpm", "run", "dev" ]
