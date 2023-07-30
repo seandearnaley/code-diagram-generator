@@ -1,8 +1,13 @@
 import { Field } from "formik";
 import { FC } from "react";
 
+type Option = {
+  id: string;
+  name: string;
+};
+
 type Props = {
-  options: string[];
+  options: Option[];
   label: string;
   name: string;
   id: string;
@@ -13,8 +18,8 @@ const SelectField: FC<Props> = ({ options, label, name, id }) => (
     {label}
     <Field as="select" name={name} id={id}>
       {options.map((option) => (
-        <option key={option} value={option}>
-          {option}
+        <option key={option.id} value={option.id}>
+          {option.name}
         </option>
       ))}
     </Field>

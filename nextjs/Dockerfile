@@ -13,4 +13,6 @@ COPY . .
 
 # RUN pnpm run build
 
+ENV NEXT_PUBLIC_API_URL=http://fastapi:8000
+
 CMD [ "pnpm", "run", "dev" ]

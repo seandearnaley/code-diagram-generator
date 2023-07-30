@@ -1,18 +1,28 @@
 "use client";
 
 import { Form, Formik, FormikHelpers } from "formik";
-// import { GetServerSideProps } from "next";
 import { FC } from "react";
 import RadioButtonGroup from "./RadioButtonGroup";
 import SelectField from "./SelectField";
 
-type Option = {
+type DiagramType = {
   id: string;
   name: string;
 };
 
-type Options = {
-  [key: string]: Option[];
+type DiagramTypes = {
+  [key: string]: DiagramType[];
+};
+
+type DiagramTypeNames = {
+  [key: string]: string;
+};
+
+type Props = {
+  options: {
+    types: DiagramTypes;
+    diagramTypeNames: DiagramTypeNames;
+  };
 };
 
 type Values = {
@@ -20,11 +30,14 @@ type Values = {
   diagramOption: string;
 };
 
-type Props = {
-  options: Options;
-};
+const DiagramForm: FC<Props> = ({ options: { types, diagramTypeNames } }) => {
+  const diagramOptions = Object.keys(types).map((key) => ({
+    id: key,
+    name: diagramTypeNames[key] || key,
+  }));
 
-const DiagramForm: FC<Props> = ({ options }) => {
+  const defaultDiagramType = diagramOptions[0]?.id || "";
+
   const handleSubmit = (
     values: Values,
     { setSubmitting }: FormikHelpers<Values>,
@@ -35,20 +48,20 @@ const DiagramForm: FC<Props> = ({ options }) => {
 
   return (
     <Formik<Values>
-      initialValues={{ diagramType: "", diagramOption: "" }}
+      initialValues={{ diagramType: defaultDiagramType, diagramOption: "" }}
       onSubmit={handleSubmit}
     >
       {({ values }) => (
         <Form>
           <SelectField
-            options={Object.keys(options)}
+            options={diagramOptions}
             label="Diagram Type"
             name="diagramType"
             id="diagramType"
           />
 
           <RadioButtonGroup
-            options={options[values.diagramType] || []}
+            options={types[values.diagramType] || []}
             name="diagramOption"
           />
 
@@ -58,16 +71,5 @@ const DiagramForm: FC<Props> = ({ options }) => {
     </Formik>
   );
 };
-
-// export const getServerSideProps: GetServerSideProps = async () => {
-//   const res = await fetch("http://localhost:8000/diagram_types"); // replace with your API endpoint
-//   const options: Options = await res.json();
-
-//   return {
-//     props: {
-//       options,
-//     },
-//   };
-// };
 
 export default DiagramForm;

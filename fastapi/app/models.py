@@ -1,5 +1,5 @@
 """Pydantic models for FastAPI."""
-from typing import List
+from typing import Dict, List
 
 from pydantic import BaseModel
 
@@ -21,5 +21,5 @@ class DiagramType(BaseModel):
 class DiagramTypes(BaseModel):
     """Model for a list of diagram types"""
 
-    flowchart: List[DiagramType]
-    sequenceDiagram: List[DiagramType]
+    types: Dict[str, List[DiagramType]]
+    diagramTypeNames: Dict[str, str]

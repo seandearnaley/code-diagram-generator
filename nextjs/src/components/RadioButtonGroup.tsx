@@ -17,7 +17,7 @@ const RadioButtonGroup: FC<Props> = ({ options, name }) => (
       <div>
         {options.map((option) => (
           <label key={option.id}>
-            <Field type="radio" name={name} value={option.name} />
+            <Field type="radio" name={name} value={option.id} />
             {option.name}
           </label>
         ))}
