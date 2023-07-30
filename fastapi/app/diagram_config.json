@@ -2,31 +2,71 @@
   "types": {
     "flowchart": [
       {
-        "id": "1",
-        "name": "Flowchart Option 1",
-        "description": "This is a description"
+        "id": "flowchart1",
+        "name": "Application Structure Flowchart",
+        "description": "This flowchart illustrates the hierarchical structure of the application, showing the main components and their relationships."
       },
       {
-        "id": "2",
-        "name": "Flowchart Option 2",
-        "description": "This is a description"
+        "id": "flowchart2",
+        "name": "Data Flow Flowchart",
+        "description": "This flowchart visualizes the flow of data within the application, showing how data is generated, processed, and passed between different components."
+      },
+      {
+        "id": "flowchart3",
+        "name": "Service Interaction Flowchart",
+        "description": "This flowchart focuses on the interaction between the different services in the application, outlining the steps involved in connecting to the respective services and passing data."
+      },
+      {
+        "id": "flowchart4",
+        "name": "User Interface Flowchart",
+        "description": "This flowchart depicts the user interface (UI) interactions in the application, illustrating the different screens, input boxes, and buttons."
+      },
+      {
+        "id": "flowchart5",
+        "name": "Testing Flowchart",
+        "description": "This flowchart outlines the testing process for the application, including the different test cases and their dependencies."
+      },
+      {
+        "id": "flowchart6",
+        "name": "Utility Functions Flowchart",
+        "description": "This flowchart focuses on the utility functions in the application, illustrating the different utility functions and their relationships."
       }
     ],
     "sequenceDiagram": [
       {
-        "id": "1",
-        "name": "Sequence Diagram Option 1",
-        "description": "This is a description"
+        "id": "sequenceDiagram1",
+        "name": "User Interaction Sequence",
+        "description": "Shows the sequence of interactions between the user interface (UI) and the application components."
       },
       {
-        "id": "2",
-        "name": "Sequence Diagram Option 2",
-        "description": "This is a description"
+        "id": "sequenceDiagram2",
+        "name": "Data Generation Sequence",
+        "description": "Illustrates the flow of data generation and processing, including steps like retrieving data, applying data algorithms, and generating outputs."
       },
       {
-        "id": "3",
-        "name": "Sequence Diagram Option 3",
-        "description": "This is a description"
+        "id": "sequenceDiagram3",
+        "name": "Service Integration Sequence",
+        "description": "Depicts the interaction between the application services and external APIs or libraries."
+      },
+      {
+        "id": "sequenceDiagram4",
+        "name": "Configuration Sequence",
+        "description": "Shows how the application loads and processes configuration settings."
+      },
+      {
+        "id": "sequenceDiagram5",
+        "name": "Testing Sequence",
+        "description": "Illustrates the sequence of steps involved in executing tests."
+      },
+      {
+        "id": "sequenceDiagram6",
+        "name": "Logging Sequence",
+        "description": "Depicts the flow of logging activities within the application."
+      },
+      {
+        "id": "sequenceDiagram7",
+        "name": "File Handling Sequence",
+        "description": "Shows the sequence of steps involved in file handling operations."
       }
     ]
   },

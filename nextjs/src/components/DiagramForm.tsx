@@ -8,6 +8,7 @@ import SelectField from "./SelectField";
 type DiagramType = {
   id: string;
   name: string;
+  description: string;
 };
 
 type DiagramTypes = {
