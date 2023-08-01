@@ -1,4 +1,4 @@
-"""Service to generate a report of the python code outline of a folder."""
+"""Service for various folder tools."""
 from pathlib import Path
 from typing import List, Optional
 

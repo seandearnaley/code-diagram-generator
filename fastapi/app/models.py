@@ -23,3 +23,19 @@ class DiagramConfig(BaseModel):
 
     diagramCategories: Dict[str, List[DiagramDefinition]]
     diagramCategoryNames: Dict[str, str]
+
+
+class LLMDefinition(BaseModel):
+    """Model for a LLM definition."""
+
+    id: str
+    name: str
+    description: str
+    max_token_length: int
+
+
+class LLMConfig(BaseModel):
+    """Model for LLM configs"""
+
+    llmVendors: Dict[str, List[LLMDefinition]]
+    llmVendorNames: Dict[str, str]

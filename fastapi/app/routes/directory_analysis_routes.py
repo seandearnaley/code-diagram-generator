@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
 
-from ..services.folder_tools_service import (
+from ..services.directory_analysis_service import (
     find_gitignore,
     folder_report,
     folder_tree,
