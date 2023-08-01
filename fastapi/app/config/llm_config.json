@@ -1,0 +1,108 @@
+{
+  "llmVendors": {
+    "openAi": [
+      {
+        "name": "GPT 3.5 Turbo",
+        "id": "gpt-3.5-turbo",
+        "description": "Model Description",
+        "max_token_length": 4096
+      },
+      {
+        "name": "GPT 3.5 Turbo 16k",
+        "id": "gpt-3.5-turbo-16k",
+        "description": "Model Description",
+        "max_token_length": 16384
+      },
+      {
+        "name": "GPT 4 8k",
+        "id": "gpt-4",
+        "description": "Model Description",
+        "max_token_length": 8192
+      },
+      {
+        "name": "GPT 4 32k",
+        "id": "gpt-4-32k",
+        "description": "Model Description",
+        "max_token_length": 32768
+      }
+    ],
+    "anthropic": [
+      {
+        "name": "Claude v2",
+        "id": "claude-2",
+        "description": "Model Description",
+        "max_token_length": 100000
+      },
+      {
+        "name": "Claude v1",
+        "id": "claude-v1",
+        "description": "Model Description",
+        "max_token_length": 9000
+      },
+      {
+        "name": "Claude v1 100k",
+        "id": "claude-v1-100k",
+        "description": "Model Description",
+        "max_token_length": 100000
+      },
+      {
+        "name": "Claude Instant v1",
+        "id": "claude-instant-v1",
+        "description": "Model Description",
+        "max_token_length": 9000
+      },
+      {
+        "name": "Claude Instant v1 100k",
+        "id": "claude-instant-v1-100k",
+        "description": "Model Description",
+        "max_token_length": 100000
+      },
+      {
+        "name": "Claude v1.3",
+        "id": "claude-v1.3",
+        "description": "Model Description",
+        "max_token_length": 9000
+      },
+      {
+        "name": "Claude v1.3 100k",
+        "id": "claude-v1.3-100k",
+        "description": "Model Description",
+        "max_token_length": 100000
+      },
+      {
+        "name": "Claude v1.2",
+        "id": "claude-v1.2",
+        "description": "Model Description",
+        "max_token_length": 9000
+      },
+      {
+        "name": "Claude v1.0",
+        "id": "claude-v1.0",
+        "description": "Model Description",
+        "max_token_length": 9000
+      },
+      {
+        "name": "Claude Instant v1.1",
+        "id": "claude-instant-v1.1",
+        "description": "Model Description",
+        "max_token_length": 9000
+      },
+      {
+        "name": "Claude Instant v1.1 100k",
+        "id": "claude-instant-v1.1-100k",
+        "description": "Model Description",
+        "max_token_length": 100000
+      },
+      {
+        "name": "Claude Instant v1.0",
+        "id": "claude-instant-v1.0",
+        "description": "Model Description",
+        "max_token_length": 9000
+      }
+    ]
+  },
+  "llmVendorNames": {
+    "openAi": "Open AI",
+    "anthropic": "Anthropic"
+  }
+}
