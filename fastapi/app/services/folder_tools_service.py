@@ -1,5 +1,4 @@
 """Service to generate a report of the python code outline of a folder."""
-import os
 from pathlib import Path
 from typing import List, Optional
 
@@ -9,6 +8,22 @@ from python_code_outline import get_report
 
 class FolderNotFoundException(Exception):
     """Exception raised when a folder is not found."""
+
+
+async def find_gitignore(root_folder: str) -> Optional[str]:
+    """
+    Find the first .gitignore file starting from the root directory.
+
+    Parameters:
+    - root_folder: The root directory to start searching from.
+
+    Returns:
+    - The path of the first .gitignore file found, or None if no such file is found.
+    """
+    try:
+        return str(next(Path(root_folder).rglob(".gitignore")))
+    except StopIteration:
+        return None
 
 
 async def folder_tree(
@@ -29,14 +44,20 @@ async def folder_report(
     return get_report(root_folder, ignore_file_path=ignore_file_path)
 
 
-async def read_folder(
-    folder_path: str,
-) -> List[str]:
-    """Get all folders in a folder."""
-    if os.path.exists(folder_path) and os.path.isdir(folder_path):
-        folders = [
-            entry.name for entry in Path(folder_path).iterdir() if entry.is_dir()
-        ]
-        return folders
+async def read_folder(folder_path: str) -> List[str]:
+    """
+    Get all folders in a folder.
 
-    raise FolderNotFoundException(f"Folder {folder_path} not found")
+    Parameters:
+    - folder_path: The directory path to read.
+
+    Returns:
+    - A list of names of all folders in the given directory. If the directory doesn't
+      exist, an empty list is returned.
+    """
+    path = Path(folder_path)
+
+    if not path.exists() or not path.is_dir():
+        return []
+
+    return [entry.name for entry in path.iterdir() if entry.is_dir()]
