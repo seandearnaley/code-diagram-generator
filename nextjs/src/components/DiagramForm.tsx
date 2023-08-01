@@ -5,39 +5,41 @@ import { FC } from "react";
 import RadioButtonGroup from "./RadioButtonGroup";
 import SelectField from "./SelectField";
 
-type DiagramType = {
+type DiagramDefinition = {
   id: string;
   name: string;
   description: string;
 };
 
-type DiagramTypes = {
-  [key: string]: DiagramType[];
+type DiagramCategories = {
+  [key: string]: DiagramDefinition[];
 };
 
-type DiagramTypeNames = {
+type DiagramCategoryNames = {
   [key: string]: string;
 };
 
 type Props = {
-  options: {
-    types: DiagramTypes;
-    diagramTypeNames: DiagramTypeNames;
+  diagramConfig: {
+    diagramCategories: DiagramCategories;
+    diagramCategoryNames: DiagramCategoryNames;
   };
 };
 
 type Values = {
-  diagramType: string;
+  diagramCategory: string;
   diagramOption: string;
 };
 
-const DiagramForm: FC<Props> = ({ options: { types, diagramTypeNames } }) => {
-  const diagramOptions = Object.keys(types).map((key) => ({
+const DiagramForm: FC<Props> = ({
+  diagramConfig: { diagramCategories, diagramCategoryNames },
+}) => {
+  const diagramOptions = Object.keys(diagramCategories).map((key) => ({
     id: key,
-    name: diagramTypeNames[key] || key,
+    name: diagramCategoryNames[key] || key,
   }));
 
-  const defaultDiagramType = diagramOptions[0]?.id || "";
+  const defaultDiagramCategory = diagramOptions[0]?.id || "";
 
   const handleSubmit = (
     values: Values,
@@ -49,20 +51,23 @@ const DiagramForm: FC<Props> = ({ options: { types, diagramTypeNames } }) => {
 
   return (
     <Formik<Values>
-      initialValues={{ diagramType: defaultDiagramType, diagramOption: "" }}
+      initialValues={{
+        diagramCategory: defaultDiagramCategory,
+        diagramOption: "",
+      }}
       onSubmit={handleSubmit}
     >
       {({ values }) => (
         <Form>
           <SelectField
             options={diagramOptions}
-            label="Diagram Type"
-            name="diagramType"
-            id="diagramType"
+            label="Diagram Category"
+            name="diagramCategory"
+            id="diagramCategory"
           />
 
           <RadioButtonGroup
-            options={types[values.diagramType] || []}
+            options={diagramCategories[values.diagramCategory] || []}
             name="diagramOption"
           />
 

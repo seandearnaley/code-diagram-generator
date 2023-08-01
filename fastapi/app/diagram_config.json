@@ -1,5 +1,5 @@
 {
-  "types": {
+  "diagramCategories": {
     "flowchart": [
       {
         "id": "flowchart1",
@@ -70,7 +70,7 @@
       }
     ]
   },
-  "diagramTypeNames": {
+  "diagramCategoryNames": {
     "flowchart": "Flowchart",
     "sequenceDiagram": "Sequence Diagram"
   }

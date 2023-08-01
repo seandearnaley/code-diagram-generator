@@ -10,16 +10,16 @@ class MermaidScript(BaseModel):
     mermaid_script: str
 
 
-class DiagramType(BaseModel):
-    """Model for a diagram type"""
+class DiagramDefinition(BaseModel):
+    """Model for a diagram definition."""
 
     id: str
     name: str
     description: str
 
 
-class DiagramTypes(BaseModel):
-    """Model for a list of diagram types"""
+class DiagramConfig(BaseModel):
+    """Model for diagram configs"""
 
-    types: Dict[str, List[DiagramType]]
-    diagramTypeNames: Dict[str, str]
+    diagramCategories: Dict[str, List[DiagramDefinition]]
+    diagramCategoryNames: Dict[str, str]

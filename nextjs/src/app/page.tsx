@@ -1,7 +1,7 @@
 import DiagramForm from "@/components/DiagramForm";
 import MermaidTest from "@/components/MermaidTest";
 
-async function getDiagramOptions() {
+async function getDiagramConfig() {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/diagram_config`,
@@ -17,11 +17,11 @@ async function getDiagramOptions() {
 }
 
 export default async function Home() {
-  const diagramOptions = await getDiagramOptions();
+  const diagramConfig = await getDiagramConfig();
   return (
     <div>
       <MermaidTest />
-      <DiagramForm options={diagramOptions} />
+      <DiagramForm diagramConfig={diagramConfig} />
     </div>
   );
 }

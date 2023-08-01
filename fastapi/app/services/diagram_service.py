@@ -3,13 +3,16 @@ import json
 from typing import Any, Dict
 
 from ..config import DIAGRAM_CONFIG_PATH
-from ..models import DiagramTypes
+from ..models import DiagramConfig
 
 
-async def load_diagram_types() -> DiagramTypes:
-    """Reads diagram types from a JSON file and returns them as a FastAPI model"""
+async def load_diagram_config() -> DiagramConfig:
+    """Reads diagram configration from a JSON file"""
     with DIAGRAM_CONFIG_PATH.open(encoding="utf-8") as json_file:
         data: Dict[str, Any] = json.load(json_file)
-        types = {k: v for k, v in data["types"].items()}
+        diagram_categories = dict(data["diagramCategories"].items())
 
-    return DiagramTypes(types=types, diagramTypeNames=data["diagramTypeNames"])
+    return DiagramConfig(
+        diagramCategories=diagram_categories,
+        diagramCategoryNames=data["diagramCategoryNames"],
+    )

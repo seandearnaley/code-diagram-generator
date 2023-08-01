@@ -2,13 +2,13 @@
 
 from fastapi import APIRouter
 
-from ..models import DiagramTypes
-from ..services.diagram_service import load_diagram_types
+from ..models import DiagramConfig
+from ..services.diagram_service import load_diagram_config
 
 router = APIRouter()
 
 
-@router.get("/diagram_config", response_model=DiagramTypes)
-async def get_diagram_types():
-    """Endpoint to get diagram types."""
-    return await load_diagram_types()
+@router.get("/diagram_config", response_model=DiagramConfig)
+async def load_diagram_config_endpoint():
+    """Endpoint to get diagram configuration."""
+    return await load_diagram_config()
