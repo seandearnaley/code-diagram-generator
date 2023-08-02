@@ -32,6 +32,11 @@
   margin-left: 10px;
 }
 
+.diagramForm .inputField {
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
 .diagramForm .checkboxField {
   margin: 20px 0;
   display: flex;
