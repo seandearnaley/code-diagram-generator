@@ -2,6 +2,7 @@
 
 import { Form, Formik, FormikHelpers } from "formik";
 import { FC } from "react";
+import { Option } from "../types/types";
 import RadioButtonGroup from "./RadioButtonGroup";
 import SelectField from "./SelectField";
 
@@ -15,15 +16,13 @@ type DiagramCategories = {
   [key: string]: DiagramDefinition[];
 };
 
-type DiagramCategoryNames = {
-  [key: string]: string;
-};
-
 type Props = {
   diagramConfig: {
     diagramCategories: DiagramCategories;
-    diagramCategoryNames: DiagramCategoryNames;
+    diagramOptions: Option[];
+    defaultDiagramCategory: string;
   };
+  styles: { [key: string]: string };
 };
 
 type Values = {
@@ -32,15 +31,9 @@ type Values = {
 };
 
 const DiagramForm: FC<Props> = ({
-  diagramConfig: { diagramCategories, diagramCategoryNames },
+  diagramConfig: { diagramCategories, diagramOptions, defaultDiagramCategory },
+  styles,
 }) => {
-  const diagramOptions = Object.keys(diagramCategories).map((key) => ({
-    id: key,
-    name: diagramCategoryNames[key] || key,
-  }));
-
-  const defaultDiagramCategory = diagramOptions[0]?.id || "";
-
   const handleSubmit = (
     values: Values,
     { setSubmitting }: FormikHelpers<Values>,
@@ -57,8 +50,8 @@ const DiagramForm: FC<Props> = ({
       }}
       onSubmit={handleSubmit}
     >
-      {({ values }) => (
-        <Form>
+      {({ values, setFieldValue }) => (
+        <Form className={styles.diagramForm}>
           <SelectField
             options={diagramOptions}
             label="Diagram Category"
@@ -69,6 +62,11 @@ const DiagramForm: FC<Props> = ({
           <RadioButtonGroup
             options={diagramCategories[values.diagramCategory] || []}
             name="diagramOption"
+            className={styles.radioButtonGroup}
+            onChange={(optionId) => {
+              console.log(`Option ${optionId} selected.`);
+              setFieldValue("diagramOption", optionId);
+            }}
           />
 
           <button type="submit">Submit</button>

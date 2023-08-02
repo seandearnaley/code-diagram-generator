@@ -1,10 +1,6 @@
 import { Field } from "formik";
 import { FC } from "react";
-
-type Option = {
-  id: string;
-  name: string;
-};
+import { Option } from "../types/types";
 
 type Props = {
   options: Option[];

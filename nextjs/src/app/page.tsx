@@ -1,6 +1,6 @@
 import DiagramForm from "@/components/DiagramForm";
 import MermaidTest from "@/components/MermaidTest";
-
+import styles from "./page.module.css";
 async function getDiagramConfig() {
   try {
     const res = await fetch(
@@ -9,7 +9,20 @@ async function getDiagramConfig() {
         cache: "no-store",
       },
     );
-    return res.json();
+    const json = await res.json();
+
+    const diagramOptions = Object.keys(json.diagramCategories).map((key) => ({
+      id: key,
+      name: json.diagramCategoryNames[key] || key,
+    }));
+
+    const defaultDiagramCategory = diagramOptions[0]?.id || "";
+
+    return {
+      ...json,
+      diagramOptions,
+      defaultDiagramCategory,
+    };
   } catch (e) {
     console.log(e);
     return {};
@@ -21,7 +34,7 @@ export default async function Home() {
   return (
     <div>
       <MermaidTest />
-      <DiagramForm diagramConfig={diagramConfig} />
+      <DiagramForm diagramConfig={diagramConfig} styles={styles} />
     </div>
   );
 }

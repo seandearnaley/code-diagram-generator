@@ -191,6 +191,9 @@
     ); /* Add this line for Safari and Safari on iOS */
 
     backdrop-filter: blur(24px);
+    /* Fallback for Firefox and Firefox for Android */
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
 
   .description div {
@@ -232,4 +235,17 @@
   to {
     transform: rotate(0deg);
   }
+}
+
+.diagramForm .radioButtonGroup > div {
+  margin-bottom: 10px;
+}
+
+.diagramForm .radioButtonGroup label span {
+  font-weight: bold;
+}
+
+.diagramForm .radioButtonGroup p {
+  margin-top: 5px;
+  margin-left: 20px;
 }
