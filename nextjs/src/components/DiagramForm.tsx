@@ -1,6 +1,6 @@
 "use client";
 
-import { Form, Formik, FormikHelpers } from "formik";
+import { Field, Form, Formik, FormikHelpers } from "formik";
 import { FC } from "react";
 import { Option } from "../types/types";
 import RadioButtonGroup from "./RadioButtonGroup";
@@ -26,6 +26,10 @@ type DiagramFormValues = {
   sourceFolderOption: string;
   diagramCategory: string;
   diagramOption: string;
+  includeFolderTree: boolean;
+  includePythonCodeOutline: boolean;
+  gitIgnoreFilePath: string;
+  designInstructions: string;
 };
 
 const DiagramForm: FC<DiagramFormProps> = ({
@@ -44,6 +48,19 @@ const DiagramForm: FC<DiagramFormProps> = ({
     console.log(values);
     setSubmitting(false);
   };
+  const handleFolderOptionChange = async (
+    folder: string,
+    setFieldValue: any,
+  ) => {
+    console.log(`Option ${folder} selected.`);
+    setFieldValue("sourceFolderOption", folder);
+    const response = await fetch(
+      `http://localhost:8000/gitignore_file/?root_folder=${folder}`,
+    );
+    if (!response.ok) throw new Error(response.statusText);
+    const data = await response.json();
+    setFieldValue("gitIgnoreFilePath", data || "No .gitignore file found");
+  };
 
   return (
     <Formik<DiagramFormValues>
@@ -51,6 +68,10 @@ const DiagramForm: FC<DiagramFormProps> = ({
         sourceFolderOption: "",
         diagramCategory: defaultDiagramCategory,
         diagramOption: "",
+        includeFolderTree: false,
+        includePythonCodeOutline: false,
+        gitIgnoreFilePath: "",
+        designInstructions: "",
       }}
       onSubmit={handleSubmit}
     >
@@ -61,11 +82,39 @@ const DiagramForm: FC<DiagramFormProps> = ({
             name="sourceFolderOption"
             styles={styles}
             label={"Select Source Folder to Analyze"}
-            onChange={(optionId) => {
-              console.log(`Option ${optionId} selected.`);
-              setFieldValue("sourceFolderOption", optionId);
-            }}
+            onChange={(folder) =>
+              handleFolderOptionChange(folder, setFieldValue)
+            }
           />
+
+          <div className={styles.checkboxField}>
+            <Field
+              type="checkbox"
+              id="includeFolderTree"
+              name="includeFolderTree"
+            />
+            <label htmlFor="includeFolderTree">Include Folder Tree</label>
+          </div>
+
+          <div className={styles.checkboxField}>
+            <Field
+              type="checkbox"
+              id="includePythonCodeOutline"
+              name="includePythonCodeOutline"
+            />
+            <label htmlFor="includePythonCodeOutline">
+              Include Python Code Outline
+            </label>
+          </div>
+
+          <div className={styles.inputField}>
+            <label htmlFor="gitIgnoreFilePath">GitIgnore File Path</label>
+            <Field
+              component="input"
+              id="gitIgnoreFilePath"
+              name="gitIgnoreFilePath"
+            />
+          </div>
 
           <SelectField
             options={diagramCategoryOptions}
@@ -85,6 +134,15 @@ const DiagramForm: FC<DiagramFormProps> = ({
               setFieldValue("diagramOption", optionId);
             }}
           />
+
+          <div className={styles.textareaField}>
+            <label htmlFor="designInstructions">Design Instructions</label>
+            <Field
+              component="textarea"
+              id="designInstructions"
+              name="designInstructions"
+            />
+          </div>
 
           <button type="submit">Submit</button>
         </Form>
