@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Set the PYTHONPATH environment variable
 ENV PYTHONPATH=/app
-
+ENV SOURCE_FOLDER=/source-repos
 # Install system dependencies
 RUN apt-get update && apt-get install -y curl gnupg wget libxss1 fonts-liberation chromium
 

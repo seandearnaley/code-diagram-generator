@@ -7,18 +7,21 @@ type Props = {
   label: string;
   name: string;
   id: string;
+  styles: { [key: string]: string };
 };
 
-const SelectField: FC<Props> = ({ options, label, name, id }) => (
+const SelectField: FC<Props> = ({ options, label, name, id, styles }) => (
   <label>
-    {label}
-    <Field as="select" name={name} id={id}>
-      {options.map((option) => (
-        <option key={option.id} value={option.id}>
-          {option.name}
-        </option>
-      ))}
-    </Field>
+    <div className={styles.selectField}>
+      {label}
+      <Field as="select" name={name} id={id} className={styles.selectDropdown}>
+        {options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.name}
+          </option>
+        ))}
+      </Field>
+    </div>
   </label>
 );
 

@@ -236,9 +236,19 @@
     transform: rotate(0deg);
   }
 }
-
 .diagramForm .radioButtonGroup > div {
   margin-bottom: 10px;
+}
+
+.diagramForm .radioButtonGroup .radioLabel {
+  /* font-size: 1.2em; */
+  margin-bottom: 2px;
+}
+
+.diagramForm .radioButtonGroup .radioList {
+  max-height: 300px; /* adjust this to your desired height */
+  overflow-y: auto;
+  border: 1px solid #ccc;
 }
 
 .diagramForm .radioButtonGroup label span {
@@ -248,4 +258,14 @@
 .diagramForm .radioButtonGroup p {
   margin-top: 5px;
   margin-left: 20px;
+}
+
+.diagramForm .selectField {
+  /* font-size: 1.2em; */
+  margin-bottom: 10px;
+}
+
+.diagramForm .selectField .selectDropdown {
+  font-size: 1em;
+  margin-left: 10px;
 }

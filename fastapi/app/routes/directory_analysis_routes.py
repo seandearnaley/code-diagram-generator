@@ -1,4 +1,6 @@
 """Folder report endpoint."""
+import os
+from pathlib import Path
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -7,7 +9,7 @@ from ..services.directory_analysis_service import (
     find_gitignore,
     folder_report,
     folder_tree,
-    read_folder,
+    read_python_projects,
 )
 
 router = APIRouter()
@@ -37,22 +39,30 @@ async def folder_tree_endpoint(
         raise HTTPException(status_code=404, detail=str(ex)) from ex
 
 
-@router.get("/folders/{folder_path:path}", response_model=List[str])
-async def read_folder_endpoint(folder_path: str):
+@router.get("/source_folders/", response_model=List[str])
+async def read_python_projects_endpoint():
     """
-    Get all folders in a folder.
-
-    Parameters:
-    - folder_path: The directory path to read.
-
-    Returns:
-    - A list of names of all folders in the given directory. If the directory doesn't
-      exist, an empty list is returned.
+    Get all python projects in a folder.
     """
-    return await read_folder(folder_path)
+
+    source_folder = os.getenv("SOURCE_FOLDER")
+
+    if source_folder is None:
+        raise HTTPException(
+            status_code=500, detail="SOURCE_FOLDER environment variable is not set"
+        )
+
+    path = Path(source_folder)
+
+    if not path.exists() or not path.is_dir():
+        raise HTTPException(
+            status_code=500, detail="SOURCE_FOLDER does not exist or is not a directory"
+        )
+
+    return await read_python_projects(str(path))
 
 
-@router.get("/gitignore_file/")
+@router.get("/gitignore_file/", response_model=str)
 async def gitignore_file_endpoint(root_folder: str):
     """
     Find the first .gitignore file starting from the root directory.

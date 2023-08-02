@@ -18,10 +18,12 @@ type DiagramFormProps = {
     diagramCategoryOptions: Option[];
     defaultDiagramCategory: string;
   };
+  sourceFolderOptions: Option[];
   styles: { [key: string]: string };
 };
 
 type DiagramFormValues = {
+  sourceFolderOption: string;
   diagramCategory: string;
   diagramOption: string;
 };
@@ -32,6 +34,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
     diagramCategoryOptions,
     defaultDiagramCategory,
   },
+  sourceFolderOptions,
   styles,
 }) => {
   const handleSubmit = (
@@ -45,6 +48,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
   return (
     <Formik<DiagramFormValues>
       initialValues={{
+        sourceFolderOption: "",
         diagramCategory: defaultDiagramCategory,
         diagramOption: "",
       }}
@@ -52,9 +56,21 @@ const DiagramForm: FC<DiagramFormProps> = ({
     >
       {({ values, setFieldValue }) => (
         <Form className={styles.diagramForm}>
+          <RadioButtonGroup
+            options={sourceFolderOptions}
+            name="sourceFolderOption"
+            styles={styles}
+            label={"Select Source Folder to Analyze"}
+            onChange={(optionId) => {
+              console.log(`Option ${optionId} selected.`);
+              setFieldValue("sourceFolderOption", optionId);
+            }}
+          />
+
           <SelectField
             options={diagramCategoryOptions}
-            label="Diagram Category"
+            styles={styles}
+            label="Select Diagram Category"
             name="diagramCategory"
             id="diagramCategory"
           />
@@ -62,7 +78,8 @@ const DiagramForm: FC<DiagramFormProps> = ({
           <RadioButtonGroup
             options={diagramCategories[values.diagramCategory] || []}
             name="diagramOption"
-            className={styles.radioButtonGroup}
+            styles={styles}
+            label="Select Diagram"
             onChange={(optionId) => {
               console.log(`Option ${optionId} selected.`);
               setFieldValue("diagramOption", optionId);
