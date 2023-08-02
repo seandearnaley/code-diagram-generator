@@ -11,16 +11,18 @@ async function getDiagramConfig() {
     );
     const json = await res.json();
 
-    const diagramOptions = Object.keys(json.diagramCategories).map((key) => ({
-      id: key,
-      name: json.diagramCategoryNames[key] || key,
-    }));
+    const diagramCategoryOptions = Object.keys(json.diagramCategories).map(
+      (key) => ({
+        id: key,
+        name: json.diagramCategoryNames[key] || key,
+      }),
+    );
 
-    const defaultDiagramCategory = diagramOptions[0]?.id || "";
+    const defaultDiagramCategory = diagramCategoryOptions[0]?.id || "";
 
     return {
       ...json,
-      diagramOptions,
+      diagramCategoryOptions,
       defaultDiagramCategory,
     };
   } catch (e) {

@@ -12,38 +12,38 @@ type DiagramDefinition = {
   description: string;
 };
 
-type DiagramCategories = {
-  [key: string]: DiagramDefinition[];
-};
-
-type Props = {
+type DiagramFormProps = {
   diagramConfig: {
-    diagramCategories: DiagramCategories;
-    diagramOptions: Option[];
+    diagramCategories: { [key: string]: DiagramDefinition[] };
+    diagramCategoryOptions: Option[];
     defaultDiagramCategory: string;
   };
   styles: { [key: string]: string };
 };
 
-type Values = {
+type DiagramFormValues = {
   diagramCategory: string;
   diagramOption: string;
 };
 
-const DiagramForm: FC<Props> = ({
-  diagramConfig: { diagramCategories, diagramOptions, defaultDiagramCategory },
+const DiagramForm: FC<DiagramFormProps> = ({
+  diagramConfig: {
+    diagramCategories,
+    diagramCategoryOptions,
+    defaultDiagramCategory,
+  },
   styles,
 }) => {
   const handleSubmit = (
-    values: Values,
-    { setSubmitting }: FormikHelpers<Values>,
+    values: DiagramFormValues,
+    { setSubmitting }: FormikHelpers<DiagramFormValues>,
   ) => {
     console.log(values);
     setSubmitting(false);
   };
 
   return (
-    <Formik<Values>
+    <Formik<DiagramFormValues>
       initialValues={{
         diagramCategory: defaultDiagramCategory,
         diagramOption: "",
@@ -53,7 +53,7 @@ const DiagramForm: FC<Props> = ({
       {({ values, setFieldValue }) => (
         <Form className={styles.diagramForm}>
           <SelectField
-            options={diagramOptions}
+            options={diagramCategoryOptions}
             label="Diagram Category"
             name="diagramCategory"
             id="diagramCategory"

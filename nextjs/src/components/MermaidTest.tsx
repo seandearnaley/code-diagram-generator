@@ -65,7 +65,7 @@ const MermaidTest: FC<Props> = ({ className }) => {
           <div ref={imageRef}>
             <Image
               src={diagramUrl}
-              style={{ width: "300px;" }}
+              style={{ width: "200px", height: "auto" }}
               alt="Mermaid Diagram"
               width={500}
               height={500}
