@@ -4,16 +4,22 @@ import { FC } from "react";
 type TextInputProps = {
   name: string;
   label: string;
+  helpText?: string;
 };
 
-export const TextInput: FC<TextInputProps> = ({ name, label }) => (
-  <div className="sm:col-span-4">
+export const TextInput: FC<TextInputProps> = ({ name, label, helpText }) => (
+  <div className="sm:col-span-4 mt-10">
     <label
       htmlFor={name}
       className="block text-sm font-medium leading-6 text-gray-900"
     >
       {label}
     </label>
+    {helpText ? (
+      <p className="mt-1 text-sm leading-6 text-gray-600  border-gray-900/10">
+        {helpText}
+      </p>
+    ) : null}
     <div className="mt-2">
       <Field
         component="input"

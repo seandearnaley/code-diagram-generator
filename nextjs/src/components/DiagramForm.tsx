@@ -85,30 +85,39 @@ const DiagramForm: FC<DiagramFormProps> = ({
               </h2>
             </div>
 
-            <RadioButtonGroup
+            <SelectField
               options={sourceFolderOptions}
+              label="Select Project Folder"
               name="sourceFolderOption"
-              label={"Source Folder"}
-              helpText={"Select the project folder to analyze"}
+              id="sourceFolderOption"
+              helpText={
+                "Select a python project to analyze, if a gitignore is found, its path will be copied into the next field."
+              }
               onChange={(folder) =>
                 handleFolderOptionChange(folder, setFieldValue)
               }
             />
 
-            <TextInput name="gitIgnoreFilePath" label="GitIgnore File Path" />
+            <TextInput
+              name="gitIgnoreFilePath"
+              label="GitIgnore File Path"
+              helpText={
+                "Enter the path to a file that specify files to ignore for analysis intentionally."
+              }
+            />
 
             <CheckboxGroup
               options={[
                 {
                   id: "includeFolderTree",
                   label: "Include Folder Tree",
-                  helpText: "Placeholder help text for Include Folder Tree.",
+                  helpText: "Whether to include the project's folder tree.",
                 },
                 {
                   id: "includePythonCodeOutline",
                   label: "Include Python Code Outline",
                   helpText:
-                    "Placeholder help text for Include Python Code Outline.",
+                    "Whether to include a simple outline of the project's python code",
                 },
               ]}
             />
@@ -124,7 +133,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
               options={diagramCategories[values.diagramCategory] || []}
               name="diagramOption"
               onChange={(optionId) => {
-                console.log(`Option ${optionId} selected.`);
                 setFieldValue("diagramOption", optionId);
               }}
             />
