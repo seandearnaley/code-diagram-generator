@@ -1,10 +1,13 @@
 "use client";
 
-import { Field, Form, Formik, FormikHelpers } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { FC } from "react";
 import { Option } from "../types/types";
-import RadioButtonGroup from "./RadioButtonGroup";
-import SelectField from "./SelectField";
+import { CheckboxGroup } from "./CheckboxGroup";
+import { RadioButtonGroup } from "./RadioButtonGroup";
+import { SelectField } from "./SelectField";
+import { TextArea } from "./TextArea";
+import { TextInput } from "./TextInput";
 
 type DiagramDefinition = {
   id: string;
@@ -19,7 +22,6 @@ type DiagramFormProps = {
     defaultDiagramCategory: string;
   };
   sourceFolderOptions: Option[];
-  styles: { [key: string]: string };
 };
 
 type DiagramFormValues = {
@@ -39,7 +41,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
     defaultDiagramCategory,
   },
   sourceFolderOptions,
-  styles,
 }) => {
   const handleSubmit = (
     values: DiagramFormValues,
@@ -76,75 +77,78 @@ const DiagramForm: FC<DiagramFormProps> = ({
       onSubmit={handleSubmit}
     >
       {({ values, setFieldValue }) => (
-        <Form className={styles.diagramForm}>
-          <RadioButtonGroup
-            options={sourceFolderOptions}
-            name="sourceFolderOption"
-            styles={styles}
-            label={"Select Source Folder to Analyze"}
-            onChange={(folder) =>
-              handleFolderOptionChange(folder, setFieldValue)
-            }
-          />
+        <Form>
+          <div className="p-3">
+            <div className="border-b border-gray-900/10">
+              <h2 className="text-base font-semibold leading-7 text-gray-900">
+                Mermaid Diagram GPT Generator
+              </h2>
+            </div>
 
-          <div className={styles.checkboxField}>
-            <Field
-              type="checkbox"
-              id="includeFolderTree"
-              name="includeFolderTree"
+            <RadioButtonGroup
+              options={sourceFolderOptions}
+              name="sourceFolderOption"
+              label={"Source Folder"}
+              helpText={"Select the project folder to analyze"}
+              onChange={(folder) =>
+                handleFolderOptionChange(folder, setFieldValue)
+              }
             />
-            <label htmlFor="includeFolderTree">Include Folder Tree</label>
-          </div>
 
-          <div className={styles.checkboxField}>
-            <Field
-              type="checkbox"
-              id="includePythonCodeOutline"
-              name="includePythonCodeOutline"
+            <TextInput name="gitIgnoreFilePath" label="GitIgnore File Path" />
+
+            <CheckboxGroup
+              options={[
+                {
+                  id: "includeFolderTree",
+                  label: "Include Folder Tree",
+                  helpText: "Placeholder help text for Include Folder Tree.",
+                },
+                {
+                  id: "includePythonCodeOutline",
+                  label: "Include Python Code Outline",
+                  helpText:
+                    "Placeholder help text for Include Python Code Outline.",
+                },
+              ]}
             />
-            <label htmlFor="includePythonCodeOutline">
-              Include Python Code Outline
-            </label>
-          </div>
 
-          <div className={styles.inputField}>
-            <label htmlFor="gitIgnoreFilePath">GitIgnore File Path</label>
-            <Field
-              component="input"
-              id="gitIgnoreFilePath"
-              name="gitIgnoreFilePath"
+            <SelectField
+              options={diagramCategoryOptions}
+              label="Select Diagram Category"
+              name="diagramCategory"
+              id="diagramCategory"
             />
-          </div>
 
-          <SelectField
-            options={diagramCategoryOptions}
-            styles={styles}
-            label="Select Diagram Category"
-            name="diagramCategory"
-            id="diagramCategory"
-          />
+            <RadioButtonGroup
+              options={diagramCategories[values.diagramCategory] || []}
+              name="diagramOption"
+              onChange={(optionId) => {
+                console.log(`Option ${optionId} selected.`);
+                setFieldValue("diagramOption", optionId);
+              }}
+            />
 
-          <RadioButtonGroup
-            options={diagramCategories[values.diagramCategory] || []}
-            name="diagramOption"
-            styles={styles}
-            label="Select Diagram"
-            onChange={(optionId) => {
-              console.log(`Option ${optionId} selected.`);
-              setFieldValue("diagramOption", optionId);
-            }}
-          />
-
-          <div className={styles.textareaField}>
-            <label htmlFor="designInstructions">Design Instructions</label>
-            <Field
-              component="textarea"
-              id="designInstructions"
+            <TextArea
               name="designInstructions"
+              label="Design Instructions"
+              rows={3}
             />
+            <div className="mt-6 flex items-center justify-end gap-x-6">
+              <button
+                type="button"
+                className="text-sm font-semibold leading-6 text-gray-900"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Submit
+              </button>
+            </div>
           </div>
-
-          <button type="submit">Submit</button>
         </Form>
       )}
     </Formik>

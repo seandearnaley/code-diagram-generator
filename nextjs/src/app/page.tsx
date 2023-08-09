@@ -1,6 +1,5 @@
 import DiagramForm from "@/components/DiagramForm";
 import MermaidTest from "@/components/MermaidTest";
-import styles from "./page.module.css";
 
 async function getDiagramConfig() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/diagram_config`, {
@@ -47,14 +46,14 @@ export default async function Home() {
   ]);
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Hello, Next.js!</h1>
-      <DiagramForm
-        diagramConfig={diagramConfig}
-        sourceFolderOptions={sourceFolderOptions}
-        styles={styles}
-      />
+      <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-2 sm:py-6">
+        <DiagramForm
+          diagramConfig={diagramConfig}
+          sourceFolderOptions={sourceFolderOptions}
+        />
 
-      <MermaidTest />
+        <MermaidTest />
+      </div>
     </>
   );
 }
