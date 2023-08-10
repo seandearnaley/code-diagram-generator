@@ -77,6 +77,30 @@ const DiagramForm: FC<DiagramFormProps> = ({
     setSubmitting(false);
   };
 
+  const createOptionChangeHandler =
+    (fieldForOption: string, fieldForDefault: string) =>
+    (
+      selectedOption: string,
+      options: any,
+      setFieldValue: (field: string, value: any) => void,
+    ) => {
+      const defaultOption = options[selectedOption]?.[0]?.id || "";
+      setFieldValues(setFieldValue, {
+        [fieldForOption]: selectedOption,
+        [fieldForDefault]: defaultOption,
+      });
+    };
+
+  const handleDiagramCategoryChange = createOptionChangeHandler(
+    "diagramCategory",
+    "diagramOption",
+  );
+
+  const handleLlmVendorChange = createOptionChangeHandler(
+    "llmVendorForInstructions",
+    "llmModelForInstructions",
+  );
+
   const handleSourceFolderChange = useCallback(
     async (
       folder: string,
@@ -90,35 +114,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
     },
     [fetch],
   );
-
-  // Use it for the diagram category change:
-  const handleDiagramCategoryChange = (
-    category: string,
-    setFieldValue: (field: string, value: any) => void,
-  ) => {
-    handleDefaultOptionChange(
-      category,
-      diagramCategories,
-      "diagramCategory",
-      "diagramOption",
-      setFieldValue,
-    );
-  };
-
-  // Use it for the LLM vendor change:
-  const handleLlmVendorChange = (
-    vendor: string,
-    setFieldValue: (field: string, value: any) => void,
-  ) => {
-    handleDefaultOptionChange(
-      vendor,
-      llmVendors,
-      "llmVendorForInstructions",
-      "llmModelForInstructions",
-      setFieldValue,
-    );
-  };
-
   return (
     <Formik<DiagramFormValues>
       initialValues={{
@@ -195,8 +190,12 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     name="diagramCategory"
                     id="diagramCategory"
                     aria-label="Select a diagram category from the list"
-                    onChange={(category) =>
-                      handleDiagramCategoryChange(category, setFieldValue)
+                    onChange={(selectedOption) =>
+                      handleDiagramCategoryChange(
+                        selectedOption,
+                        diagramCategories,
+                        setFieldValue,
+                      )
                     }
                   />
 
@@ -218,7 +217,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     name="llmVendorForInstructions"
                     id="llmVendorForInstructions"
                     onChange={(vendor) =>
-                      handleLlmVendorChange(vendor, setFieldValue)
+                      handleLlmVendorChange(vendor, llmVendors, setFieldValue)
                     }
                   />
                   <RadioButtonGroup
