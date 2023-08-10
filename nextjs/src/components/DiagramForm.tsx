@@ -30,6 +30,32 @@ import {
   validationSchema,
 } from "@/types/DiagramForm.types";
 
+const setFieldValues = (
+  setFieldValue: (field: string, value: any) => void,
+  fieldValues: { [key: string]: any },
+) => {
+  Object.entries(fieldValues).forEach(([field, value]) => {
+    setFieldValue(field, value);
+  });
+};
+
+/**
+ * Function to handle default option changes.
+ */
+const handleDefaultOptionChange = (
+  selectedOption: string,
+  options: any,
+  fieldForOption: string,
+  fieldForDefault: string,
+  setFieldValue: (field: string, value: any) => void,
+) => {
+  const defaultOption = options[selectedOption]?.[0]?.id || "";
+  setFieldValues(setFieldValue, {
+    [fieldForOption]: selectedOption,
+    [fieldForDefault]: defaultOption,
+  });
+};
+
 const DiagramForm: FC<DiagramFormProps> = ({
   diagramConfig: {
     diagramCategories,
@@ -42,17 +68,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
   initialGitIgnoreFilePath,
 }) => {
   const { fetch, loading, error } = useGitIgnore();
-  const handleSourceFolderChange = useCallback(
-    async (
-      folder: string,
-      setFieldValue: (field: string, value: any) => void,
-    ) => {
-      const gitIgnorePath = await fetch(folder);
-      setFieldValue("sourceFolderOption", folder);
-      setFieldValue("gitIgnoreFilePath", gitIgnorePath || "");
-    },
-    [fetch],
-  );
 
   const handleSubmit = (
     values: DiagramFormValues,
@@ -62,19 +77,18 @@ const DiagramForm: FC<DiagramFormProps> = ({
     setSubmitting(false);
   };
 
-  const handleDefaultOptionChange = useCallback(
-    (
-      selectedOption: string,
-      options: any,
-      fieldForOption: string,
-      fieldForDefault: string,
+  const handleSourceFolderChange = useCallback(
+    async (
+      folder: string,
       setFieldValue: (field: string, value: any) => void,
-    ) => {
-      const defaultOption = options[selectedOption]?.[0]?.id || ""; // Assuming the first option is default
-      setFieldValue(fieldForOption, selectedOption);
-      setFieldValue(fieldForDefault, defaultOption);
+    ): Promise<void> => {
+      const gitIgnorePath = await fetch(folder); // using fetch
+      setFieldValues(setFieldValue, {
+        sourceFolderOption: folder,
+        gitIgnoreFilePath: gitIgnorePath || "",
+      });
     },
-    [],
+    [fetch],
   );
 
   // Use it for the diagram category change:
