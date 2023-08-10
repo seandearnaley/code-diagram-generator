@@ -39,23 +39,6 @@ const setFieldValues = (
   });
 };
 
-/**
- * Function to handle default option changes.
- */
-const handleDefaultOptionChange = (
-  selectedOption: string,
-  options: any,
-  fieldForOption: string,
-  fieldForDefault: string,
-  setFieldValue: (field: string, value: any) => void,
-) => {
-  const defaultOption = options[selectedOption]?.[0]?.id || "";
-  setFieldValues(setFieldValue, {
-    [fieldForOption]: selectedOption,
-    [fieldForDefault]: defaultOption,
-  });
-};
-
 const DiagramForm: FC<DiagramFormProps> = ({
   diagramConfig: {
     diagramCategories,
