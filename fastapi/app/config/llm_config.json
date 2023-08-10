@@ -4,25 +4,25 @@
       {
         "name": "GPT 3.5 Turbo",
         "id": "gpt-3.5-turbo",
-        "description": "Model Description",
+        "description": "GPT-3.5 Turbo is a set of models that improve on GPT-3 and can understand as well as generate natural language or code.",
         "max_token_length": 4096
       },
       {
         "name": "GPT 3.5 Turbo 16k",
         "id": "gpt-3.5-turbo-16k",
-        "description": "Model Description",
+        "description": "GPT-3.5 Turbo 16k offers 4 times the context length of GPT-3.5 Turbo at twice the price: $0.003 per 1K input tokens and $0.004 per 1K output tokens. 16k context means the model can now support ~20 pages of text in a single request.",
         "max_token_length": 16384
       },
       {
         "name": "GPT 4 8k",
         "id": "gpt-4",
-        "description": "Model Description",
+        "description": "GPT-4 is a large multimodal model that can solve difficult problems with greater accuracy than any of OpenAI’s previous models, thanks to its broader general knowledge and advanced reasoning capabilities.",
         "max_token_length": 8192
       },
       {
         "name": "GPT 4 32k",
         "id": "gpt-4-32k",
-        "description": "Model Description",
+        "description": "GPT-4 also offers an extended 32,000 token context-length model, which is being rolled out separately to the 8k model. This model has the same capabilities as the base GPT-4 model but with 4x the context length.",
         "max_token_length": 32768
       }
     ],
@@ -30,73 +30,73 @@
       {
         "name": "Claude v2",
         "id": "claude-2",
-        "description": "Model Description",
+        "description": "Claude v2 is an AI chatbot platform introduced by Anthropic that rivals ChatGPT in an exciting and innovative manner. It has redefined how we interact with AI platforms by extending the length of meaningful interactions to an incredible 75,000 words. What sets Claude v2 apart is its commitment to ethical AI. The platform has been designed with a unique “constitution” to prevent the generation of harmful content, making it a responsible addition to the AI community.",
         "max_token_length": 100000
       },
       {
         "name": "Claude v1",
         "id": "claude-v1",
-        "description": "Model Description",
+        "description": "Claude v1 is a powerful model that can handle sophisticated dialogue, creative content generation, and detailed instructions.",
         "max_token_length": 9000
       },
       {
         "name": "Claude v1 100k",
         "id": "claude-v1-100k",
-        "description": "Model Description",
+        "description": "Claude v1 with a context window of 100,000 tokens is equal to around 75,000 words! This means that Claude can now analyze a large amount of text, equivalent to hundreds of pages, and conversations with Claude can last for hours or even days.",
         "max_token_length": 100000
       },
       {
         "name": "Claude Instant v1",
         "id": "claude-instant-v1",
-        "description": "Model Description",
+        "description": "Claude Instant v1 is a faster and less expensive model that can handle casual dialogue, text analysis and summarization, and document Q&A.",
         "max_token_length": 9000
       },
       {
         "name": "Claude Instant v1 100k",
         "id": "claude-instant-v1-100k",
-        "description": "Model Description",
+        "description": "Claude Instant v1 with a context window of 100,000 tokens is equal to around 75,000 words! This means that Claude can now analyze a large amount of text, equivalent to hundreds of pages, and conversations with Claude can last for hours or even days.",
         "max_token_length": 100000
       },
       {
         "name": "Claude v1.3",
         "id": "claude-v1.3",
-        "description": "Model Description",
+        "description": "Claude v1.3 is designed to be safer, less vulnerable to adversarial attacks, and provide equal or better performance across all domains compared to previous versions according to Anthropic.",
         "max_token_length": 9000
       },
       {
         "name": "Claude v1.3 100k",
         "id": "claude-v1.3-100k",
-        "description": "Model Description",
+        "description": "I’m sorry but I couldn’t find any information about this specific version.",
         "max_token_length": 100000
       },
       {
         "name": "Claude v1.2",
         "id": "claude-v1.2",
-        "description": "Model Description",
+        "description": "I’m sorry but I couldn’t find any information about this specific version.",
         "max_token_length": 9000
       },
       {
         "name": "Claude v1.0",
         "id": "claude-v1.0",
-        "description": "Model Description",
+        "description": "I’m sorry but I couldn’t find any information about this specific version.",
         "max_token_length": 9000
       },
       {
         "name": "Claude Instant v1.1",
         "id": "claude-instant-v1.1",
-        "description": "Model Description",
+        "description": "Claude Instant v1.1 is a faster and cheaper yet still very capable model that can handle a range of tasks including casual dialogue, text analysis, summarization, and document comprehension.",
         "max_token_length": 9000
       },
       {
         "name": "Claude Instant v1.1 100k",
         "id": "claude-instant-v1.1-100k",
-        "description": "Model Description",
+        "description": "Claude Instant v1.1 with a context window of 100,000 tokens is equal to around 75,000 words! This means that Claude can now analyze a large amount of text, equivalent to hundreds of pages, and conversations with Claude can last for hours or even days.",
         "max_token_length": 100000
       },
       {
         "name": "Claude Instant v1.0",
         "id": "claude-instant-v1.0",
-        "description": "Model Description",
+        "description": "I’m sorry but I couldn’t find any information about this specific version.",
         "max_token_length": 9000
       }
     ]

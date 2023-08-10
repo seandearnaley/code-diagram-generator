@@ -8,7 +8,7 @@ type TextInputProps = {
 };
 
 export const TextInput: FC<TextInputProps> = ({ name, label, helpText }) => (
-  <div className="sm:col-span-4 mt-10">
+  <div className="sm:col-span-4 mt-5">
     <label
       htmlFor={name}
       className="block text-sm font-medium leading-6 text-gray-900"

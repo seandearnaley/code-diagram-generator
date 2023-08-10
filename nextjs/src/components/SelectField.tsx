@@ -1,6 +1,6 @@
+import { Option } from "@/types/DiagramForm.types";
 import { Field } from "formik";
 import { FC } from "react";
-import { Option } from "../types/types";
 
 type Props = {
   options: Option[];
@@ -19,7 +19,7 @@ export const SelectField: FC<Props> = ({
   id,
   onChange,
 }) => (
-  <div className="sm:col-span-3 mt-10">
+  <div className="sm:col-span-3 mt-5">
     <label
       htmlFor={`${id}`}
       className="block text-sm font-medium leading-6 text-gray-900"

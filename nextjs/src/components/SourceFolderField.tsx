@@ -1,8 +1,7 @@
 import { SelectField } from "./SelectField";
 
+import { Option } from "@/types/DiagramForm.types";
 import { FC } from "react";
-
-import { Option } from "../types/types";
 
 type SourceFolderFieldProps = {
   handleSourceFolderChange: (folder: string) => void;

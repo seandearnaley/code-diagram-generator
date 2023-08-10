@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import PlainTextResponse
 
 from ..services.directory_analysis_service import (
     find_gitignore,
@@ -34,7 +35,7 @@ def get_source_folder() -> str:
     return str(path)
 
 
-@router.get("/folder_report/")
+@router.get("/folder_report/", response_class=PlainTextResponse)
 async def folder_report_endpoint(
     root_folder: str,
     ignore_file_path: Optional[str] = None,
@@ -46,7 +47,7 @@ async def folder_report_endpoint(
         raise HTTPException(status_code=404, detail=str(ex)) from ex
 
 
-@router.get("/folder_tree/")
+@router.get("/folder_tree/", response_class=PlainTextResponse)
 async def folder_tree_endpoint(
     root_folder: str,
     ignore_file_path: Optional[str] = None,

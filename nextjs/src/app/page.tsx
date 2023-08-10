@@ -23,6 +23,26 @@ async function getDiagramConfig() {
   };
 }
 
+async function getLlmConfig() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/llm_config`, {
+    cache: "no-store",
+  });
+  const json = await res.json();
+
+  const llmVendorOptions = Object.keys(json.llmVendors).map((key) => ({
+    id: key,
+    name: json.llmVendorNames[key] || key,
+  }));
+
+  const defaultLlmVendor = llmVendorOptions[0]?.id || "";
+  console.log("llmVendorOptions", llmVendorOptions, defaultLlmVendor);
+  return {
+    ...json,
+    llmVendorOptions,
+    defaultLlmVendor,
+  };
+}
+
 async function getSourceFolders() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/source_folders`, {
     cache: "no-store",
@@ -48,10 +68,12 @@ async function getInitialGitIgnoreFilePath(folder: string) {
 
 export default async function Home() {
   const diagramConfigData = getDiagramConfig();
+  const llmConfigData = getLlmConfig();
   const sourceFoldersData = getSourceFolders();
 
-  const [diagramConfig, sourceFolderOptions] = await Promise.all([
+  const [diagramConfig, llmConfig, sourceFolderOptions] = await Promise.all([
     diagramConfigData,
+    llmConfigData,
     sourceFoldersData,
   ]);
 
@@ -65,9 +87,10 @@ export default async function Home() {
 
   return (
     <>
-      <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-2 sm:py-6">
+      <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50">
         <DiagramForm
           diagramConfig={diagramConfig}
+          llmConfig={llmConfig}
           sourceFolderOptions={sourceFolderOptions}
           defaultSourceFolder={defaultSourceFolder}
           initialGitIgnoreFilePath={initialGitIgnoreFilePath} // Pass the initial path as a prop
