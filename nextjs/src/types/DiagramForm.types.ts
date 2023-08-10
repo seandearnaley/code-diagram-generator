@@ -51,7 +51,6 @@ export type DiagramFormValues = {
   includeFolderTree: boolean;
   includePythonCodeOutline: boolean;
   gitIgnoreFilePath: string;
-  designInstructions: string;
   llmVendorForInstructions: string;
   llmModelForInstructions: string;
 };

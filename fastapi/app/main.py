@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .routes import (
+    diagram_generation_routes,
     diagram_routes,
     directory_analysis_routes,
     llm_routes,
@@ -26,5 +27,6 @@ app.add_middleware(
 
 app.include_router(mermaid_routes.router)
 app.include_router(directory_analysis_routes.router)
+app.include_router(diagram_generation_routes.router)
 app.include_router(diagram_routes.router)
 app.include_router(llm_routes.router)

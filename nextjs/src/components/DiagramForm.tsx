@@ -1,9 +1,5 @@
 "use client";
 
-import useGitIgnore from "@/hooks/useGitIgnore";
-import { Form, Formik, FormikHelpers } from "formik";
-import { FC, useCallback, useMemo } from "react";
-
 import {
   CancelButton,
   CheckboxGroup,
@@ -23,6 +19,9 @@ import {
   DEFAULT_LLM_VENDOR,
   DEFAULT_SOURCE_FOLDER,
 } from "@/config/formDefaults";
+import useGitIgnore from "@/hooks/useGitIgnore";
+import { Form, Formik, FormikHelpers } from "formik";
+import { FC, useCallback, useMemo } from "react";
 
 import {
   DiagramFormProps,
@@ -50,13 +49,32 @@ const DiagramForm: FC<DiagramFormProps> = ({
   defaultSourceFolder,
   initialGitIgnoreFilePath,
 }) => {
-  const { fetch, loading, error } = useGitIgnore();
-
-  const handleSubmit = (
+  const { fetch: fetchGitIgnore, loading, error } = useGitIgnore();
+  const handleSubmit = async (
     values: DiagramFormValues,
-    { setSubmitting }: FormikHelpers<DiagramFormValues>,
+    { setSubmitting, setFieldValue }: FormikHelpers<DiagramFormValues>,
   ) => {
-    console.log(values);
+    const postUrl = "http://localhost:8000/generate_diagram/";
+
+    const response = await fetch(postUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+
+    if (!response.ok) {
+      console.error("There was an error posting the data");
+      return;
+    }
+
+    const payload = await response.json();
+
+    if (payload) {
+      setFieldValue("designInstructions", payload.payload);
+    }
+
     setSubmitting(false);
   };
 
@@ -83,20 +101,20 @@ const DiagramForm: FC<DiagramFormProps> = ({
     "llmVendorForInstructions",
     "llmModelForInstructions",
   );
-
   const handleSourceFolderChange = useCallback(
     async (
       folder: string,
       setFieldValue: (field: string, value: any) => void,
     ): Promise<void> => {
-      const gitIgnorePath = await fetch(folder); // using fetch
+      const gitIgnorePath = await fetchGitIgnore(folder); // using renamed fetch
       setFieldValues(setFieldValue, {
         sourceFolderOption: folder,
         gitIgnoreFilePath: gitIgnorePath || "",
       });
     },
-    [fetch],
+    [fetchGitIgnore],
   );
+
   return (
     <Formik<DiagramFormValues>
       initialValues={{
@@ -106,7 +124,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
         includeFolderTree: true,
         includePythonCodeOutline: true,
         gitIgnoreFilePath: initialGitIgnoreFilePath || "",
-        designInstructions: "",
         llmVendorForInstructions: DEFAULT_LLM_VENDOR,
         llmModelForInstructions: DEFAULT_LLM_MODEL,
       }}

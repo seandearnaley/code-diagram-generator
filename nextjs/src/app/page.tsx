@@ -3,7 +3,7 @@ import MermaidTest from "@/components/MermaidTest";
 
 async function getDiagramConfig() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/diagram_config`, {
-    next: { revalidate: 500 },
+    next: { revalidate: 50000 },
   });
   const json = await res.json();
 
@@ -25,7 +25,7 @@ async function getDiagramConfig() {
 
 async function getLlmConfig() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/llm_config`, {
-    cache: "no-store",
+    next: { revalidate: 50000 },
   });
   const json = await res.json();
 
@@ -59,6 +59,9 @@ async function getSourceFolders() {
 async function getInitialGitIgnoreFilePath(folder: string) {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/gitignore_file/?root_folder=${folder}`,
+    {
+      cache: "no-store",
+    },
   );
   if (!response.ok) {
     throw new Error(await response.text());
@@ -93,7 +96,7 @@ export default async function Home() {
           llmConfig={llmConfig}
           sourceFolderOptions={sourceFolderOptions}
           defaultSourceFolder={defaultSourceFolder}
-          initialGitIgnoreFilePath={initialGitIgnoreFilePath} // Pass the initial path as a prop
+          initialGitIgnoreFilePath={initialGitIgnoreFilePath}
         />
 
         <MermaidTest />
