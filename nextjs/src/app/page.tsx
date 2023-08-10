@@ -3,43 +3,43 @@ import MermaidTest from "@/components/MermaidTest";
 
 async function getDiagramConfig() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/diagram_config`, {
-    next: { revalidate: 50000 },
+    cache: "no-store",
   });
   const json = await res.json();
 
-  const diagramCategoryOptions = Object.keys(json.diagramCategories).map(
+  const diagram_category_options = Object.keys(json.diagram_categories).map(
     (key) => ({
       id: key,
-      name: json.diagramCategoryNames[key] || key,
+      name: json.diagram_category_names[key] || key,
     }),
   );
 
-  const defaultDiagramCategory = diagramCategoryOptions[0]?.id || "";
+  const default_diagram_category = diagram_category_options[0]?.id || "";
 
   return {
     ...json,
-    diagramCategoryOptions,
-    defaultDiagramCategory,
+    diagram_category_options,
+    default_diagram_category,
   };
 }
 
 async function getLlmConfig() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/llm_config`, {
-    next: { revalidate: 50000 },
+    cache: "no-store",
   });
   const json = await res.json();
 
-  const llmVendorOptions = Object.keys(json.llmVendors).map((key) => ({
+  const llm_vendor_options = Object.keys(json.llm_vendors).map((key) => ({
     id: key,
-    name: json.llmVendorNames[key] || key,
+    name: json.llm_vendor_names[key] || key,
   }));
 
-  const defaultLlmVendor = llmVendorOptions[0]?.id || "";
-  console.log("llmVendorOptions", llmVendorOptions, defaultLlmVendor);
+  const default_llm_vendor = llm_vendor_options[0]?.id || "";
+  console.log("llm_vendor_options", llm_vendor_options, default_llm_vendor);
   return {
     ...json,
-    llmVendorOptions,
-    defaultLlmVendor,
+    llm_vendor_options,
+    default_llm_vendor,
   };
 }
 
@@ -70,33 +70,31 @@ async function getInitialGitIgnoreFilePath(folder: string) {
 }
 
 export default async function Home() {
-  const diagramConfigData = getDiagramConfig();
-  const llmConfigData = getLlmConfig();
-  const sourceFoldersData = getSourceFolders();
+  const diagram_config_data = getDiagramConfig();
+  const llm_config_data = getLlmConfig();
+  const source_folders_data = getSourceFolders();
 
-  const [diagramConfig, llmConfig, sourceFolderOptions] = await Promise.all([
-    diagramConfigData,
-    llmConfigData,
-    sourceFoldersData,
-  ]);
+  const [diagram_config, llm_config, source_folder_options] = await Promise.all(
+    [diagram_config_data, llm_config_data, source_folders_data],
+  );
 
   // Assuming you want to use the first source folder as the default
-  const defaultSourceFolder = sourceFolderOptions[0]?.id;
+  const default_source_folder = source_folder_options[0]?.id;
 
   // Fetch the initial gitignore file path for the default source folder
-  const initialGitIgnoreFilePath = await getInitialGitIgnoreFilePath(
-    defaultSourceFolder,
+  const initial_git_ignore_file_path = await getInitialGitIgnoreFilePath(
+    default_source_folder,
   );
 
   return (
     <>
       <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50">
         <DiagramForm
-          diagramConfig={diagramConfig}
-          llmConfig={llmConfig}
-          sourceFolderOptions={sourceFolderOptions}
-          defaultSourceFolder={defaultSourceFolder}
-          initialGitIgnoreFilePath={initialGitIgnoreFilePath}
+          diagram_config={diagram_config}
+          llm_config={llm_config}
+          source_folder_options={source_folder_options}
+          default_source_folder={default_source_folder}
+          initial_git_ignore_file_path={initial_git_ignore_file_path}
         />
 
         <MermaidTest />

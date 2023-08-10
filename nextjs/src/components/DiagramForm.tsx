@@ -1,15 +1,16 @@
 "use client";
+import { ClipboardIcon } from "@heroicons/react/24/solid";
 
 import {
   CancelButton,
   CheckboxGroup,
+  CodeComponent,
   Error,
   Loading,
   RadioButtonGroup,
   SelectField,
   SourceFolderField,
   SubmitButton,
-  TextArea,
   TextInput,
 } from "@/components";
 import {
@@ -21,35 +22,38 @@ import {
 } from "@/config/formDefaults";
 import useGitIgnore from "@/hooks/useGitIgnore";
 import { Form, Formik, FormikHelpers } from "formik";
-import { FC, useCallback, useMemo } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import {
   DiagramFormProps,
   DiagramFormValues,
   validationSchema,
 } from "@/types/DiagramForm.types";
+import ReactMarkdown from "react-markdown";
+import {
+  createOptionChangeHandler,
+  handleSourceFolderChange,
+} from "../lib/diagramFormHandlers";
 
-const setFieldValues = (
-  setFieldValue: (field: string, value: any) => void,
-  fieldValues: { [key: string]: any },
-) => {
-  Object.entries(fieldValues).forEach(([field, value]) => {
-    setFieldValue(field, value);
-  });
+const components = {
+  code: CodeComponent,
 };
 
 const DiagramForm: FC<DiagramFormProps> = ({
-  diagramConfig: {
-    diagramCategories,
-    diagramCategoryOptions,
-    defaultDiagramCategory,
+  diagram_config: {
+    diagram_categories,
+    diagram_category_options,
+    default_diagram_category,
   },
-  llmConfig: { llmVendors, llmVendorOptions, defaultLlmVendor },
-  sourceFolderOptions,
-  defaultSourceFolder,
-  initialGitIgnoreFilePath,
+  llm_config: { llm_vendors, llm_vendor_options, default_llm_vendor },
+  source_folder_options,
+  default_source_folder,
+  initial_git_ignore_file_path,
 }) => {
   const { fetch: fetchGitIgnore, loading, error } = useGitIgnore();
+  const [fullText, setFullText] = useState("");
+
   const handleSubmit = async (
     values: DiagramFormValues,
     { setSubmitting, setFieldValue }: FormikHelpers<DiagramFormValues>,
@@ -72,72 +76,53 @@ const DiagramForm: FC<DiagramFormProps> = ({
     const payload = await response.json();
 
     if (payload) {
-      setFieldValue("designInstructions", payload.payload);
+      setFieldValue("design_instructions", payload.payload);
     }
 
     setSubmitting(false);
   };
 
-  const createOptionChangeHandler =
-    (fieldForOption: string, fieldForDefault: string) =>
-    (
-      selectedOption: string,
-      options: any,
-      setFieldValue: (field: string, value: any) => void,
-    ) => {
-      const defaultOption = options[selectedOption]?.[0]?.id || "";
-      setFieldValues(setFieldValue, {
-        [fieldForOption]: selectedOption,
-        [fieldForDefault]: defaultOption,
-      });
-    };
-
   const handleDiagramCategoryChange = createOptionChangeHandler(
-    "diagramCategory",
-    "diagramOption",
+    "diagram_category",
+    "diagram_option",
   );
 
   const handleLlmVendorChange = createOptionChangeHandler(
-    "llmVendorForInstructions",
-    "llmModelForInstructions",
-  );
-  const handleSourceFolderChange = useCallback(
-    async (
-      folder: string,
-      setFieldValue: (field: string, value: any) => void,
-    ): Promise<void> => {
-      const gitIgnorePath = await fetchGitIgnore(folder); // using renamed fetch
-      setFieldValues(setFieldValue, {
-        sourceFolderOption: folder,
-        gitIgnoreFilePath: gitIgnorePath || "",
-      });
-    },
-    [fetchGitIgnore],
+    "llm_vendor_for_instructions",
+    "llm_model_for_instructions",
   );
 
   return (
     <Formik<DiagramFormValues>
       initialValues={{
-        sourceFolderOption: defaultSourceFolder || DEFAULT_SOURCE_FOLDER,
-        diagramCategory: defaultDiagramCategory || DEFAULT_DIAGRAM_CATEGORY,
-        diagramOption: DEFAULT_DIAGRAM_OPTION,
-        includeFolderTree: true,
-        includePythonCodeOutline: true,
-        gitIgnoreFilePath: initialGitIgnoreFilePath || "",
-        llmVendorForInstructions: DEFAULT_LLM_VENDOR,
-        llmModelForInstructions: DEFAULT_LLM_MODEL,
+        source_folder_option: default_source_folder || DEFAULT_SOURCE_FOLDER,
+        diagram_category: default_diagram_category || DEFAULT_DIAGRAM_CATEGORY,
+        diagram_option: DEFAULT_DIAGRAM_OPTION,
+        include_folder_tree: true,
+        include_python_code_outline: true,
+        git_ignore_file_path: initial_git_ignore_file_path || "",
+        llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
+        llm_model_for_instructions: DEFAULT_LLM_MODEL,
+        design_instructions: "",
       }}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
       {({ values, setFieldValue, errors }) => {
+        // Whenever the payload changes, update the fullText state variable
+        useEffect(() => {
+          setFullText(values.design_instructions);
+        }, [values.design_instructions]);
+
+        const processedInstructions = values.design_instructions;
+
         const diagramOptions = useMemo(() => {
-          return diagramCategories[values.diagramCategory] || [];
-        }, [values.diagramCategory, diagramCategories]);
+          return diagram_categories[values.diagram_category] || [];
+        }, [values.diagram_category, diagram_categories]);
 
         const modelOptions = useMemo(() => {
-          return llmVendors[values.llmVendorForInstructions] || [];
-        }, [values.llmVendorForInstructions, llmVendors]);
+          return llm_vendors[values.llm_vendor_for_instructions] || [];
+        }, [values.llm_vendor_for_instructions, llm_vendors]);
 
         return (
           <Form aria-labelledby="formTitle">
@@ -152,15 +137,15 @@ const DiagramForm: FC<DiagramFormProps> = ({
               <div className="grid grid-cols-2 gap-4 p-3">
                 <div className="col-span-1">
                   <SourceFolderField
-                    handleSourceFolderChange={(folder) =>
-                      handleSourceFolderChange(folder, setFieldValue)
-                    }
-                    options={sourceFolderOptions}
-                    error={errors.sourceFolderOption}
+                    handleSourceFolderChange={handleSourceFolderChange(
+                      fetchGitIgnore,
+                    )}
+                    options={source_folder_options}
+                    error={errors.source_folder_option}
                   />
 
                   <TextInput
-                    name="gitIgnoreFilePath"
+                    name="git_ignore_file_path"
                     label="GitIgnore File Path"
                     helpText={
                       "Enter the path to a file that specify files to ignore for analysis intentionally."
@@ -170,13 +155,13 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   <CheckboxGroup
                     options={[
                       {
-                        id: "includeFolderTree",
+                        id: "include_folder_tree",
                         label: "Include Folder Tree",
                         helpText:
                           "Whether to include the project's folder tree.",
                       },
                       {
-                        id: "includePythonCodeOutline",
+                        id: "include_python_code_outline",
                         label: "Include Python Code Outline",
                         helpText:
                           "Whether to include a simple outline of the project's python code",
@@ -185,15 +170,15 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   />
 
                   <SelectField
-                    options={diagramCategoryOptions}
+                    options={diagram_category_options}
                     label="Select Diagram Category"
-                    name="diagramCategory"
-                    id="diagramCategory"
+                    name="diagram_category"
+                    id="diagram_category"
                     aria-label="Select a diagram category from the list"
-                    onChange={(selectedOption) =>
+                    onChange={(selected_option) =>
                       handleDiagramCategoryChange(
-                        selectedOption,
-                        diagramCategories,
+                        selected_option,
+                        diagram_categories,
                         setFieldValue,
                       )
                     }
@@ -201,47 +186,66 @@ const DiagramForm: FC<DiagramFormProps> = ({
 
                   <RadioButtonGroup
                     options={diagramOptions}
-                    name="diagramOption"
+                    name="diagram_option"
                     onChange={(optionId) => {
-                      setFieldValue("diagramOption", optionId);
+                      setFieldValue("diagram_option", optionId);
                     }}
                   />
 
-                  {errors.diagramOption ? (
-                    <div className="text-red-500">{errors.diagramOption}</div>
+                  {errors.diagram_option ? (
+                    <div className="text-red-500">{errors.diagram_option}</div>
                   ) : null}
 
                   <SelectField
-                    options={llmVendorOptions}
+                    options={llm_vendor_options}
                     label="Select LLM Vendor for Instructions"
-                    name="llmVendorForInstructions"
-                    id="llmVendorForInstructions"
+                    name="llm_vendor_for_instructions"
+                    id="llm_vendor_for_instructions"
                     onChange={(vendor) =>
-                      handleLlmVendorChange(vendor, llmVendors, setFieldValue)
+                      handleLlmVendorChange(vendor, llm_vendors, setFieldValue)
                     }
                   />
                   <RadioButtonGroup
                     options={modelOptions}
-                    name="llmModelForInstructions"
+                    name="llm_model_for_instructions"
                     onChange={(optionId) => {
-                      setFieldValue("llmModelForInstructions", optionId);
+                      setFieldValue("llm_model_for_instructions", optionId);
                     }}
                   />
 
-                  {errors.llmModelForInstructions ? (
+                  {errors.llm_model_for_instructions ? (
                     <div className="text-red-500">
-                      {errors.llmModelForInstructions}
+                      {errors.llm_model_for_instructions}
                     </div>
                   ) : null}
                 </div>
                 <div className="col-span-1">
-                  <TextArea
-                    name="designInstructions"
-                    label="Design Instructions"
-                    rows={30}
-                    aria-label="Enter design instructions"
-                  />
-
+                  <label
+                    htmlFor="design_instructions"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Design Instructions
+                  </label>
+                  <ReactMarkdown
+                    components={components}
+                    className="p-2 prose max-w-[700px] mt-1 text-sm text-gray-500 max-h-[500px] overflow-y-auto border border-gray-300"
+                  >
+                    {processedInstructions}
+                  </ReactMarkdown>
+                  <div className="p-2">
+                    <CopyToClipboard text={fullText}>
+                      <button
+                        className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
+                        type="button"
+                        onClick={() =>
+                          alert("All content copied to clipboard!")
+                        }
+                      >
+                        <ClipboardIcon className="h-5 w-5 mr-2" />
+                        Copy All Content
+                      </button>
+                    </CopyToClipboard>
+                  </div>
                   <div className="mt-6 flex items-center justify-end gap-x-6">
                     <CancelButton />
                     <SubmitButton />

@@ -1,5 +1,5 @@
 {
-  "diagramCategories": {
+  "diagram_categories": {
     "flowchart": [
       {
         "id": "flowchart1",
@@ -32,7 +32,7 @@
         "description": "This flowchart focuses on the utility functions in the application, illustrating the different utility functions and their relationships."
       }
     ],
-    "sequenceDiagram": [
+    "sequence_diagram": [
       {
         "id": "sequenceDiagram1",
         "name": "User Interaction Sequence",
@@ -70,8 +70,8 @@
       }
     ]
   },
-  "diagramCategoryNames": {
+  "diagram_category_names": {
     "flowchart": "Flowchart",
-    "sequenceDiagram": "Sequence Diagram"
+    "sequence_diagram": "Sequence Diagram"
   }
 }

@@ -1,6 +1,6 @@
 {
-  "llmVendors": {
-    "openAi": [
+  "llm_vendors": {
+    "open_ai": [
       {
         "name": "GPT 3.5 Turbo",
         "id": "gpt-3.5-turbo",
@@ -101,8 +101,8 @@
       }
     ]
   },
-  "llmVendorNames": {
-    "openAi": "Open AI",
+  "llm_vendor_names": {
+    "open_ai": "Open AI",
     "anthropic": "Anthropic"
   }
 }

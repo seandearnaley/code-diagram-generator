@@ -33,9 +33,9 @@ export default function useGitIgnore() {
     setLoading(true);
     setError(null);
     try {
-      const gitIgnorePath = await fetchGitIgnoreFilePath(folder);
+      const git_ignore_path = await fetchGitIgnoreFilePath(folder);
       setLoading(false);
-      return gitIgnorePath;
+      return git_ignore_path;
     } catch (err: any) {
       setError(err.message || "An error occurred");
       setLoading(false);

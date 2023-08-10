@@ -10,9 +10,9 @@ async def load_diagram_config() -> DiagramConfig:
     """Reads diagram configration from a JSON file"""
     with DIAGRAM_CONFIG_PATH.open(encoding="utf-8") as json_file:
         data: Dict[str, Any] = json.load(json_file)
-        diagram_categories = dict(data["diagramCategories"].items())
+        diagram_categories = dict(data["diagram_categories"].items())
 
     return DiagramConfig(
-        diagramCategories=diagram_categories,
-        diagramCategoryNames=data["diagramCategoryNames"],
+        diagram_categories=diagram_categories,
+        diagram_category_names=data["diagram_category_names"],
     )

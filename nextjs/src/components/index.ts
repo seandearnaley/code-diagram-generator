@@ -1,5 +1,6 @@
 export { CancelButton } from "./CancelButton";
 export { CheckboxGroup } from "./CheckboxGroup";
+export { CodeComponent } from "./CodeComponent";
 export { Error } from "./Error";
 export { Loading } from "./Loading";
 export { RadioButtonGroup } from "./RadioButtonGroup";

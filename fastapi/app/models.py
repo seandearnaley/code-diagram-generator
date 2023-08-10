@@ -3,6 +3,10 @@ from typing import Dict, List
 
 from pydantic import BaseModel
 
+OPEN_AI_CHAT_TYPE = "OpenAI Chat"
+OPEN_AI_INSTRUCT_TYPE = "OpenAI Instruct"
+ANTHROPIC_AI_TYPE = "Anthropic Chat"
+
 
 class MermaidScript(BaseModel):
     """Pydantic model for Mermaid script."""
@@ -21,8 +25,8 @@ class DiagramDefinition(BaseModel):
 class DiagramConfig(BaseModel):
     """Model for diagram configs"""
 
-    diagramCategories: Dict[str, List[DiagramDefinition]]
-    diagramCategoryNames: Dict[str, str]
+    diagram_categories: Dict[str, List[DiagramDefinition]]
+    diagram_category_names: Dict[str, str]
 
 
 class LLMDefinition(BaseModel):
@@ -37,5 +41,5 @@ class LLMDefinition(BaseModel):
 class LLMConfig(BaseModel):
     """Model for LLM configs"""
 
-    llmVendors: Dict[str, List[LLMDefinition]]
-    llmVendorNames: Dict[str, str]
+    llm_vendors: Dict[str, List[LLMDefinition]]
+    llm_vendor_names: Dict[str, str]
