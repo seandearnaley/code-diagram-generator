@@ -36,6 +36,16 @@ async function getSourceFolders() {
   }));
 }
 
+async function getInitialGitIgnoreFilePath(folder: string) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/gitignore_file/?root_folder=${folder}`,
+  );
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+  return response.json();
+}
+
 export default async function Home() {
   const diagramConfigData = getDiagramConfig();
   const sourceFoldersData = getSourceFolders();
@@ -44,12 +54,23 @@ export default async function Home() {
     diagramConfigData,
     sourceFoldersData,
   ]);
+
+  // Assuming you want to use the first source folder as the default
+  const defaultSourceFolder = sourceFolderOptions[0]?.id;
+
+  // Fetch the initial gitignore file path for the default source folder
+  const initialGitIgnoreFilePath = await getInitialGitIgnoreFilePath(
+    defaultSourceFolder,
+  );
+
   return (
     <>
       <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-2 sm:py-6">
         <DiagramForm
           diagramConfig={diagramConfig}
           sourceFolderOptions={sourceFolderOptions}
+          defaultSourceFolder={defaultSourceFolder}
+          initialGitIgnoreFilePath={initialGitIgnoreFilePath} // Pass the initial path as a prop
         />
 
         <MermaidTest />

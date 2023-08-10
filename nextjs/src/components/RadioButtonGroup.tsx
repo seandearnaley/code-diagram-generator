@@ -23,7 +23,7 @@ export const RadioButtonGroup: FC<Props> = ({
   onChange,
 }) => (
   <FieldArray name={name}>
-    <div className="border-b border-gray-900/10 pb-6">
+    <div className="border-b border-gray-900/10 pb-6 bg-blue-50">
       <div className="mt-2 space-y-10">
         <fieldset>
           {label ? (
@@ -37,7 +37,7 @@ export const RadioButtonGroup: FC<Props> = ({
               {helpText}
             </p>
           ) : null}
-          <div className="mt-6 space-y-6 overflow-y-auto max-h-[300px]">
+          <div className="mt-6 space-y-6 overflow-y-auto max-h-[300px] pr-5">
             {options.map((option) => (
               <div key={option.id} className="flex flex-col">
                 <label
@@ -49,7 +49,7 @@ export const RadioButtonGroup: FC<Props> = ({
                     id={`push-everything-${option.id}`}
                     name={name}
                     value={option.id}
-                    className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 my-auto mr-2 ml-4"
+                    className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600 my-auto mr-2 ml-4"
                     onChange={() => onChange && onChange(option.id)}
                   />
                   <span className="my-auto">{option.name}</span>

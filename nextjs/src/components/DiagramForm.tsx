@@ -1,38 +1,25 @@
 "use client";
 
+import useGitIgnore from "@/hooks/useGitIgnore";
 import { Form, Formik, FormikHelpers } from "formik";
-import { FC } from "react";
-import { Option } from "../types/types";
-import { CheckboxGroup } from "./CheckboxGroup";
-import { RadioButtonGroup } from "./RadioButtonGroup";
-import { SelectField } from "./SelectField";
-import { TextArea } from "./TextArea";
-import { TextInput } from "./TextInput";
+import { FC, useCallback, useMemo } from "react";
 
-type DiagramDefinition = {
-  id: string;
-  name: string;
-  description: string;
-};
+import { DiagramFormProps, DiagramFormValues } from "../types/types";
 
-type DiagramFormProps = {
-  diagramConfig: {
-    diagramCategories: { [key: string]: DiagramDefinition[] };
-    diagramCategoryOptions: Option[];
-    defaultDiagramCategory: string;
-  };
-  sourceFolderOptions: Option[];
-};
+import {
+  CancelButton,
+  CheckboxGroup,
+  Error,
+  Loading,
+  RadioButtonGroup,
+  SelectField,
+  SourceFolderField,
+  SubmitButton,
+  TextArea,
+  TextInput,
+} from "@/components";
 
-type DiagramFormValues = {
-  sourceFolderOption: string;
-  diagramCategory: string;
-  diagramOption: string;
-  includeFolderTree: boolean;
-  includePythonCodeOutline: boolean;
-  gitIgnoreFilePath: string;
-  designInstructions: string;
-};
+import { validationSchema } from "@/types/DiagramForm.types";
 
 const DiagramForm: FC<DiagramFormProps> = ({
   diagramConfig: {
@@ -41,7 +28,23 @@ const DiagramForm: FC<DiagramFormProps> = ({
     defaultDiagramCategory,
   },
   sourceFolderOptions,
+  defaultSourceFolder,
+  initialGitIgnoreFilePath,
 }) => {
+  const { fetch, loading, error } = useGitIgnore();
+
+  const handleSourceFolderChange = useCallback(
+    async (
+      folder: string,
+      setFieldValue: (field: string, value: any) => void,
+    ) => {
+      const gitIgnorePath = await fetch(folder);
+      setFieldValue("sourceFolderOption", folder);
+      setFieldValue("gitIgnoreFilePath", gitIgnorePath || "");
+    },
+    [fetch],
+  );
+
   const handleSubmit = (
     values: DiagramFormValues,
     { setSubmitting }: FormikHelpers<DiagramFormValues>,
@@ -49,116 +52,107 @@ const DiagramForm: FC<DiagramFormProps> = ({
     console.log(values);
     setSubmitting(false);
   };
-  const handleFolderOptionChange = async (
-    folder: string,
-    setFieldValue: any,
-  ) => {
-    console.log(`Option ${folder} selected.`);
-    setFieldValue("sourceFolderOption", folder);
-    const response = await fetch(
-      `http://localhost:8000/gitignore_file/?root_folder=${folder}`,
-    );
-    if (!response.ok) throw new Error(response.statusText);
-    const data = await response.json();
-    setFieldValue("gitIgnoreFilePath", data || "No .gitignore file found");
-  };
 
   return (
     <Formik<DiagramFormValues>
       initialValues={{
-        sourceFolderOption: "",
+        sourceFolderOption: defaultSourceFolder || "",
         diagramCategory: defaultDiagramCategory,
         diagramOption: "",
-        includeFolderTree: false,
-        includePythonCodeOutline: false,
-        gitIgnoreFilePath: "",
+        includeFolderTree: true,
+        includePythonCodeOutline: true,
+        gitIgnoreFilePath: initialGitIgnoreFilePath || "",
         designInstructions: "",
       }}
+      validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ values, setFieldValue }) => (
-        <Form>
-          <div className="p-3">
-            <div className="border-b border-gray-900/10">
-              <h2 className="text-base font-semibold leading-7 text-gray-900">
-                Mermaid Diagram GPT Generator
-              </h2>
+      {({ values, setFieldValue, errors }) => {
+        const diagramOptions = useMemo(() => {
+          return diagramCategories[values.diagramCategory] || [];
+        }, [values.diagramCategory, diagramCategories]);
+
+        return (
+          <Form aria-labelledby="formTitle">
+            <div className={loading || error ? "relative" : ""}>
+              {loading && <Loading message="Loading gitignore file..." />}
+              {error && <Error message={error} />}
+
+              <div className="p-3">
+                <div className="border-b border-gray-900/10">
+                  <h2 className="text-base font-semibold leading-10 text-gray-900">
+                    Mermaid Diagram GPT Generator
+                  </h2>
+                </div>
+                <SourceFolderField
+                  handleSourceFolderChange={(folder) =>
+                    handleSourceFolderChange(folder, setFieldValue)
+                  }
+                  options={sourceFolderOptions}
+                  error={errors.sourceFolderOption}
+                />
+
+                <TextInput
+                  name="gitIgnoreFilePath"
+                  label="GitIgnore File Path"
+                  helpText={
+                    "Enter the path to a file that specify files to ignore for analysis intentionally."
+                  }
+                />
+
+                <CheckboxGroup
+                  options={[
+                    {
+                      id: "includeFolderTree",
+                      label: "Include Folder Tree",
+                      helpText: "Whether to include the project's folder tree.",
+                    },
+                    {
+                      id: "includePythonCodeOutline",
+                      label: "Include Python Code Outline",
+                      helpText:
+                        "Whether to include a simple outline of the project's python code",
+                    },
+                  ]}
+                />
+
+                <SelectField
+                  options={diagramCategoryOptions}
+                  label="Select Diagram Category"
+                  name="diagramCategory"
+                  id="diagramCategory"
+                  onChange={(category) =>
+                    setFieldValue("diagramCategory", category)
+                  }
+                />
+
+                <RadioButtonGroup
+                  options={diagramOptions}
+                  name="diagramOption"
+                  onChange={(optionId) => {
+                    setFieldValue("diagramOption", optionId);
+                  }}
+                />
+
+                {errors.diagramOption ? (
+                  <div className="text-red-500">{errors.diagramOption}</div>
+                ) : null}
+
+                <TextArea
+                  name="designInstructions"
+                  label="Design Instructions"
+                  rows={3}
+                  aria-label="Enter design instructions"
+                />
+                <div className="mt-6 flex items-center justify-end gap-x-6">
+                  <CancelButton />
+                  <SubmitButton />
+                </div>
+              </div>
             </div>
-
-            <SelectField
-              options={sourceFolderOptions}
-              label="Select Project Folder"
-              name="sourceFolderOption"
-              id="sourceFolderOption"
-              helpText={
-                "Select a python project to analyze, if a gitignore is found, its path will be copied into the next field."
-              }
-              onChange={(folder) =>
-                handleFolderOptionChange(folder, setFieldValue)
-              }
-            />
-
-            <TextInput
-              name="gitIgnoreFilePath"
-              label="GitIgnore File Path"
-              helpText={
-                "Enter the path to a file that specify files to ignore for analysis intentionally."
-              }
-            />
-
-            <CheckboxGroup
-              options={[
-                {
-                  id: "includeFolderTree",
-                  label: "Include Folder Tree",
-                  helpText: "Whether to include the project's folder tree.",
-                },
-                {
-                  id: "includePythonCodeOutline",
-                  label: "Include Python Code Outline",
-                  helpText:
-                    "Whether to include a simple outline of the project's python code",
-                },
-              ]}
-            />
-
-            <SelectField
-              options={diagramCategoryOptions}
-              label="Select Diagram Category"
-              name="diagramCategory"
-              id="diagramCategory"
-            />
-
-            <RadioButtonGroup
-              options={diagramCategories[values.diagramCategory] || []}
-              name="diagramOption"
-              onChange={(optionId) => {
-                setFieldValue("diagramOption", optionId);
-              }}
-            />
-
-            <TextArea
-              name="designInstructions"
-              label="Design Instructions"
-              rows={3}
-            />
-            <div className="mt-6 flex items-center justify-end gap-x-6">
-              <button
-                type="button"
-                className="text-sm font-semibold leading-6 text-gray-900"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </Form>
-      )}
+          </Form>
+        );
+      }}
     </Formik>
   );
 };

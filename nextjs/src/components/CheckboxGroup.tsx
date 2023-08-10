@@ -20,7 +20,7 @@ export const CheckboxGroup: FC<CheckboxGroupProps> = ({ options }) => (
             type="checkbox"
             id={option.id}
             name={option.id}
-            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
           />
         </div>
         <div className="text-sm leading-6">
