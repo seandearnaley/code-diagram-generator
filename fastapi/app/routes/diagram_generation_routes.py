@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Optional, Tuple
 
-from pydantic import BaseModel
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 from fastapi import APIRouter, Body
 
@@ -40,15 +40,14 @@ async def get_folder_content(payload: DiagramPayload) -> Tuple[str, str]:
     return folder_tree_content, folder_report_content
 
 
-@router.post("/generate_diagram/")
-async def generate_diagram(payload: DiagramPayload = Body(...)) -> dict:
+@router.post("/generate_diagram_instructions/")
+async def generate_diagram_instructions(payload: DiagramPayload = Body(...)) -> dict:
     """Generate a diagram based on the payload"""
     folder_tree_content, folder_report_content = await get_folder_content(payload)
 
     dump = (
-        f"Folder Tree:\n```\n{folder_tree_content}```\n\nPython"
-        f" Report:\n```\n{folder_report_content}\n```\n\n```python\nimport numpy as"
-        " np\nx = np.array([1, 2, 3])\nprint(x.mean())\n```\n\n"
+        f"**Folder Tree**:\n```\n{folder_tree_content}```\n\n**Python"
+        f" Report**:\n```\n{folder_report_content}\n```\n"
     )
 
     return {"status": "success", "payload": dump}

@@ -2,15 +2,14 @@
 import { ClipboardIcon } from "@heroicons/react/24/solid";
 
 import {
-  CancelButton,
   CheckboxGroup,
   CodeComponent,
   Error,
+  GenericButton,
   Loading,
   RadioButtonGroup,
   SelectField,
   SourceFolderField,
-  SubmitButton,
   TextInput,
 } from "@/components";
 import {
@@ -58,7 +57,14 @@ const DiagramForm: FC<DiagramFormProps> = ({
     values: DiagramFormValues,
     { setSubmitting, setFieldValue }: FormikHelpers<DiagramFormValues>,
   ) => {
-    const postUrl = "http://localhost:8000/generate_diagram/";
+    setSubmitting(false);
+  };
+
+  const handleNextStep = async (
+    values: DiagramFormValues,
+    setFieldValue: Function,
+  ) => {
+    const postUrl = "http://localhost:8000/generate_diagram_instructions/";
 
     const response = await fetch(postUrl, {
       method: "POST",
@@ -78,8 +84,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
     if (payload) {
       setFieldValue("design_instructions", payload.payload);
     }
-
-    setSubmitting(false);
   };
 
   const handleDiagramCategoryChange = createOptionChangeHandler(
@@ -108,19 +112,18 @@ const DiagramForm: FC<DiagramFormProps> = ({
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ values, setFieldValue, errors }) => {
-        // Whenever the payload changes, update the fullText state variable
+      {({ values, setFieldValue, errors, handleReset }) => {
         useEffect(() => {
           setFullText(values.design_instructions);
         }, [values.design_instructions]);
 
         const processedInstructions = values.design_instructions;
 
-        const diagramOptions = useMemo(() => {
+        const diagram_options = useMemo(() => {
           return diagram_categories[values.diagram_category] || [];
         }, [values.diagram_category, diagram_categories]);
 
-        const modelOptions = useMemo(() => {
+        const model_options = useMemo(() => {
           return llm_vendors[values.llm_vendor_for_instructions] || [];
         }, [values.llm_vendor_for_instructions, llm_vendors]);
 
@@ -134,7 +137,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   Mermaid Diagram GPT Generator
                 </h2>
               </div>
-              <div className="grid grid-cols-2 gap-4 p-3">
+              <div className="grid grid-cols-2 gap-4 pl-4">
                 <div className="col-span-1">
                   <SourceFolderField
                     handleSourceFolderChange={handleSourceFolderChange(
@@ -185,7 +188,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   />
 
                   <RadioButtonGroup
-                    options={diagramOptions}
+                    options={diagram_options}
                     name="diagram_option"
                     onChange={(optionId) => {
                       setFieldValue("diagram_option", optionId);
@@ -206,7 +209,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     }
                   />
                   <RadioButtonGroup
-                    options={modelOptions}
+                    options={model_options}
                     name="llm_model_for_instructions"
                     onChange={(optionId) => {
                       setFieldValue("llm_model_for_instructions", optionId);
@@ -218,38 +221,62 @@ const DiagramForm: FC<DiagramFormProps> = ({
                       {errors.llm_model_for_instructions}
                     </div>
                   ) : null}
-                </div>
-                <div className="col-span-1">
-                  <label
-                    htmlFor="design_instructions"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Design Instructions
-                  </label>
-                  <ReactMarkdown
-                    components={components}
-                    className="p-2 prose max-w-[700px] mt-1 text-sm text-gray-500 max-h-[500px] overflow-y-auto border border-gray-300"
-                  >
-                    {processedInstructions}
-                  </ReactMarkdown>
-                  <div className="p-2">
-                    <CopyToClipboard text={fullText}>
-                      <button
-                        className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
-                        type="button"
-                        onClick={() =>
-                          alert("All content copied to clipboard!")
-                        }
-                      >
-                        <ClipboardIcon className="h-5 w-5 mr-2" />
-                        Copy All Content
-                      </button>
-                    </CopyToClipboard>
-                  </div>
+
                   <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <CancelButton />
-                    <SubmitButton />
+                    <GenericButton
+                      label="Prepare Design Instructions"
+                      type="button"
+                      className="bg-blue-600 px-3 py-2 text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                      onClick={() => handleNextStep(values, setFieldValue)}
+                    />
+
+                    <GenericButton
+                      label="Cancel"
+                      type="button"
+                      className="text-gray-900 pl-2 py-2"
+                      onClick={handleReset}
+                    />
                   </div>
+                </div>
+                <div className="col-span-1 pt-2">
+                  {processedInstructions ? (
+                    <>
+                      <label
+                        htmlFor="design_instructions"
+                        className="block text-sm text-gray-700 font-medium leading-6"
+                      >
+                        Design Instructions
+                      </label>
+
+                      <ReactMarkdown
+                        components={components}
+                        className="p-2 prose max-w-[700px] mt-1 text-sm max-h-[800px] overflow-y-auto border border-gray-300 bg-slate-300 text-slate-500 rounded-md"
+                      >
+                        {processedInstructions}
+                      </ReactMarkdown>
+
+                      <div className="p-2">
+                        <CopyToClipboard text={fullText}>
+                          <button
+                            className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
+                            type="button"
+                            onClick={() =>
+                              alert("All content copied to clipboard!")
+                            }
+                          >
+                            <ClipboardIcon className="h-5 w-5 mr-2" />
+                            Copy All Content
+                          </button>
+                        </CopyToClipboard>
+                        {/* 
+                        <GenericButton
+                          label="Submit (Does Nothing)"
+                          type="submit"
+                          className="bg-green-600 px-3 text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 "
+                        /> */}
+                      </div>
+                    </>
+                  ) : null}
                 </div>
               </div>
             </div>

@@ -1,11 +1,12 @@
 """Pydantic models for FastAPI."""
 from typing import Dict, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
-OPEN_AI_CHAT_TYPE = "OpenAI Chat"
-OPEN_AI_INSTRUCT_TYPE = "OpenAI Instruct"
-ANTHROPIC_AI_TYPE = "Anthropic Chat"
+# had to disable pylint because it was complaining about BaseModel/
+# anthropic is behind fastapi in versions of pydantic, no biggie
+# but it's annoying to see the red squiggles.
+# we should update to pydantic 2 ASAP---> its faster
 
 
 class MermaidScript(BaseModel):

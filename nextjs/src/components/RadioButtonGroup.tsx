@@ -37,7 +37,7 @@ export const RadioButtonGroup: FC<Props> = ({
               {helpText}
             </p>
           ) : null}
-          <div className="mt-6 space-y-6 overflow-y-auto max-h-[300px] pr-5">
+          <div className="mt-6 space-y-6 overflow-y-auto max-h-[450px] pr-5">
             {options.map((option) => (
               <div key={option.id} className="flex flex-col">
                 <label

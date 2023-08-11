@@ -1,0 +1,73 @@
+I want you to come up with a one pager for an AI designer who runs the same software as you.  Here is what we intend to build:
+
+{diagram_option} ({diagram_category}):
+
+{description}
+
+Your final product needs to be well written beautiful mermaid code that can run in mermaid cli.
+
+Here's an example of a highly detailed brief for a talented designer who specializes in Mermaid diagrams. note: we do not want to want to create any code, we will leave that up the AI designer based on your notes- think of these as instructions to yourself or a colleague that you can layout a plan for your actions before executing the design functions:
+
+```
+### Title: End-to-End Flow of a Distributed Web Application Architecture
+
+**Objective:** Illustrate the intricate architecture and interactions within our distributed web application, covering microservices, database interactions, caching mechanisms, authentication, security protocols, and user interfaces.
+
+**Components:**
+
+- **Frontend:** Web Browser, Mobile App
+- **Backend Microservices:** Authentication, Billing, Product Management, User Profile, Recommendations
+- **Databases:** UserDB, ProductDB, BillingDB
+- **Third-party Services:** Payment Gateway, Email Notification Service
+- **Security:** Firewall, Encryption, OAuth2
+- **Caching:** Redis, CDN
+- **Monitoring & Logging:** Log Collector, Analytics Dashboard
+- **Infrastructure:** Load Balancer, Compute Nodes, Storage Servers
+
+**Relationships and Interactions:**
+
+- **User Interaction:**
+    - User logs in via Web Browser or Mobile App
+    - Interactions with different microservices for various functionalities
+- **Microservices Interaction:**
+    - Each microservice and its interaction with other microservices, databases, caching layers, and third-party services
+    - Data flow and error handling within microservices
+- **Security Protocols:**
+    - Authentication flows, including tokens and OAuth2
+    - Firewall rules and encryption methods
+- **Caching Mechanisms:**
+    - Caching strategies for different data types and services
+    - CDN usage for content delivery
+- **Monitoring & Logging:**
+    - Collection, aggregation, and visualization of logs and metrics
+    - Alerting mechanisms
+
+**Styling Preferences:**
+
+- Use specific icons or symbols for different components
+- Consistent color scheme to differentiate layers and services
+- Annotations and legends to explain specific interactions and flows
+- Maintain readability for complex interactions
+
+**Format:**
+
+- Mermaid code with possible segregation into sub-diagrams for clarity
+- Complementary written documentation to explain intricate parts
+
+**Examples or References:**
+
+- Links to industry-standard architecture diagrams
+- Internal documents explaining specific parts of the system
+
+**Additional Notes:**
+
+- Regular checkpoints or review meetings if necessary
+- Compliance with corporate branding and security guidelines
+- Expectation for a few iterations for feedback and refinements
+
+**Timeline:**
+
+- Final version due in three weeks, respond with completed, correct mermaid code.
+```
+
+BEGIN

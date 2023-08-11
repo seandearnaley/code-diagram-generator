@@ -1,5 +1,4 @@
 import DiagramForm from "@/components/DiagramForm";
-import MermaidTest from "@/components/MermaidTest";
 
 async function getDiagramConfig() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/diagram_config`, {
@@ -87,18 +86,16 @@ export default async function Home() {
   );
 
   return (
-    <>
-      <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50">
-        <DiagramForm
-          diagram_config={diagram_config}
-          llm_config={llm_config}
-          source_folder_options={source_folder_options}
-          default_source_folder={default_source_folder}
-          initial_git_ignore_file_path={initial_git_ignore_file_path}
-        />
-
-        <MermaidTest />
-      </div>
-    </>
+    <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50">
+      <DiagramForm
+        diagram_config={diagram_config}
+        llm_config={llm_config}
+        source_folder_options={source_folder_options}
+        default_source_folder={default_source_folder}
+        initial_git_ignore_file_path={initial_git_ignore_file_path}
+      />
+      {/* 
+      <MermaidTest /> */}
+    </div>
   );
 }

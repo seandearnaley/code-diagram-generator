@@ -4,7 +4,7 @@ import math
 import tiktoken
 from anthropic import Anthropic
 
-from ..config import ANTHROPIC_AI_TYPE, OPEN_AI_CHAT_TYPE
+from ..config import ANTHROPIC_AI_VENDOR, OPEN_AI_VENDOR
 
 
 def anthropic_sync_count_tokens(text: str) -> int:
@@ -14,13 +14,13 @@ def anthropic_sync_count_tokens(text: str) -> int:
     return number_of_tokens
 
 
-def num_tokens_from_string(string: str, model_type: str = OPEN_AI_CHAT_TYPE) -> int:
+def num_tokens_from_string(string: str, model_type: str = OPEN_AI_VENDOR) -> int:
     """
     Returns the number of tokens in a text string.
     NOTE: openAI and Anthropics have different token counting mechanisms.
     https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
     """
-    is_anthropic = model_type == ANTHROPIC_AI_TYPE
+    is_anthropic = model_type == ANTHROPIC_AI_VENDOR
 
     num_tokens = (
         anthropic_sync_count_tokens(string)

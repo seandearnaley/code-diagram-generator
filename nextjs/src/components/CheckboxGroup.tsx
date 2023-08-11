@@ -12,7 +12,7 @@ type CheckboxGroupProps = {
 };
 
 export const CheckboxGroup: FC<CheckboxGroupProps> = ({ options }) => (
-  <div className="mt-6 ml-4 space-y-6">
+  <div className="mt-2 ml-4 space-y-6 mb-2">
     {options.map((option) => (
       <div className="relative flex gap-x-3" key={option.id}>
         <div className="flex h-6 items-center">

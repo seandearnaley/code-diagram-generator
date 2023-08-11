@@ -19,7 +19,7 @@ export const SelectField: FC<Props> = ({
   id,
   onChange,
 }) => (
-  <div className="sm:col-span-3 mt-5">
+  <div className="sm:col-span-3 pt-3">
     <label
       htmlFor={`${id}`}
       className="block text-sm font-medium leading-6 text-gray-900"
