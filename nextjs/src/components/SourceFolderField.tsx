@@ -6,30 +6,25 @@ import { FC } from "react";
 import { useFormikContext } from "formik";
 
 type SourceFolderFieldProps = {
-  handleSourceFolderChange: (
-    folder: string,
-    setFieldValue: (field: string, value: any) => void,
-  ) => Promise<void>;
+  setSelectedFolder: (folder: string) => void;
   options: Option[];
   error: string | undefined;
 };
 
 export const SourceFolderField: FC<SourceFolderFieldProps> = ({
-  handleSourceFolderChange,
+  setSelectedFolder,
   options,
   error,
 }) => {
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue, values } = useFormikContext();
   return (
     <>
       <SelectField
         options={options}
         label="Select Project Folder"
-        name="sourceFolderOption"
-        id="sourceFolderOption"
-        onChange={(folder: string) =>
-          handleSourceFolderChange(folder, setFieldValue)
-        }
+        name="source_folder_option"
+        id="source_folder_option"
+        onChange={(folder: string) => setSelectedFolder(folder)}
         helpText="Select a python project to analyze..."
       />
       {error ? <div className="text-red-500">{error}</div> : null}

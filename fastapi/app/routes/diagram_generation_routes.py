@@ -46,8 +46,8 @@ async def generate_diagram_instructions(payload: DiagramPayload = Body(...)) -> 
     folder_tree_content, folder_report_content = await get_folder_content(payload)
 
     dump = (
-        f"**Folder Tree**:\n```\n{folder_tree_content}```\n\n**Python"
-        f" Report**:\n```\n{folder_report_content}\n```\n"
+        f"### Folder Tree:\n```\n{folder_tree_content}```\n\n"
+        f"### Python Report:\n```\n{folder_report_content}\n```\n"
     )
 
     return {"status": "success", "payload": dump}

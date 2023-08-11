@@ -40,7 +40,6 @@ export type DiagramFormProps = {
     default_llm_vendor: string;
   };
   source_folder_options: Option[];
-  default_source_folder: string;
   initial_git_ignore_file_path: string;
 };
 export type DiagramFormValues = {

@@ -47,11 +47,42 @@ const DiagramForm: FC<DiagramFormProps> = ({
   },
   llm_config: { llm_vendors, llm_vendor_options, default_llm_vendor },
   source_folder_options,
-  default_source_folder,
   initial_git_ignore_file_path,
 }) => {
   const { fetch: fetchGitIgnore, loading, error } = useGitIgnore();
   const [fullText, setFullText] = useState("");
+  const initialValues = useMemo(() => {
+    const savedValues = localStorage.getItem("formValues");
+    let initialFormValues = {
+      source_folder_option: DEFAULT_SOURCE_FOLDER,
+      diagram_category: default_diagram_category || DEFAULT_DIAGRAM_CATEGORY,
+      diagram_option: DEFAULT_DIAGRAM_OPTION,
+      include_folder_tree: true,
+      include_python_code_outline: true,
+      git_ignore_file_path: initial_git_ignore_file_path || "",
+      llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
+      llm_model_for_instructions: DEFAULT_LLM_MODEL,
+      design_instructions: "",
+    };
+
+    if (source_folder_options.length > 0) {
+      initialFormValues.source_folder_option = source_folder_options[0]?.id;
+    }
+
+    if (savedValues) {
+      const parsedValues = JSON.parse(savedValues);
+      initialFormValues = {
+        ...initialFormValues,
+        ...parsedValues,
+      };
+    }
+
+    return initialFormValues;
+  }, [
+    source_folder_options,
+    default_diagram_category,
+    initial_git_ignore_file_path,
+  ]);
 
   const handleSubmit = async (
     values: DiagramFormValues,
@@ -98,21 +129,30 @@ const DiagramForm: FC<DiagramFormProps> = ({
 
   return (
     <Formik<DiagramFormValues>
-      initialValues={{
-        source_folder_option: default_source_folder || DEFAULT_SOURCE_FOLDER,
-        diagram_category: default_diagram_category || DEFAULT_DIAGRAM_CATEGORY,
-        diagram_option: DEFAULT_DIAGRAM_OPTION,
-        include_folder_tree: true,
-        include_python_code_outline: true,
-        git_ignore_file_path: initial_git_ignore_file_path || "",
-        llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
-        llm_model_for_instructions: DEFAULT_LLM_MODEL,
-        design_instructions: "",
-      }}
+      initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ values, setFieldValue, errors, handleReset }) => {
+      {({ values, setFieldValue, errors, handleReset, dirty }) => {
+        const [selectedFolder, setSelectedFolder] = useState("");
+
+        useEffect(() => {
+          if (selectedFolder) {
+            handleSourceFolderChange(fetchGitIgnore)(
+              selectedFolder,
+              setFieldValue,
+              values,
+            );
+          }
+        }, [selectedFolder]);
+
+        // Save form values to localStorage whenever they change
+        useEffect(() => {
+          if (dirty) {
+            localStorage.setItem("formValues", JSON.stringify(values));
+          }
+        }, [values, dirty]);
+
         useEffect(() => {
           setFullText(values.design_instructions);
         }, [values.design_instructions]);
@@ -140,9 +180,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
               <div className="grid grid-cols-2 gap-4 pl-4">
                 <div className="col-span-1">
                   <SourceFolderField
-                    handleSourceFolderChange={handleSourceFolderChange(
-                      fetchGitIgnore,
-                    )}
+                    setSelectedFolder={setSelectedFolder}
                     options={source_folder_options}
                     error={errors.source_folder_option}
                   />
@@ -268,12 +306,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
                             Copy All Content
                           </button>
                         </CopyToClipboard>
-                        {/* 
-                        <GenericButton
-                          label="Submit (Does Nothing)"
-                          type="submit"
-                          className="bg-green-600 px-3 text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 "
-                        /> */}
                       </div>
                     </>
                   ) : null}

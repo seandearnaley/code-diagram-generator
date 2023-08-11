@@ -20,10 +20,14 @@ export const handleSourceFolderChange =
   async (
     folder: string,
     setFieldValue: (field: string, value: any) => void,
+    values: any,
   ): Promise<void> => {
-    const git_ignore_path = await fetchGitIgnore(folder);
-    setFieldValues(setFieldValue, {
-      source_folder_option: folder,
-      git_ignore_file_path: git_ignore_path || "",
-    });
+    const currentFolder = values.source_folder_option;
+    if (folder !== currentFolder) {
+      const git_ignore_path = await fetchGitIgnore(folder);
+      setFieldValues(setFieldValue, {
+        source_folder_option: folder,
+        git_ignore_file_path: git_ignore_path || "",
+      });
+    }
   };
