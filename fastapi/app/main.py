@@ -11,7 +11,7 @@ from .routes import (
     mermaid_routes,
 )
 
-app = FastAPI()
+app = FastAPI(debug=True)
 
 origins = [
     "http://localhost:3000",

@@ -4,7 +4,8 @@ import os
 from typing import Any, Dict
 
 import openai
-from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
+
+# from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
 from openai.openai_object import OpenAIObject
 
 from ..config import LLM_CONFIG_PATH
@@ -68,22 +69,22 @@ def complete_openai_text(
         return f"OpenAI Client Error: {err}"
 
 
-def complete_anthropic_text(
-    prompt: str,
-    max_tokens: int,
-    model: str,
-) -> str:
-    """Use Anthropic's model to complete text based on the given prompt."""
+# def complete_anthropic_text(
+#     prompt: str,
+#     max_tokens: int,
+#     model: str,
+# ) -> str:
+#     """Use Anthropic's model to complete text based on the given prompt."""
 
-    try:
-        anthropic_client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-        response = anthropic_client.completions.create(
-            prompt=f"{HUMAN_PROMPT} {prompt}{AI_PROMPT}",
-            stop_sequences=[HUMAN_PROMPT],
-            model=model,
-            max_tokens_to_sample=max_tokens,
-        )
+#     try:
+#         anthropic_client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+#         response = anthropic_client.completions.create(
+#             prompt=f"{HUMAN_PROMPT} {prompt}{AI_PROMPT}",
+#             stop_sequences=[HUMAN_PROMPT],
+#             model=model,
+#             max_tokens_to_sample=max_tokens,
+#         )
 
-        return response.completion.strip()
-    except AnthropicException as err:
-        return f"Anthropic Client Error: {err}"
+#         return response.completion.strip()
+#     except AnthropicException as err:
+#         return f"Anthropic Client Error: {err}"

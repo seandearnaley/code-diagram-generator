@@ -4,8 +4,9 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
+from pydantic import validator
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter
 
 from ..services.directory_analysis_service import folder_report, folder_tree
 
@@ -23,6 +24,14 @@ class DiagramPayload(BaseModel):
     git_ignore_file_path: Optional[Path] = None
     llm_vendor_for_instructions: str
     llm_model_for_instructions: str
+
+    @validator("source_folder_option")
+    @classmethod
+    def validate_source_folder_option(cls, value: str) -> str:
+        """Validate source_folder_option"""
+        if not value:
+            raise ValueError("source_folder_option must not be empty")
+        return value
 
 
 async def get_folder_content(
@@ -55,7 +64,7 @@ async def get_folder_content(
 
 
 @router.post("/generate_diagram_instructions/")
-async def generate_diagram_instructions(payload: DiagramPayload = Body(...)) -> dict:
+async def generate_diagram_instructions(payload: DiagramPayload):
     """Generate diagram instructions"""
     print("Received request for generate_diagram_instructions")
     folder_tree_content, folder_report_content = await get_folder_content(payload)
