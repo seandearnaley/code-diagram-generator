@@ -23,8 +23,8 @@ export const CodeComponent: React.FC<CustomCodeProps> = ({
   };
 
   return (
-    <div>
-      <pre className="whitespace-pre-wrap rounded-md">
+    <div className="prose overflow-y-auto bg-slate-500 text-slate-500 rounded-md">
+      <pre className="max-h-[500px] max-w-[800px] whitespace-pre-wrap m-0 ">
         {/* Code block */}
         {match && !inline ? (
           <SyntaxHighlighter
@@ -40,7 +40,7 @@ export const CodeComponent: React.FC<CustomCodeProps> = ({
       </pre>
       <CopyToClipboard text={codeString}>
         <button
-          className="text-sm font-semibold leading-6 text-white flex items-center cursor-pointer"
+          className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer p-2"
           type="button"
           onClick={handleCopyClick}
         >

@@ -76,7 +76,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
     setSubmitting(false);
   };
 
-  const handleNextStep = async (
+  const prepareDesignInstructions = async (
     values: DiagramFormValues,
     setFieldValue: Function,
   ) => {
@@ -219,7 +219,9 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     label="Prepare Design Instructions"
                     type="button"
                     className="bg-blue-600 px-3 py-2 text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                    onClick={() => handleNextStep(values, setFieldValue)}
+                    onClick={() =>
+                      prepareDesignInstructions(values, setFieldValue)
+                    }
                   />
 
                   <GenericButton
@@ -242,7 +244,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
 
                     <ReactMarkdown
                       components={components}
-                      className="p-2 prose max-w-[700px] mt-1 text-sm max-h-[800px] overflow-y-auto border border-gray-300 bg-slate-300 text-slate-500 rounded-md"
+                      className=" m-0 p-4 max-w-[600px] overflow-y-auto bg-slate-300 text-slate-500 rounded-md font-bold"
                     >
                       {values.design_instructions}
                     </ReactMarkdown>
