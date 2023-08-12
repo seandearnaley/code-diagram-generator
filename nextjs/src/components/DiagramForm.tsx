@@ -20,6 +20,7 @@ import {
   DEFAULT_SOURCE_FOLDER,
 } from "@/config/formDefaults";
 import useGitIgnore from "@/hooks/useGitIgnore";
+import useLocalStorage from "@/hooks/useLocalStorage";
 import { Form, Formik, FormikHelpers } from "formik";
 import { FC, useEffect, useMemo, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -51,38 +52,32 @@ const DiagramForm: FC<DiagramFormProps> = ({
 }) => {
   const { fetch: fetchGitIgnore, loading, error } = useGitIgnore();
   const [fullText, setFullText] = useState("");
-  const initialValues = useMemo(() => {
-    const savedValues = localStorage.getItem("formValues");
-    let initialFormValues = {
-      source_folder_option: DEFAULT_SOURCE_FOLDER,
-      diagram_category: default_diagram_category || DEFAULT_DIAGRAM_CATEGORY,
-      diagram_option: DEFAULT_DIAGRAM_OPTION,
-      include_folder_tree: true,
-      include_python_code_outline: true,
-      git_ignore_file_path: initial_git_ignore_file_path || "",
-      llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
-      llm_model_for_instructions: DEFAULT_LLM_MODEL,
-      design_instructions: "",
-    };
 
-    if (source_folder_options.length > 0) {
-      initialFormValues.source_folder_option = source_folder_options[0]?.id;
+  const [storedValue, setStoredValue] = useLocalStorage("formValues", {
+    source_folder_option: DEFAULT_SOURCE_FOLDER,
+    diagram_category: default_diagram_category || DEFAULT_DIAGRAM_CATEGORY,
+    diagram_option: DEFAULT_DIAGRAM_OPTION,
+    include_folder_tree: true,
+    include_python_code_outline: true,
+    git_ignore_file_path: initial_git_ignore_file_path || "",
+    llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
+    llm_model_for_instructions: DEFAULT_LLM_MODEL,
+    design_instructions: "",
+  });
+
+  const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
+    useState(true);
+
+  // Add this useEffect to set the stored value as soon as the component mounts
+  useEffect(() => {
+    if (storedValue) {
+      setLoadingValuesFromStorage(false);
     }
+  }, [storedValue]);
 
-    if (savedValues) {
-      const parsedValues = JSON.parse(savedValues);
-      initialFormValues = {
-        ...initialFormValues,
-        ...parsedValues,
-      };
-    }
-
-    return initialFormValues;
-  }, [
-    source_folder_options,
-    default_diagram_category,
-    initial_git_ignore_file_path,
-  ]);
+  if (loadingValuesFromStorage) {
+    return <Loading message="Loading state..." />;
+  }
 
   const handleSubmit = async (
     values: DiagramFormValues,
@@ -129,7 +124,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
 
   return (
     <Formik<DiagramFormValues>
-      initialValues={initialValues}
+      initialValues={storedValue}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
@@ -146,16 +141,21 @@ const DiagramForm: FC<DiagramFormProps> = ({
           }
         }, [selectedFolder]);
 
-        // Save form values to localStorage whenever they change
         useEffect(() => {
           if (dirty) {
-            localStorage.setItem("formValues", JSON.stringify(values));
+            console.log("Saving to local storage:", values);
+            setStoredValue(values);
           }
         }, [values, dirty]);
 
         useEffect(() => {
           setFullText(values.design_instructions);
         }, [values.design_instructions]);
+
+        useEffect(() => {
+          console.log("Values changed:", values);
+          // rest of the code...
+        }, [values]);
 
         const processedInstructions = values.design_instructions;
 

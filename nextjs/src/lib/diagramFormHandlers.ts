@@ -9,10 +9,8 @@ export const createOptionChangeHandler =
     setFieldValue: (field: string, value: any) => void,
   ) => {
     const default_option = options[selected_option]?.[0]?.id || "";
-    setFieldValues(setFieldValue, {
-      [field_for_option]: selected_option,
-      [field_for_default]: default_option,
-    });
+    setFieldValue(field_for_option, selected_option);
+    setFieldValue(field_for_default, default_option);
   };
 
 export const handleSourceFolderChange =
@@ -22,6 +20,7 @@ export const handleSourceFolderChange =
     setFieldValue: (field: string, value: any) => void,
     values: any,
   ): Promise<void> => {
+    console.log("Input values:", folder, values);
     const currentFolder = values.source_folder_option;
     if (folder !== currentFolder) {
       const git_ignore_path = await fetchGitIgnore(folder);
@@ -30,4 +29,5 @@ export const handleSourceFolderChange =
         git_ignore_file_path: git_ignore_path || "",
       });
     }
+    console.log("Output values:", folder, values);
   };
