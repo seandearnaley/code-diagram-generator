@@ -4,13 +4,11 @@ import { ClipboardIcon } from "@heroicons/react/24/solid";
 import {
   CheckboxGroup,
   CodeComponent,
-  Error,
   GenericButton,
   Loading,
   RadioButtonGroup,
   SelectField,
-  SourceFolderField,
-  TextInput,
+  SourceFolderSection,
 } from "@/components";
 import {
   DEFAULT_DIAGRAM_CATEGORY,
@@ -19,7 +17,6 @@ import {
   DEFAULT_LLM_VENDOR,
   DEFAULT_SOURCE_FOLDER,
 } from "@/config/formDefaults";
-import useGitIgnore from "@/hooks/useGitIgnore";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Form, Formik, FormikHelpers } from "formik";
 import { FC, useEffect, useMemo, useState } from "react";
@@ -31,10 +28,7 @@ import {
   validationSchema,
 } from "@/types/DiagramForm.types";
 import ReactMarkdown from "react-markdown";
-import {
-  createOptionChangeHandler,
-  handleSourceFolderChange,
-} from "../lib/diagramFormHandlers";
+import { createOptionChangeHandler } from "../lib/diagramFormHandlers";
 
 const components = {
   code: CodeComponent,
@@ -46,29 +40,31 @@ const DiagramForm: FC<DiagramFormProps> = ({
     diagram_category_options,
     default_diagram_category,
   },
-  llm_config: { llm_vendors, llm_vendor_options, default_llm_vendor },
+  llm_config: { llm_vendors, llm_vendor_options },
   source_folder_options,
   initial_git_ignore_file_path,
 }) => {
-  const { fetch: fetchGitIgnore, loading, error } = useGitIgnore();
-  const [fullText, setFullText] = useState("");
+  const [fullText, setFullText] = useState<string | undefined>(undefined);
 
-  const [storedValue, setStoredValue] = useLocalStorage("formValues", {
-    source_folder_option: DEFAULT_SOURCE_FOLDER,
-    diagram_category: default_diagram_category || DEFAULT_DIAGRAM_CATEGORY,
-    diagram_option: DEFAULT_DIAGRAM_OPTION,
-    include_folder_tree: true,
-    include_python_code_outline: true,
-    git_ignore_file_path: initial_git_ignore_file_path || "",
-    llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
-    llm_model_for_instructions: DEFAULT_LLM_MODEL,
-    design_instructions: "",
-  });
+  const [storedValue, setStoredValue] = useLocalStorage(
+    "formValues",
+    {
+      source_folder_option: DEFAULT_SOURCE_FOLDER,
+      git_ignore_file_path: initial_git_ignore_file_path || "",
+      diagram_category: default_diagram_category || DEFAULT_DIAGRAM_CATEGORY,
+      diagram_option: DEFAULT_DIAGRAM_OPTION,
+      include_folder_tree: true,
+      include_python_code_outline: true,
+      llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
+      llm_model_for_instructions: DEFAULT_LLM_MODEL,
+      design_instructions: "",
+    },
+    ["design_instructions"],
+  );
 
   const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
     useState(true);
 
-  // Add this useEffect to set the stored value as soon as the component mounts
   useEffect(() => {
     if (storedValue) {
       setLoadingValuesFromStorage(false);
@@ -76,7 +72,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
   }, [storedValue]);
 
   if (loadingValuesFromStorage) {
-    return <Loading message="Loading state..." />;
+    return <Loading message="Loading local storage state..." />;
   }
 
   const handleSubmit = async (
@@ -91,7 +87,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
     setFieldValue: Function,
   ) => {
     const postUrl = "http://localhost:8000/generate_diagram_instructions/";
-
+    console.log("posting values=", values);
     const response = await fetch(postUrl, {
       method: "POST",
       headers: {
@@ -129,18 +125,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
       onSubmit={handleSubmit}
     >
       {({ values, setFieldValue, errors, handleReset, dirty }) => {
-        const [selectedFolder, setSelectedFolder] = useState("");
-
-        useEffect(() => {
-          if (selectedFolder) {
-            handleSourceFolderChange(fetchGitIgnore)(
-              selectedFolder,
-              setFieldValue,
-              values,
-            );
-          }
-        }, [selectedFolder]);
-
         useEffect(() => {
           if (dirty) {
             console.log("Saving to local storage:", values);
@@ -169,9 +153,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
 
         return (
           <Form aria-labelledby="formTitle">
-            <div className={loading || error ? "relative" : ""}>
-              {loading && <Loading message="Loading gitignore file..." />}
-              {error && <Error message={error} />}
+            <div>
               <div className="border-b border-gray-900/10 pl-4">
                 <h2 className="text-base font-semibold leading-10 text-gray-900">
                   Mermaid Diagram GPT Generator
@@ -179,19 +161,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-4 pl-4">
                 <div className="col-span-1">
-                  <SourceFolderField
-                    setSelectedFolder={setSelectedFolder}
-                    options={source_folder_options}
-                    error={errors.source_folder_option}
-                  />
-
-                  <TextInput
-                    name="git_ignore_file_path"
-                    label="GitIgnore File Path"
-                    helpText={
-                      "Enter the path to a file that specify files to ignore for analysis intentionally."
-                    }
-                  />
+                  <SourceFolderSection options={source_folder_options} />
 
                   <CheckboxGroup
                     options={[
@@ -294,7 +264,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                       </ReactMarkdown>
 
                       <div className="p-2">
-                        <CopyToClipboard text={fullText}>
+                        <CopyToClipboard text={fullText || ""}>
                           <button
                             className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
                             type="button"

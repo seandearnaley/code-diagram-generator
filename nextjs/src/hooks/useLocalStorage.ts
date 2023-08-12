@@ -3,6 +3,7 @@ import { useState } from "react";
 export default function useLocalStorage<T>(
   key: string,
   initialValue: T,
+  omitFields: string[] = [],
 ): [T, (value: T) => void] {
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window !== "undefined") {
@@ -13,7 +14,11 @@ export default function useLocalStorage<T>(
   });
 
   const setValue = (value: T) => {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    const valueToStore: Partial<T> = { ...value };
+    omitFields.forEach((field) => {
+      delete valueToStore[field as keyof typeof valueToStore];
+    });
+    window.localStorage.setItem(key, JSON.stringify(valueToStore));
     setStoredValue(value);
   };
 

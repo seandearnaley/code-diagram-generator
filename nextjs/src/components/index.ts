@@ -5,6 +5,6 @@ export { GenericButton } from "./GenericButton";
 export { Loading } from "./Loading";
 export { RadioButtonGroup } from "./RadioButtonGroup";
 export { SelectField } from "./SelectField";
-export { SourceFolderField } from "./SourceFolderField";
+export { SourceFolderSection } from "./SourceFolderSection";
 export { TextArea } from "./TextArea";
 export { TextInput } from "./TextInput";

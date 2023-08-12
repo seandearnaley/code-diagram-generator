@@ -25,29 +25,46 @@ class DiagramPayload(BaseModel):
     llm_model_for_instructions: str
 
 
-async def get_folder_content(payload: DiagramPayload) -> Tuple[str, str]:
-    """Get the folder tree and folder report content"""
+async def get_folder_content(
+    payload: DiagramPayload,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Get the folder content for the payload"""
     source_folder = "/source-repos/" + payload.source_folder_option
-    ignore_file_path = (
-        str(payload.git_ignore_file_path) if payload.git_ignore_file_path else None
+    git_ignore_file_path_str = (
+        str(payload.git_ignore_file_path)
+        if payload.git_ignore_file_path and payload.git_ignore_file_path != Path(".")
+        else ""
     )
-    folder_tree_content = await folder_tree(
-        source_folder, ignore_file_path=ignore_file_path
-    )
-    folder_report_content = await folder_report(
-        source_folder, ignore_file_path=ignore_file_path
-    )
+
+    ignore_file_path = git_ignore_file_path_str.strip() or None
+
+    folder_tree_content = None
+    folder_report_content = None
+
+    if payload.include_folder_tree:
+        folder_tree_content = await folder_tree(
+            source_folder, ignore_file_path=ignore_file_path
+        )
+
+    if payload.include_python_code_outline:
+        folder_report_content = await folder_report(
+            source_folder, ignore_file_path=ignore_file_path
+        )
+
     return folder_tree_content, folder_report_content
 
 
 @router.post("/generate_diagram_instructions/")
 async def generate_diagram_instructions(payload: DiagramPayload = Body(...)) -> dict:
-    """Generate a diagram based on the payload"""
+    """Generate diagram instructions"""
     folder_tree_content, folder_report_content = await get_folder_content(payload)
 
-    dump = (
-        f"### Folder Tree:\n```\n{folder_tree_content}```\n\n"
-        f"### Python Report:\n```\n{folder_report_content}\n```\n"
-    )
+    dump = ""
+
+    if folder_tree_content:
+        dump += f"### Folder Tree:\n```\n{folder_tree_content}```\n\n"
+
+    if folder_report_content:
+        dump += f"### Python Report:\n```\n{folder_report_content}\n```\n"
 
     return {"status": "success", "payload": dump}
