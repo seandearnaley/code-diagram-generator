@@ -57,6 +57,7 @@ async def get_folder_content(
 @router.post("/generate_diagram_instructions/")
 async def generate_diagram_instructions(payload: DiagramPayload = Body(...)) -> dict:
     """Generate diagram instructions"""
+    print("Received request for generate_diagram_instructions")
     folder_tree_content, folder_report_content = await get_folder_content(payload)
 
     dump = ""
@@ -67,4 +68,6 @@ async def generate_diagram_instructions(payload: DiagramPayload = Body(...)) -> 
     if folder_report_content:
         dump += f"### Python Report:\n```\n{folder_report_content}\n```\n"
 
-    return {"status": "success", "payload": dump}
+    response = {"status": "success", "payload": dump}
+    print("Sending response:", response)
+    return response

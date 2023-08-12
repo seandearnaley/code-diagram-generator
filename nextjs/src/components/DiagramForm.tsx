@@ -20,8 +20,8 @@ import {
   DEFAULT_SOURCE_FOLDER,
 } from "@/config/formDefaults";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { Form, Formik, FormikHelpers } from "formik";
-import { FC, useEffect, useMemo, useState } from "react";
+import { Form, Formik } from "formik";
+import { FC, useEffect, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import {
@@ -37,15 +37,10 @@ const components = {
 };
 
 const DiagramForm: FC<DiagramFormProps> = ({
-  diagram_config: {
-    diagram_categories,
-    diagram_category_options,
-    default_diagram_category,
-  },
+  diagram_config: { diagram_categories, diagram_category_options },
   llm_config: { llm_vendors, llm_vendor_options },
   source_folder_options,
 }) => {
-  const [fullText, setFullText] = useState<string | undefined>(undefined);
   const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
     useState(true);
   const [storedValue, setStoredValue] = useLocalStorage(
@@ -53,7 +48,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
     {
       source_folder_option: DEFAULT_SOURCE_FOLDER,
       git_ignore_file_path: "",
-      diagram_category: default_diagram_category || DEFAULT_DIAGRAM_CATEGORY,
+      diagram_category: DEFAULT_DIAGRAM_CATEGORY,
       diagram_option: DEFAULT_DIAGRAM_OPTION,
       include_folder_tree: true,
       include_python_code_outline: true,
@@ -64,7 +59,16 @@ const DiagramForm: FC<DiagramFormProps> = ({
     ["design_instructions"],
   );
 
+  // const [valuesChanged, setValuesChanged] = useState(false);
   const { data, error, mutate } = useDiagramInstructions(storedValue);
+
+  // useEffect(() => {
+  //   if (valuesChanged) {
+  //     console.log("Saving to local storage");
+  //     setStoredValue(storedValue);
+  //     setValuesChanged(false); // Reset the flag
+  //   }
+  // }, [valuesChanged, setStoredValue, storedValue]);
 
   useEffect(() => {
     if (storedValue) {
@@ -72,12 +76,13 @@ const DiagramForm: FC<DiagramFormProps> = ({
     }
   }, [storedValue]);
 
-  const handleSubmit = async (
-    values: DiagramFormValues,
-    { setSubmitting, setFieldValue }: FormikHelpers<DiagramFormValues>,
-  ) => {
-    setSubmitting(false);
-  };
+  // const handleSubmit = async (
+  //   values: DiagramFormValues,
+  //   { setSubmitting }: FormikHelpers<DiagramFormValues>,
+  // ) => {
+  //   // Here, you would typically send the form values to your server or handle them accordingly
+  //   setSubmitting(false);
+  // };
 
   const handleDiagramCategoryChange = createOptionChangeHandler(
     "diagram_category",
@@ -97,9 +102,11 @@ const DiagramForm: FC<DiagramFormProps> = ({
     <Formik<DiagramFormValues>
       initialValues={storedValue}
       validationSchema={validationSchema}
-      onSubmit={handleSubmit}
+      onSubmit={() => {}} // do nothing
+      // onSubmit={handleSubmit}
     >
       {({ values, setFieldValue, errors, handleReset, dirty }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (dirty) {
             console.log("Saving to local storage:", values);
@@ -107,28 +114,22 @@ const DiagramForm: FC<DiagramFormProps> = ({
           }
         }, [values, dirty]);
 
-        useEffect(() => {
-          setFullText(values.design_instructions); // for copy to clipboard
-        }, [values.design_instructions]);
-
-        useEffect(() => {
-          if (data) {
-            setFieldValue("design_instructions", data.payload);
-          }
-        }, [data]);
-
         const handlePrepareDesignInstructions = () => {
-          // Trigger revalidation to fetch new data
-          mutate();
+          mutate().then((data) => {
+            if (data && data.payload) {
+              setFieldValue("design_instructions", data.payload);
+            } else {
+              console.error("Unexpected response structure", data);
+            }
+          });
         };
 
-        const diagram_options = useMemo(() => {
-          return diagram_categories[values.diagram_category] || [];
-        }, [values.diagram_category, diagram_categories]);
+        const fullText = values.design_instructions; // for copy to clipboard
 
-        const model_options = useMemo(() => {
-          return llm_vendors[values.llm_vendor_for_instructions] || [];
-        }, [values.llm_vendor_for_instructions, llm_vendors]);
+        const diagram_options =
+          diagram_categories[values.diagram_category] || [];
+        const model_options =
+          llm_vendors[values.llm_vendor_for_instructions] || [];
 
         return (
           <Form aria-labelledby="formTitle">
@@ -170,6 +171,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                 <RadioButtonGroup
                   options={diagram_options}
                   name="diagram_option"
+                  categoryKey={values.diagram_category}
                   onChange={(optionId) => {
                     setFieldValue("diagram_option", optionId);
                   }}
@@ -191,6 +193,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                 <RadioButtonGroup
                   options={model_options}
                   name="llm_model_for_instructions"
+                  categoryKey={values.llm_vendor_for_instructions}
                   onChange={(optionId) => {
                     setFieldValue("llm_model_for_instructions", optionId);
                   }}
@@ -217,8 +220,9 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     onClick={handleReset}
                   />
 
-                  {error ? <div>Error fetching instructions</div> : null}
-                  {data ? (
+                  {error ? (
+                    <div>Error fetching instructions: {error.message}</div>
+                  ) : data ? (
                     <div>hello</div>
                   ) : (
                     <Loading message="Loading design instructions..." />
