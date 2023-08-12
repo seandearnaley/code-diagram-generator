@@ -141,8 +141,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
           // rest of the code...
         }, [values]);
 
-        const processedInstructions = values.design_instructions;
-
         const diagram_options = useMemo(() => {
           return diagram_categories[values.diagram_category] || [];
         }, [values.diagram_category, diagram_categories]);
@@ -247,7 +245,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   </div>
                 </div>
                 <div className="col-span-1 pt-2">
-                  {processedInstructions ? (
+                  {values.design_instructions ? (
                     <>
                       <label
                         htmlFor="design_instructions"
@@ -260,7 +258,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                         components={components}
                         className="p-2 prose max-w-[700px] mt-1 text-sm max-h-[800px] overflow-y-auto border border-gray-300 bg-slate-300 text-slate-500 rounded-md"
                       >
-                        {processedInstructions}
+                        {values.design_instructions}
                       </ReactMarkdown>
 
                       <div className="p-2">

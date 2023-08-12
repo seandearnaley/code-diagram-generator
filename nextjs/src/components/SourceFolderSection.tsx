@@ -19,7 +19,11 @@ export const SourceFolderSection: FC<SourceFolderSectionProps> = ({
 
   useEffect(() => {
     if (selectedFolder) {
-      handleSourceFolderChange(fetch)(selectedFolder, setFieldValue, values);
+      handleSourceFolderChange(fetch)(
+        selectedFolder,
+        setFieldValue,
+        values.source_folder_option,
+      );
     }
   }, [selectedFolder]);
 
