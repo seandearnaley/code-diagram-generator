@@ -43,46 +43,25 @@ const DiagramForm: FC<DiagramFormProps> = ({
 }) => {
   const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
     useState(true);
-  const [storedValue, setStoredValue] = useLocalStorage(
-    "formValues",
-    {
-      source_folder_option: DEFAULT_SOURCE_FOLDER,
-      git_ignore_file_path: "",
-      diagram_category: DEFAULT_DIAGRAM_CATEGORY,
-      diagram_option: DEFAULT_DIAGRAM_OPTION,
-      include_folder_tree: true,
-      include_python_code_outline: true,
-      llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
-      llm_model_for_instructions: DEFAULT_LLM_MODEL,
-      design_instructions: "",
-    },
-    ["design_instructions"],
-  );
+  const [storedValue, setStoredValue] = useLocalStorage("formValues", {
+    source_folder_option: DEFAULT_SOURCE_FOLDER,
+    git_ignore_file_path: "",
+    diagram_category: DEFAULT_DIAGRAM_CATEGORY,
+    diagram_option: DEFAULT_DIAGRAM_OPTION,
+    include_folder_tree: true,
+    include_python_code_outline: true,
+    llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
+    llm_model_for_instructions: DEFAULT_LLM_MODEL,
+    design_instructions: "",
+  });
 
-  // const [valuesChanged, setValuesChanged] = useState(false);
   const { data, error, mutate } = useDiagramInstructions(storedValue);
-
-  // useEffect(() => {
-  //   if (valuesChanged) {
-  //     console.log("Saving to local storage");
-  //     setStoredValue(storedValue);
-  //     setValuesChanged(false); // Reset the flag
-  //   }
-  // }, [valuesChanged, setStoredValue, storedValue]);
 
   useEffect(() => {
     if (storedValue) {
       setLoadingValuesFromStorage(false);
     }
   }, [storedValue]);
-
-  // const handleSubmit = async (
-  //   values: DiagramFormValues,
-  //   { setSubmitting }: FormikHelpers<DiagramFormValues>,
-  // ) => {
-  //   // Here, you would typically send the form values to your server or handle them accordingly
-  //   setSubmitting(false);
-  // };
 
   const handleDiagramCategoryChange = createOptionChangeHandler(
     "diagram_category",
@@ -103,16 +82,18 @@ const DiagramForm: FC<DiagramFormProps> = ({
       initialValues={storedValue}
       validationSchema={validationSchema}
       onSubmit={() => {}} // do nothing
-      // onSubmit={handleSubmit}
     >
       {({ values, setFieldValue, errors, handleReset, dirty }) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
+          // wish there was a way to do this in Formik with the hook in callback
           if (dirty) {
             console.log("Saving to local storage:", values);
             setStoredValue(values);
           }
         }, [values, dirty]);
+
+        const fullText = values.design_instructions; // for copy to clipboard
 
         const handlePrepareDesignInstructions = () => {
           mutate().then((data) => {
@@ -123,8 +104,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
             }
           });
         };
-
-        const fullText = values.design_instructions; // for copy to clipboard
 
         const diagram_options =
           diagram_categories[values.diagram_category] || [];
