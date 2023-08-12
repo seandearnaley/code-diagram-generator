@@ -73,11 +73,7 @@ export default async function Home() {
         diagram_config={diagram_config}
         llm_config={llm_config}
         source_folder_options={source_folder_options}
-        // default_source_folder={default_source_folder}
-        // initial_git_ignore_file_path={initial_git_ignore_file_path}
       />
-      {/* 
-      <MermaidTest /> */}
     </div>
   );
 }

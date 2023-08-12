@@ -4,6 +4,7 @@ import { ClipboardIcon } from "@heroicons/react/24/solid";
 import {
   CheckboxGroup,
   CodeComponent,
+  FormContent,
   GenericButton,
   Loading,
   RadioButtonGroup,
@@ -44,7 +45,8 @@ const DiagramForm: FC<DiagramFormProps> = ({
   source_folder_options,
 }) => {
   const [fullText, setFullText] = useState<string | undefined>(undefined);
-
+  const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
+    useState(true);
   const [storedValue, setStoredValue] = useLocalStorage(
     "formValues",
     {
@@ -61,18 +63,11 @@ const DiagramForm: FC<DiagramFormProps> = ({
     ["design_instructions"],
   );
 
-  const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
-    useState(true);
-
   useEffect(() => {
     if (storedValue) {
       setLoadingValuesFromStorage(false);
     }
   }, [storedValue]);
-
-  if (loadingValuesFromStorage) {
-    return <Loading message="Loading local storage state..." />;
-  }
 
   const handleSubmit = async (
     values: DiagramFormValues,
@@ -117,6 +112,10 @@ const DiagramForm: FC<DiagramFormProps> = ({
     "llm_model_for_instructions",
   );
 
+  if (loadingValuesFromStorage) {
+    return <Loading message="Loading local storage state..." />;
+  }
+
   return (
     <Formik<DiagramFormValues>
       initialValues={storedValue}
@@ -135,11 +134,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
           setFullText(values.design_instructions);
         }, [values.design_instructions]);
 
-        useEffect(() => {
-          console.log("Values changed:", values);
-          // rest of the code...
-        }, [values]);
-
         const diagram_options = useMemo(() => {
           return diagram_categories[values.diagram_category] || [];
         }, [values.diagram_category, diagram_categories]);
@@ -150,135 +144,127 @@ const DiagramForm: FC<DiagramFormProps> = ({
 
         return (
           <Form aria-labelledby="formTitle">
-            <div>
-              <div className="border-b border-gray-900/10 pl-4">
-                <h2 className="text-base font-semibold leading-10 text-gray-900">
-                  Mermaid Diagram GPT Generator
-                </h2>
-              </div>
-              <div className="grid grid-cols-2 gap-4 pl-4">
-                <div className="col-span-1">
-                  <SourceFolderSection options={source_folder_options} />
+            <FormContent title="Mermaid Diagram GPT Generator">
+              <div className="col-span-1">
+                <SourceFolderSection options={source_folder_options} />
 
-                  <CheckboxGroup
-                    options={[
-                      {
-                        id: "include_folder_tree",
-                        label: "Include Folder Tree",
-                        helpText:
-                          "Whether to include the project's folder tree.",
-                      },
-                      {
-                        id: "include_python_code_outline",
-                        label: "Include Python Code Outline",
-                        helpText:
-                          "Whether to include a simple outline of the project's python code",
-                      },
-                    ]}
-                  />
+                <CheckboxGroup
+                  options={[
+                    {
+                      id: "include_folder_tree",
+                      label: "Include Folder Tree",
+                      helpText: "Whether to include the project's folder tree.",
+                    },
+                    {
+                      id: "include_python_code_outline",
+                      label: "Include Python Code Outline",
+                      helpText:
+                        "Whether to include a simple outline of the project's python code",
+                    },
+                  ]}
+                />
 
-                  <SelectField
-                    options={diagram_category_options}
-                    label="Select Diagram Category"
-                    name="diagram_category"
-                    id="diagram_category"
-                    aria-label="Select a diagram category from the list"
-                    onChange={(selected_option) =>
-                      handleDiagramCategoryChange(
-                        selected_option,
-                        diagram_categories,
-                        setFieldValue,
-                      )
-                    }
-                  />
+                <SelectField
+                  options={diagram_category_options}
+                  label="Select Diagram Category"
+                  name="diagram_category"
+                  id="diagram_category"
+                  aria-label="Select a diagram category from the list"
+                  onChange={(selected_option) =>
+                    handleDiagramCategoryChange(
+                      selected_option,
+                      diagram_categories,
+                      setFieldValue,
+                    )
+                  }
+                />
 
-                  <RadioButtonGroup
-                    options={diagram_options}
-                    name="diagram_option"
-                    onChange={(optionId) => {
-                      setFieldValue("diagram_option", optionId);
-                    }}
-                  />
+                <RadioButtonGroup
+                  options={diagram_options}
+                  name="diagram_option"
+                  onChange={(optionId) => {
+                    setFieldValue("diagram_option", optionId);
+                  }}
+                />
 
-                  {errors.diagram_option ? (
-                    <div className="text-red-500">{errors.diagram_option}</div>
-                  ) : null}
+                {errors.diagram_option ? (
+                  <div className="text-red-500">{errors.diagram_option}</div>
+                ) : null}
 
-                  <SelectField
-                    options={llm_vendor_options}
-                    label="Select LLM Vendor for Instructions"
-                    name="llm_vendor_for_instructions"
-                    id="llm_vendor_for_instructions"
-                    onChange={(vendor) =>
-                      handleLlmVendorChange(vendor, llm_vendors, setFieldValue)
-                    }
-                  />
-                  <RadioButtonGroup
-                    options={model_options}
-                    name="llm_model_for_instructions"
-                    onChange={(optionId) => {
-                      setFieldValue("llm_model_for_instructions", optionId);
-                    }}
-                  />
+                <SelectField
+                  options={llm_vendor_options}
+                  label="Select LLM Vendor for Instructions"
+                  name="llm_vendor_for_instructions"
+                  id="llm_vendor_for_instructions"
+                  onChange={(vendor) =>
+                    handleLlmVendorChange(vendor, llm_vendors, setFieldValue)
+                  }
+                />
+                <RadioButtonGroup
+                  options={model_options}
+                  name="llm_model_for_instructions"
+                  onChange={(optionId) => {
+                    setFieldValue("llm_model_for_instructions", optionId);
+                  }}
+                />
 
-                  {errors.llm_model_for_instructions ? (
-                    <div className="text-red-500">
-                      {errors.llm_model_for_instructions}
-                    </div>
-                  ) : null}
-
-                  <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <GenericButton
-                      label="Prepare Design Instructions"
-                      type="button"
-                      className="bg-blue-600 px-3 py-2 text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                      onClick={() => handleNextStep(values, setFieldValue)}
-                    />
-
-                    <GenericButton
-                      label="Cancel"
-                      type="button"
-                      className="text-gray-900 pl-2 py-2"
-                      onClick={handleReset}
-                    />
+                {errors.llm_model_for_instructions ? (
+                  <div className="text-red-500">
+                    {errors.llm_model_for_instructions}
                   </div>
-                </div>
-                <div className="col-span-1 pt-2">
-                  {values.design_instructions ? (
-                    <>
-                      <label
-                        htmlFor="design_instructions"
-                        className="block text-sm text-gray-700 font-medium leading-6"
-                      >
-                        Design Instructions
-                      </label>
+                ) : null}
 
-                      <ReactMarkdown
-                        components={components}
-                        className="p-2 prose max-w-[700px] mt-1 text-sm max-h-[800px] overflow-y-auto border border-gray-300 bg-slate-300 text-slate-500 rounded-md"
-                      >
-                        {values.design_instructions}
-                      </ReactMarkdown>
+                <div className="mt-6 flex items-center justify-end gap-x-6">
+                  <GenericButton
+                    label="Prepare Design Instructions"
+                    type="button"
+                    className="bg-blue-600 px-3 py-2 text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    onClick={() => handleNextStep(values, setFieldValue)}
+                  />
 
-                      <div className="p-2">
-                        <CopyToClipboard text={fullText || ""}>
-                          <button
-                            className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
-                            type="button"
-                            onClick={() =>
-                              alert("All content copied to clipboard!")
-                            }
-                          >
-                            <ClipboardIcon className="h-5 w-5 mr-2" />
-                            Copy All Content
-                          </button>
-                        </CopyToClipboard>
-                      </div>
-                    </>
-                  ) : null}
+                  <GenericButton
+                    label="Cancel"
+                    type="button"
+                    className="text-gray-900 pl-2 py-2"
+                    onClick={handleReset}
+                  />
                 </div>
               </div>
-            </div>
+              <div className="col-span-1 pt-2">
+                {values.design_instructions ? (
+                  <>
+                    <label
+                      htmlFor="design_instructions"
+                      className="block text-sm text-gray-700 font-medium leading-6"
+                    >
+                      Design Instructions
+                    </label>
+
+                    <ReactMarkdown
+                      components={components}
+                      className="p-2 prose max-w-[700px] mt-1 text-sm max-h-[800px] overflow-y-auto border border-gray-300 bg-slate-300 text-slate-500 rounded-md"
+                    >
+                      {values.design_instructions}
+                    </ReactMarkdown>
+
+                    <div className="p-2">
+                      <CopyToClipboard text={fullText || ""}>
+                        <button
+                          className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
+                          type="button"
+                          onClick={() =>
+                            alert("All content copied to clipboard!")
+                          }
+                        >
+                          <ClipboardIcon className="h-5 w-5 mr-2" />
+                          Copy All Content
+                        </button>
+                      </CopyToClipboard>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </FormContent>
           </Form>
         );
       }}

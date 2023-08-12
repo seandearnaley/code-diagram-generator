@@ -1,6 +1,7 @@
 export { CheckboxGroup } from "./CheckboxGroup";
 export { CodeComponent } from "./CodeComponent";
 export { Error } from "./Error";
+export { FormContent } from "./FormContent";
 export { GenericButton } from "./GenericButton";
 export { Loading } from "./Loading";
 export { RadioButtonGroup } from "./RadioButtonGroup";
