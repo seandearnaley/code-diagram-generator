@@ -1,4 +1,5 @@
 "use client";
+import { useDiagramInstructions } from "@/hooks/useDiagramInstructions";
 import { ClipboardIcon } from "@heroicons/react/24/solid";
 
 import {
@@ -63,6 +64,8 @@ const DiagramForm: FC<DiagramFormProps> = ({
     ["design_instructions"],
   );
 
+  const { data, error, mutate } = useDiagramInstructions(storedValue);
+
   useEffect(() => {
     if (storedValue) {
       setLoadingValuesFromStorage(false);
@@ -74,32 +77,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
     { setSubmitting, setFieldValue }: FormikHelpers<DiagramFormValues>,
   ) => {
     setSubmitting(false);
-  };
-
-  const prepareDesignInstructions = async (
-    values: DiagramFormValues,
-    setFieldValue: Function,
-  ) => {
-    const postUrl = "http://localhost:8000/generate_diagram_instructions/";
-    console.log("posting values=", values);
-    const response = await fetch(postUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (!response.ok) {
-      console.error("There was an error posting the data");
-      return;
-    }
-
-    const payload = await response.json();
-
-    if (payload) {
-      setFieldValue("design_instructions", payload.payload);
-    }
   };
 
   const handleDiagramCategoryChange = createOptionChangeHandler(
@@ -131,8 +108,19 @@ const DiagramForm: FC<DiagramFormProps> = ({
         }, [values, dirty]);
 
         useEffect(() => {
-          setFullText(values.design_instructions);
+          setFullText(values.design_instructions); // for copy to clipboard
         }, [values.design_instructions]);
+
+        useEffect(() => {
+          if (data) {
+            setFieldValue("design_instructions", data.payload);
+          }
+        }, [data]);
+
+        const handlePrepareDesignInstructions = () => {
+          // Trigger revalidation to fetch new data
+          mutate();
+        };
 
         const diagram_options = useMemo(() => {
           return diagram_categories[values.diagram_category] || [];
@@ -219,9 +207,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     label="Prepare Design Instructions"
                     type="button"
                     className="bg-blue-600 px-3 py-2 text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                    onClick={() =>
-                      prepareDesignInstructions(values, setFieldValue)
-                    }
+                    onClick={handlePrepareDesignInstructions}
                   />
 
                   <GenericButton
@@ -230,6 +216,13 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     className="text-gray-900 pl-2 py-2"
                     onClick={handleReset}
                   />
+
+                  {error ? <div>Error fetching instructions</div> : null}
+                  {data ? (
+                    <div>hello</div>
+                  ) : (
+                    <Loading message="Loading design instructions..." />
+                  )}
                 </div>
               </div>
               <div className="col-span-1 pt-2">
