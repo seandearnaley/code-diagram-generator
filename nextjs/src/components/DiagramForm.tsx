@@ -42,7 +42,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
   },
   llm_config: { llm_vendors, llm_vendor_options },
   source_folder_options,
-  initial_git_ignore_file_path,
 }) => {
   const [fullText, setFullText] = useState<string | undefined>(undefined);
 
@@ -50,7 +49,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
     "formValues",
     {
       source_folder_option: DEFAULT_SOURCE_FOLDER,
-      git_ignore_file_path: initial_git_ignore_file_path || "",
+      git_ignore_file_path: "",
       diagram_category: default_diagram_category || DEFAULT_DIAGRAM_CATEGORY,
       diagram_option: DEFAULT_DIAGRAM_OPTION,
       include_folder_tree: true,

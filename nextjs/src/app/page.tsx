@@ -55,19 +55,6 @@ async function getSourceFolders() {
   }));
 }
 
-async function getInitialGitIgnoreFilePath(folder: string) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/gitignore_file/?root_folder=${folder}`,
-    {
-      cache: "no-store",
-    },
-  );
-  if (!response.ok) {
-    throw new Error(await response.text());
-  }
-  return response.json();
-}
-
 export default async function Home() {
   const diagram_config_data = getDiagramConfig();
   const llm_config_data = getLlmConfig();
@@ -80,11 +67,6 @@ export default async function Home() {
   // Assuming you want to use the first source folder as the default
   const default_source_folder = source_folder_options[0]?.id;
 
-  // Fetch the initial gitignore file path for the default source folder
-  const initial_git_ignore_file_path = await getInitialGitIgnoreFilePath(
-    default_source_folder,
-  );
-
   return (
     <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50">
       <DiagramForm
@@ -92,7 +74,7 @@ export default async function Home() {
         llm_config={llm_config}
         source_folder_options={source_folder_options}
         // default_source_folder={default_source_folder}
-        initial_git_ignore_file_path={initial_git_ignore_file_path}
+        // initial_git_ignore_file_path={initial_git_ignore_file_path}
       />
       {/* 
       <MermaidTest /> */}
