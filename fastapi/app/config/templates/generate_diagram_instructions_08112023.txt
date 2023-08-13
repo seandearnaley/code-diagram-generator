@@ -1,8 +1,11 @@
 I want you to come up with a one pager for an AI designer who runs the same software as you.  Here is what we intend to build:
 
+```
 {diagram_option} ({diagram_category}):
 
 {description}
+```
+
 
 Your final product needs to be well written beautiful mermaid code that can run in mermaid cli.
 
