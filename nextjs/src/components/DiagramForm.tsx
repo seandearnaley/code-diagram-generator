@@ -41,7 +41,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
   source_folder_options,
 }) => {
   const [toast, setToast] = useState<ToastProps | null>(null); // Add a state for managing toast
-
+  const [designInstructions, setDesignInstructions] = useState("");
   const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
     useState(true);
   const [storedValue, setStoredValue] = useLocalStorage("formValues", {
@@ -53,7 +53,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
     include_python_code_outline: true,
     llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
     llm_model_for_instructions: DEFAULT_LLM_MODEL,
-    design_instructions: "",
+    // design_instructions: "",
   });
 
   useEffect(() => {
@@ -102,14 +102,14 @@ const DiagramForm: FC<DiagramFormProps> = ({
             }
           }, [debouncedValues, dirty]);
 
-          const fullText = values.design_instructions; // for copy to clipboard
+          // const fullText = values.design_instructions; // for copy to clipboard
 
           const handlePrepareDesignInstructions = async () => {
             try {
               const data = await mutate();
               if (data && data.payload) {
                 console.log("Setting field value:", data.payload);
-                setFieldValue("design_instructions", data.payload);
+                setDesignInstructions(data.payload);
               } else {
                 console.error("Unexpected response structure", data);
                 setToast({
@@ -196,7 +196,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   ) : isLoading ? (
                     <Loading message="Loading design instructions..." />
                   ) : null}
-                  {values.design_instructions ? (
+                  {designInstructions ? (
                     <>
                       <label
                         htmlFor="design_instructions"
@@ -209,11 +209,11 @@ const DiagramForm: FC<DiagramFormProps> = ({
                         components={components}
                         className=" m-0 p-4 max-w-[600px] overflow-y-auto bg-slate-300 text-slate-500 rounded-md font-bold"
                       >
-                        {values.design_instructions}
+                        {designInstructions}
                       </ReactMarkdown>
 
                       <div className="p-2">
-                        <CopyToClipboard text={fullText || ""}>
+                        <CopyToClipboard text={""}>
                           <button
                             className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
                             type="button"

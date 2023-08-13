@@ -34,7 +34,6 @@ async function getLlmConfig() {
   }));
 
   const default_llm_vendor = llm_vendor_options[0]?.id || "";
-  console.log("llm_vendor_options", llm_vendor_options, default_llm_vendor);
   return {
     ...json,
     llm_vendor_options,

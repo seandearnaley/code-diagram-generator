@@ -1,16 +1,14 @@
-// fetcher.ts
-const fetcher = async (url: string, body: any) => {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+
+  if (response.status === 422) {
+    const errorDetail = await response.json();
+    console.error(`Error 422: `, errorDetail);
+    throw new Error(`Unprocessable Entity: ${JSON.stringify(errorDetail)}`);
+  }
 
   if (response.status === 500) {
-    // Extract the details if the status code is 500
-    const errorDetail = await response.json(); // You can change this to .json() if the details are in JSON format
+    const errorDetail = await response.json();
     throw new Error(`Server error 500: ${errorDetail.detail}`);
   }
 

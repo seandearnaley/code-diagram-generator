@@ -50,5 +50,5 @@ export type DiagramFormValues = {
   git_ignore_file_path: string;
   llm_vendor_for_instructions: string;
   llm_model_for_instructions: string;
-  design_instructions: string;
+  // design_instructions: string;
 };
