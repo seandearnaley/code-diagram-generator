@@ -5,6 +5,7 @@ type TextInputProps = {
   name: string;
   label: string;
   helpText?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const TextInput: FC<TextInputProps> = ({ name, label, helpText }) => (

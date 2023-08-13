@@ -1,6 +1,7 @@
 "use client";
 import { useDiagramInstructions } from "@/hooks/useDiagramInstructions";
 import { ClipboardIcon } from "@heroicons/react/24/solid";
+import { useDebounce } from "use-debounce";
 
 import {
   CheckboxGroup,
@@ -53,14 +54,14 @@ const DiagramForm: FC<DiagramFormProps> = ({
     design_instructions: "",
   });
 
-  const { data, error, mutate, isLoading } =
-    useDiagramInstructions(storedValue);
-
   useEffect(() => {
     if (storedValue) {
       setLoadingValuesFromStorage(false);
     }
   }, [storedValue]);
+
+  const { data, error, mutate, isLoading } =
+    useDiagramInstructions(storedValue);
 
   if (loadingValuesFromStorage) {
     return <Loading message="Loading local storage state..." />;
@@ -74,24 +75,29 @@ const DiagramForm: FC<DiagramFormProps> = ({
     >
       {({ values, setFieldValue, errors, handleReset, dirty }) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [debouncedValues] = useDebounce(values, 500); // 500ms
+
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
-          // wish there was a way to do this in Formik with the hook in callback
           if (dirty) {
-            console.log("Saving to local storage:", values);
-            setStoredValue(values);
+            console.log("Saving to local storage:", debouncedValues);
+            setStoredValue(debouncedValues);
           }
-        }, [values, dirty]);
+        }, [debouncedValues, dirty]);
 
         const fullText = values.design_instructions; // for copy to clipboard
 
-        const handlePrepareDesignInstructions = () => {
-          mutate().then((data) => {
+        const handlePrepareDesignInstructions = async () => {
+          try {
+            const data = await mutate();
             if (data && data.payload) {
               setFieldValue("design_instructions", data.payload);
             } else {
               console.error("Unexpected response structure", data);
             }
-          });
+          } catch (error) {
+            console.error("Error fetching instructions:", error);
+          }
         };
 
         return (

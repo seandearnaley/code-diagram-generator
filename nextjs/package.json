@@ -30,6 +30,7 @@
     "typescript": "5.1.6",
     "unified": "^10.1.2",
     "unist-util-visit": "^5.0.0",
+    "use-debounce": "^9.0.4",
     "yup": "^1.2.0"
   },
   "devDependencies": {
