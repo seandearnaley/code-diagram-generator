@@ -8,9 +8,20 @@ from pydantic import BaseModel, validator
 
 from fastapi import APIRouter, HTTPException, Query
 
+from ..services.diagram_service import (
+    get_category_by_id,
+    get_diagram_by_id,
+    load_diagram_config,
+)
 from ..services.directory_analysis_service import folder_report, folder_tree
 
 router = APIRouter()
+
+
+def load_template(template_path: str) -> str:
+    """Load a template file and return its content as a string"""
+    with open(template_path, "r", encoding="utf-8") as file:
+        return file.read()
 
 
 class DiagramPayload(BaseModel):
@@ -129,9 +140,30 @@ async def generate_diagram_instructions(
 
     dump = ""
     if folder_tree_content:
-        dump += f"### Folder Tree:\n```\n{folder_tree_content[:1000]}\n```\n\n"
+        dump += f"### Folder Tree:\n```\n{folder_tree_content[:2000]}\n```\n\n"
     if folder_report_content:
-        dump += f"### Python Report:\n```\n{folder_report_content[:1000]}\n```\n"
+        dump += f"### Python Report:\n```\n{folder_report_content[:2000]}\n```\n"
+
+    # Load the diagram configuration
+    diagram_config = await load_diagram_config()
+
+    # Get the diagram by id
+    diagram = get_diagram_by_id(diagram_config, diagram_option)
+    category_name = get_category_by_id(diagram_config, diagram_category)
+    # Load the template
+    template_path = "config/templates/generate_diagram_instructions_08112023.txt"
+
+    # relative path from this file to the template
+    template = load_template(str(Path(__file__).parent.parent / template_path))
+
+    # Substitute the placeholders in the template with the actual data
+    template_dump = template.format(
+        diagram_option=diagram.name if diagram else "",
+        diagram_category=category_name,
+        description=diagram.description if diagram else "",
+    )
+
+    dump += template_dump
 
     response = {"status": "success", "payload": dump}
     return response

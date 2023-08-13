@@ -10,8 +10,16 @@ from .routes import (
     llm_routes,
     mermaid_routes,
 )
+from .services.diagram_service import load_diagram_config
 
 app = FastAPI(debug=True)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Load diagram config on startup."""
+    app.state.diagram_config = await load_diagram_config()
+
 
 origins = [
     "http://localhost:3000",

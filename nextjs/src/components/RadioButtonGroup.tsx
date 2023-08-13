@@ -28,7 +28,7 @@ export const RadioButtonGroup: FC<Props> = ({
   onChange,
   value,
 }) => {
-  const colorClass = getCategoryColor(categoryKey || ""); // Get the color class for this category
+  const colorClass = getCategoryColor(categoryKey || "");
 
   return (
     <FieldArray name={name}>

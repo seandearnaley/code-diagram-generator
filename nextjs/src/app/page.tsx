@@ -1,25 +1,32 @@
 import DiagramForm from "@/components/DiagramForm";
 
 async function getDiagramConfig() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/diagram_config`, {
-    cache: "no-store",
-  });
-  const json = await res.json();
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/diagram_config`,
+      {
+        cache: "no-store",
+      },
+    );
+    const json = await res.json();
 
-  const diagram_category_options = Object.keys(json.diagram_categories).map(
-    (key) => ({
-      id: key,
-      name: json.diagram_category_names[key] || key,
-    }),
-  );
+    const diagram_category_options = Object.keys(json.diagram_categories).map(
+      (key) => ({
+        id: key,
+        name: json.diagram_category_names[key] || key,
+      }),
+    );
 
-  const default_diagram_category = diagram_category_options[0]?.id || "";
+    const default_diagram_category = diagram_category_options[0]?.id || "";
 
-  return {
-    ...json,
-    diagram_category_options,
-    default_diagram_category,
-  };
+    return {
+      ...json,
+      diagram_category_options,
+      default_diagram_category,
+    };
+  } catch (error) {
+    console.error("Error fetching diagram config:", error);
+  }
 }
 
 async function getLlmConfig() {

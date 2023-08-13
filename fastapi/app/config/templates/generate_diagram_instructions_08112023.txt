@@ -1,3 +1,5 @@
+# Directive
+
 I want you to come up with a one pager for an AI designer who runs the same software as you.  Here is what we intend to build:
 
 ```
@@ -72,5 +74,3 @@ Here's an example of a highly detailed brief for a talented designer who special
 
 - Final version due in three weeks, respond with completed, correct mermaid code.
 ```
-
-BEGIN
