@@ -51,7 +51,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
     include_python_code_outline: true,
     llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
     llm_model_for_instructions: DEFAULT_LLM_MODEL,
-    // design_instructions: "",
   });
 
   useEffect(() => {
