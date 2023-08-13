@@ -4,10 +4,14 @@ import { useDebounce } from "use-debounce";
 import fetcher from "../lib/fetcher";
 
 export const useDiagramInstructions = (payload: DiagramFormValues | null) => {
-  const [debouncedPayload] = useDebounce(payload, 500); // Debounce payload by 500ms
-
+  const [debouncedPayload] = useDebounce(payload, 500); // ms
   const shouldFetch =
-    debouncedPayload && debouncedPayload.source_folder_option !== "";
+    debouncedPayload &&
+    debouncedPayload.source_folder_option !== "" &&
+    debouncedPayload.diagram_category !== "" &&
+    debouncedPayload.diagram_option !== "" &&
+    debouncedPayload.llm_vendor_for_instructions !== "" &&
+    debouncedPayload.llm_model_for_instructions !== "";
 
   // Construct the query parameters from the debounced payload
   const queryParams = new URLSearchParams({

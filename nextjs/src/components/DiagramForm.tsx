@@ -19,7 +19,7 @@ import { useDiagramInstructions } from "@/hooks/useDiagramInstructions";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { ClipboardIcon } from "@heroicons/react/24/solid";
 import { Form, Formik } from "formik";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useDebounce } from "use-debounce";
 
@@ -33,15 +33,15 @@ import ReactMarkdown from "react-markdown";
 const components = {
   code: CodeComponent,
 };
-
 const DiagramForm: FC<DiagramFormProps> = ({
   diagram_config: { diagram_categories, diagram_category_options },
   llm_config: { llm_vendors, llm_vendor_options },
   source_folder_options,
 }) => {
-  const [toast, setToast] = useState<ToastProps | null>(null); // Add a state for managing toast
+  const [toast, setToast] = useState<ToastProps | null>(null);
   const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
     useState(true);
+  const [savingToStorage, setSavingToStorage] = useState(false);
   const [storedValue, setStoredValue] = useLocalStorage("formValues", {
     source_folder_option: DEFAULT_SOURCE_FOLDER,
     git_ignore_file_path: "",
@@ -54,8 +54,19 @@ const DiagramForm: FC<DiagramFormProps> = ({
   });
 
   useEffect(() => {
-    if (storedValue) {
+    if (storedValue && !savingToStorage) {
       setLoadingValuesFromStorage(false);
+    }
+  }, [storedValue, savingToStorage]);
+
+  const isFirstMount = useRef(true);
+
+  useEffect(() => {
+    if (isFirstMount.current) {
+      if (storedValue) {
+        setLoadingValuesFromStorage(false);
+      }
+      isFirstMount.current = false;
     }
   }, [storedValue]);
 
@@ -63,6 +74,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
     data: diagram_instruction_data,
     error: diagram_instruction_data_error,
     isLoading,
+    // mutate,
   } = useDiagramInstructions(storedValue);
 
   useEffect(() => {
@@ -84,21 +96,22 @@ const DiagramForm: FC<DiagramFormProps> = ({
       <Formik<DiagramFormValues>
         initialValues={storedValue}
         validationSchema={validationSchema}
-        onSubmit={() => {}} // do nothing
+        validateOnChange={true}
+        onSubmit={() => {}}
       >
         {({ values, setFieldValue, errors, dirty }) => {
           /* eslint-disable react-hooks/rules-of-hooks */
-          const [debouncedValues] = useDebounce(values, 500); // 500ms
+          const [debouncedValues] = useDebounce(values, 500);
 
           useEffect(() => {
-            if (dirty) {
-              console.log("Saving to local storage:", debouncedValues);
+            if (dirty && !isFirstMount.current) {
+              setSavingToStorage(true);
               setStoredValue(debouncedValues);
+              setSavingToStorage(false);
             }
           }, [debouncedValues, dirty]);
 
-          /* eslint-enable react-hooks/rules-of-hooks */
-
+          /* eslint-enabled react-hooks/rules-of-hooks */
           return (
             <Form aria-labelledby="formTitle">
               <FormContent title="Mermaid Diagram GPT Generator">
@@ -149,10 +162,9 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   />
                 </div>
                 <div className="col-span-1 pt-2">
-                  {isLoading ? (
-                    <Loading message="Loading design instructions..." />
-                  ) : diagram_instruction_data &&
-                    diagram_instruction_data.payload ? (
+                  {diagram_instruction_data &&
+                  diagram_instruction_data.payload &&
+                  !isLoading ? (
                     <>
                       <label
                         htmlFor="design_instructions"

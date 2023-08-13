@@ -1,13 +1,12 @@
-"""Routes for generating diagrams"""
-
+"""Diagram generation routes"""
 from pathlib import Path
 from typing import Optional, Tuple
 
-# pylint: disable=no-name-in-module
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
 
 from fastapi import APIRouter, HTTPException, Query
 
+from ..models import DiagramDefinition
 from ..services.diagram_service import (
     get_category_by_id,
     get_diagram_by_id,
@@ -25,7 +24,7 @@ def load_template(template_path: str) -> str:
 
 
 class DiagramPayload(BaseModel):
-    """Payload for generating diagrams"""
+    """Payload for diagram generation"""
 
     source_folder_option: str
     diagram_category: str
@@ -113,6 +112,35 @@ async def get_folder_content(
     return folder_tree_content, folder_report_content
 
 
+def construct_payload_dump(
+    folder_tree_content: Optional[str],
+    folder_report_content: Optional[str],
+    diagram: Optional[DiagramDefinition],
+    category_name: Optional[str],
+) -> str:
+    """Construct payload dump"""
+    template_path = (
+        Path(__file__).parent.parent
+        / "config/templates/generate_diagram_instructions_08112023.txt"
+    )
+    template = load_template(str(template_path))
+
+    template_dump = template.format(
+        diagram_option=diagram.name if diagram else "",
+        diagram_category=category_name,
+        description=diagram.description if diagram else "",
+    )
+
+    dump = template_dump
+
+    if folder_tree_content:
+        dump += f"### Folder Tree:\n```\n{folder_tree_content[:2000]}\n```\n\n"
+    if folder_report_content:
+        dump += f"### Python Report:\n```\n{folder_report_content[:2000]}\n```\n"
+
+    return dump
+
+
 @router.get("/generate_diagram_instructions")
 async def generate_diagram_instructions(
     source_folder_option: str = Query(...),
@@ -126,44 +154,28 @@ async def generate_diagram_instructions(
 ):
     """Generate diagram instructions"""
     payload = create_payload(
-        source_folder_option,
-        diagram_category,
-        diagram_option,
-        include_folder_tree,
-        include_python_code_outline,
-        git_ignore_file_path,
-        llm_vendor_for_instructions,
-        llm_model_for_instructions,
+        source_folder_option=source_folder_option,
+        diagram_category=diagram_category,
+        diagram_option=diagram_option,
+        include_folder_tree=include_folder_tree,
+        include_python_code_outline=include_python_code_outline,
+        git_ignore_file_path=git_ignore_file_path,
+        llm_vendor_for_instructions=llm_vendor_for_instructions,
+        llm_model_for_instructions=llm_model_for_instructions,
     )
 
     folder_tree_content, folder_report_content = await get_folder_content(payload)
 
-    dump = ""
-    if folder_tree_content:
-        dump += f"### Folder Tree:\n```\n{folder_tree_content[:2000]}\n```\n\n"
-    if folder_report_content:
-        dump += f"### Python Report:\n```\n{folder_report_content[:2000]}\n```\n"
-
-    # Load the diagram configuration
     diagram_config = await load_diagram_config()
-
-    # Get the diagram by id
     diagram = get_diagram_by_id(diagram_config, diagram_option)
     category_name = get_category_by_id(diagram_config, diagram_category)
-    # Load the template
-    template_path = "config/templates/generate_diagram_instructions_08112023.txt"
 
-    # relative path from this file to the template
-    template = load_template(str(Path(__file__).parent.parent / template_path))
-
-    # Substitute the placeholders in the template with the actual data
-    template_dump = template.format(
-        diagram_option=diagram.name if diagram else "",
-        diagram_category=category_name,
-        description=diagram.description if diagram else "",
+    dump = construct_payload_dump(
+        folder_tree_content,
+        folder_report_content,
+        diagram,
+        category_name,
     )
-
-    dump += template_dump
 
     response = {"status": "success", "payload": dump}
     return response

@@ -2,12 +2,12 @@ import * as Yup from "yup";
 
 export const validationSchema = Yup.object().shape({
   source_folder_option: Yup.string().required("Project Folder is required"),
-  diagram_category: Yup.string().required("Diagram Category is required"),
-  diagram_option: Yup.string().required("Diagram Option is required"),
+  diagram_category: Yup.string().required("Select Diagram Category"),
+  diagram_option: Yup.string().required("Choose Diagram"),
   git_ignore_file_path: Yup.string(),
   design_instructions: Yup.string(), // Note: Keeping this as is unless you provide a new name
-  llm_vendor_for_instructions: Yup.string().required("Vendor is required"),
-  llm_model_for_instructions: Yup.string().required("Vendor Model is required"),
+  llm_vendor_for_instructions: Yup.string().required("Choose Vendor"),
+  llm_model_for_instructions: Yup.string().required("Choose Model"),
 });
 
 export type Option = {

@@ -30,6 +30,11 @@
         "id": "flowchart6",
         "name": "Utility Functions Flowchart",
         "description": "This flowchart focuses on the utility functions in the application, illustrating the different utility functions and their relationships."
+      },
+      {
+        "id": "flowchart7",
+        "name": "Deployment Flowchart",
+        "description": "This flowchart outlines the deployment process of the application, including building, packaging, and deploying to various environments."
       }
     ],
     "sequence_diagram": [
@@ -67,11 +72,293 @@
         "id": "sequenceDiagram7",
         "name": "File Handling Sequence",
         "description": "Shows the sequence of steps involved in file handling operations."
+      },
+      {
+        "id": "sequenceDiagram8",
+        "name": "API Communication Sequence",
+        "description": "Illustrates the sequence of API calls and responses between different microservices in the application architecture."
+      }
+    ],
+    "class_diagram": [
+      {
+        "id": "classDiagram1",
+        "name": "System Structure",
+        "description": "This diagram illustrates the classes in the system, their attributes, methods, and the relationships among them."
+      },
+      {
+        "id": "classDiagram2",
+        "name": "User Interaction Classes",
+        "description": "This diagram focuses on the classes related to user interactions, showing their attributes, methods, and how they interact with other parts of the system."
+      },
+      {
+        "id": "classDiagram3",
+        "name": "Service Integration Classes",
+        "description": "This diagram illustrates the classes involved in integrating different services, including their methods and relationships with other classes."
+      },
+      {
+        "id": "classDiagram4",
+        "name": "Data Processing Classes",
+        "description": "This diagram depicts the classes responsible for data processing, their attributes, methods, and how they interact with data storage and retrieval classes."
+      },
+      {
+        "id": "classDiagram5",
+        "name": "Utility Classes",
+        "description": "This diagram outlines the utility classes within the system, showing their common methods and relationships."
+      }
+    ],
+    "state_diagram": [
+      {
+        "id": "stateDiagram1",
+        "name": "User Interaction States",
+        "description": "This diagram illustrates the states involved in user interaction, showing transitions between states based on user actions."
+      },
+      {
+        "id": "stateDiagram2",
+        "name": "Data Processing States",
+        "description": "This diagram depicts the states and transitions involved in data processing, including data retrieval, transformation, and storage."
+      },
+      {
+        "id": "stateDiagram3",
+        "name": "Service Integration States",
+        "description": "This diagram outlines the states related to integrating various services, such as connecting to external APIs, and the transitions between these states."
+      },
+      {
+        "id": "stateDiagram4",
+        "name": "System Initialization States",
+        "description": "This diagram shows the states involved in system initialization, including configuration loading, service startup, and readiness checks."
+      },
+      {
+        "id": "stateDiagram5",
+        "name": "Error Handling States",
+        "description": "This diagram focuses on the states related to error handling, illustrating how the system transitions between states in response to different error conditions."
+      }
+    ],
+    "entity_relationship_diagram": [
+      {
+        "id": "erDiagram1",
+        "name": "Customer Relations",
+        "description": "This diagram shows the CUSTOMER entity and its relationships with other entities such as ORDERS and PRODUCTS."
+      },
+      {
+        "id": "erDiagram2",
+        "name": "Inventory Management",
+        "description": "This diagram represents the PRODUCT entity, its attributes, and its relationships with entities like SUPPLIERS and INVENTORY."
+      },
+      {
+        "id": "erDiagram3",
+        "name": "Employee Management",
+        "description": "This diagram illustrates the EMPLOYEE entity, depicting its relationships with other entities such as DEPARTMENT and JOB ROLES."
+      },
+      {
+        "id": "erDiagram4",
+        "name": "Billing and Payment",
+        "description": "This diagram focuses on the PAYMENT entity, showing its attributes and relationships with entities like CUSTOMER and INVOICES."
+      },
+      {
+        "id": "erDiagram5",
+        "name": "Service Provision",
+        "description": "This diagram outlines the SERVICE entity and its relationships with other entities such as CUSTOMER and SERVICE PROVIDERS."
+      }
+    ],
+    "user_journey_diagram": [
+      {
+        "id": "userJourney1",
+        "name": "Customer Checkout Journey",
+        "description": "This diagram illustrates the journey a customer takes to select products, add them to the cart, and complete the checkout process."
+      },
+      {
+        "id": "userJourney2",
+        "name": "User Registration Journey",
+        "description": "This diagram depicts the steps involved in a user registering for an account, including filling out details, email verification, and profile setup."
+      },
+      {
+        "id": "userJourney3",
+        "name": "Product Search and Filtering Journey",
+        "description": "This diagram outlines the journey users take to search for products, apply filters, and view product details."
+      },
+      {
+        "id": "userJourney4",
+        "name": "Customer Support Interaction Journey",
+        "description": "This diagram shows the journey of a customer seeking support, including navigating to the support page, selecting a support option, and interacting with support staff."
+      },
+      {
+        "id": "userJourney5",
+        "name": "User Content Creation Journey",
+        "description": "This diagram illustrates the steps a user takes to create and publish content within the platform, including drafting, editing, previewing, and publishing."
+      }
+    ],
+    "gantt_diagram": [
+      {
+        "id": "ganttDiagram1",
+        "name": "Project Development Timeline",
+        "description": "This Gantt chart illustrates the development timeline for the project, including phases such as planning, development, testing, and deployment."
+      },
+      {
+        "id": "ganttDiagram2",
+        "name": "Feature Implementation Timeline",
+        "description": "This Gantt chart focuses on the implementation timeline for specific features, showing the start and end dates and dependencies between tasks."
+      },
+      {
+        "id": "ganttDiagram3",
+        "name": "Maintenance Schedule",
+        "description": "This Gantt chart outlines the schedule for regular maintenance tasks, including updates, bug fixes, and performance optimizations."
+      }
+    ],
+    "pie_chart": [
+      {
+        "id": "pieChart1",
+        "name": "User Demographics",
+        "description": "This pie chart represents the distribution of users across different age groups or regions."
+      },
+      {
+        "id": "pieChart2",
+        "name": "Revenue Sources",
+        "description": "This pie chart illustrates the proportion of revenue coming from different products or services."
+      },
+      {
+        "id": "pieChart3",
+        "name": "System Resource Usage",
+        "description": "This pie chart shows the allocation of system resources such as memory, CPU, and storage."
+      }
+    ],
+    "quadrant_chart": [
+      {
+        "id": "quadrantChart1",
+        "name": "Product Priority",
+        "description": "This quadrant chart plots products based on their market growth and market share, helping in decision-making for investment and development."
+      },
+      {
+        "id": "quadrantChart2",
+        "name": "Risk Assessment",
+        "description": "This quadrant chart is used to visualize risks, plotting them based on their potential impact and likelihood, aiding in risk management strategies."
+      },
+      {
+        "id": "quadrantChart3",
+        "name": "Customer Segmentation",
+        "description": "This quadrant chart represents customers based on their value and engagement, providing insights into customer relationships and marketing strategies."
+      }
+    ],
+    "requirement_diagram": [
+      {
+        "id": "requirementDiagram1",
+        "name": "Functional Requirements",
+        "description": "This diagram visualizes the functional requirements of the system, showing connections and dependencies between various requirements."
+      },
+      {
+        "id": "requirementDiagram2",
+        "name": "Non-Functional Requirements",
+        "description": "This diagram outlines the non-functional requirements, such as performance and security, and illustrates their relationships to other elements."
+      },
+      {
+        "id": "requirementDiagram3",
+        "name": "User Requirements",
+        "description": "This diagram focuses on user-related requirements, illustrating how they connect to system functionalities and constraints."
+      }
+    ],
+    "gitgraph_diagram": [
+      {
+        "id": "gitgraphDiagram1",
+        "name": "Main Branching Strategy",
+        "description": "This Git Graph represents the primary branching strategy, showing the commits and actions on various branches in the main development flow."
+      },
+      {
+        "id": "gitgraphDiagram2",
+        "name": "Feature Branching Strategy",
+        "description": "This Git Graph visualizes the strategy for feature branches, depicting how features are developed and merged into the main codebase."
+      },
+      {
+        "id": "gitgraphDiagram3",
+        "name": "Hotfix Branching Strategy",
+        "description": "This Git Graph illustrates the branching strategy for hotfixes, including the creation, development, and merging of hotfix branches."
+      }
+    ],
+    "c4_diagram": [
+      {
+        "id": "c4Diagram1",
+        "name": "System Context",
+        "description": "This C4 diagram provides an overview of the entire system, showing how it fits into the larger environment."
+      },
+      {
+        "id": "c4Diagram2",
+        "name": "Container View",
+        "description": "This C4 diagram shows the high-level structure of the software, focusing on containers and their interactions."
+      },
+      {
+        "id": "c4Diagram3",
+        "name": "Component View",
+        "description": "This C4 diagram details the components within a container, illustrating how they interact with one another."
+      }
+    ],
+    "mindmap": [
+      {
+        "id": "mindmap1",
+        "name": "Project Overview",
+        "description": "This mindmap organizes the key concepts, goals, and stakeholders for the project, showing their relationships."
+      },
+      {
+        "id": "mindmap2",
+        "name": "System Architecture",
+        "description": "This mindmap visually represents the architecture of the system, connecting major components, technologies, and dependencies."
+      }
+    ],
+    "timeline_diagram": [
+      {
+        "id": "timelineDiagram1",
+        "name": "Project Development Timeline",
+        "description": "This timeline illustrates the key milestones and events in the project's development history."
+      },
+      {
+        "id": "timelineDiagram2",
+        "name": "System Lifecycle Timeline",
+        "description": "This timeline depicts the various phases of the system's lifecycle, including design, development, deployment, maintenance, and decommissioning."
+      },
+      {
+        "id": "timelineDiagram3",
+        "name": "User Activity Timeline",
+        "description": "This timeline shows the chronology of user activities and interactions with the system."
+      }
+    ],
+    "zenuml_sequence_diagram": [
+      {
+        "id": "zenumlSequenceDiagram1",
+        "name": "User Registration ZenUML Sequence",
+        "description": "A ZenUML sequence diagram illustrating the process of user registration in the system."
+      },
+      {
+        "id": "zenumlSequenceDiagram2",
+        "name": "Data Processing ZenUML Sequence",
+        "description": "A ZenUML sequence diagram depicting the steps involved in data processing within the system."
+      }
+    ],
+    "flow_analysis_diagram": [
+      {
+        "id": "flowAnalysisDiagram1",
+        "name": "Code Execution Flow Analysis",
+        "description": "This diagram visually breaks down the execution flow of specific code segments, aiding in understanding code behavior and potential bottlenecks."
+      },
+      {
+        "id": "flowAnalysisDiagram2",
+        "name": "Data Flow Analysis",
+        "description": "Illustrates the flow of data through your application's components, helping in identifying data sources, transformations, and sinks."
       }
     ]
   },
   "diagram_category_names": {
     "flowchart": "Flowchart",
-    "sequence_diagram": "Sequence Diagram"
+    "sequence_diagram": "Sequence Diagram",
+    "class_diagram": "Class Diagram",
+    "state_diagram": "State Diagram",
+    "entity_relationship_diagram": "Entity Relationship Diagram",
+    "user_journey_diagram": "User Journey Diagram",
+    "gantt_diagram": "Gantt Diagram",
+    "pie_chart": "Pie Chart",
+    "quadrant_chart": "Quadrant Chart",
+    "requirement_diagram": "Requirement Diagram",
+    "gitgraph_diagram": "Gitgraph Diagram",
+    "c4_diagram": "C4 Diagram",
+    "mindmap": "Mindmap",
+    "timeline_diagram": "Timeline Diagram",
+    "zenuml_sequence_diagram": "ZenUML Sequence Diagram",
+    "flow_analysis_diagram": "Flow Analysis Diagram"
   }
 }

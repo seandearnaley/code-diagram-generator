@@ -62,7 +62,9 @@ export const SelectorWithRadioOptions: FC<Props> = ({
       )}
 
       {errors[radioName] ? (
-        <div className="text-red-500">{errors[radioName]}</div>
+        <div className="text-red-500 text-sm font-bold ml-5">
+          &gt; {errors[radioName]}
+        </div>
       ) : null}
     </>
   );
