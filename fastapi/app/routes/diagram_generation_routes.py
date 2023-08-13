@@ -3,10 +3,10 @@
 from pathlib import Path
 from typing import Optional, Tuple
 
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
-from pydantic import validator
+# pylint: disable=no-name-in-module
+from pydantic import BaseModel, validator
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from ..services.directory_analysis_service import folder_report, folder_tree
 
@@ -34,6 +34,10 @@ class DiagramPayload(BaseModel):
         return value
 
 
+class DiagramGenerationException(Exception):
+    """Exception for diagram generation"""
+
+
 async def get_folder_content(
     payload: DiagramPayload,
 ) -> Tuple[Optional[str], Optional[str]]:
@@ -51,14 +55,20 @@ async def get_folder_content(
     folder_report_content = None
 
     if payload.include_folder_tree:
-        folder_tree_content = await folder_tree(
-            source_folder, ignore_file_path=ignore_file_path
-        )
+        try:
+            folder_tree_content = await folder_tree(
+                source_folder, ignore_file_path=ignore_file_path
+            )
+        except DiagramGenerationException as err:
+            raise HTTPException(status_code=500, detail=str(err)) from err
 
     if payload.include_python_code_outline:
-        folder_report_content = await folder_report(
-            source_folder, ignore_file_path=ignore_file_path
-        )
+        try:
+            folder_report_content = await folder_report(
+                source_folder, ignore_file_path=ignore_file_path
+            )
+        except DiagramGenerationException as err:
+            raise HTTPException(status_code=500, detail=str(err)) from err
 
     return folder_tree_content, folder_report_content
 
@@ -72,10 +82,10 @@ async def generate_diagram_instructions(payload: DiagramPayload):
     dump = ""
 
     if folder_tree_content:
-        dump += f"### Folder Tree:\n```\n{folder_tree_content}```\n\n"
+        dump += f"### Folder Tree:\n```\n{folder_tree_content[:1000]}\n```\n\n"
 
     if folder_report_content:
-        dump += f"### Python Report:\n```\n{folder_report_content}\n```\n"
+        dump += f"### Python Report:\n```\n{folder_report_content[:1000]}\n```\n"
 
     response = {"status": "success", "payload": dump}
     print("Sending response:", response)

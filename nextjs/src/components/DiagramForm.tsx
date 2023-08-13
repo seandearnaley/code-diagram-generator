@@ -1,8 +1,4 @@
 "use client";
-import { useDiagramInstructions } from "@/hooks/useDiagramInstructions";
-import { ClipboardIcon } from "@heroicons/react/24/solid";
-import { useDebounce } from "use-debounce";
-
 import {
   CheckboxGroup,
   CodeComponent,
@@ -12,6 +8,7 @@ import {
   SelectorWithRadioOptions,
   SourceFolderSection,
 } from "@/components";
+import { Toast, ToastProps } from "@/components/Toast";
 import {
   DEFAULT_DIAGRAM_CATEGORY,
   DEFAULT_DIAGRAM_OPTION,
@@ -19,10 +16,13 @@ import {
   DEFAULT_LLM_VENDOR,
   DEFAULT_SOURCE_FOLDER,
 } from "@/config/formDefaults";
+import { useDiagramInstructions } from "@/hooks/useDiagramInstructions";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { ClipboardIcon } from "@heroicons/react/24/solid";
 import { Form, Formik } from "formik";
 import { FC, useEffect, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { useDebounce } from "use-debounce";
 
 import {
   DiagramFormProps,
@@ -40,6 +40,8 @@ const DiagramForm: FC<DiagramFormProps> = ({
   llm_config: { llm_vendors, llm_vendor_options },
   source_folder_options,
 }) => {
+  const [toast, setToast] = useState<ToastProps | null>(null); // Add a state for managing toast
+
   const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
     useState(true);
   const [storedValue, setStoredValue] = useLocalStorage("formValues", {
@@ -60,156 +62,179 @@ const DiagramForm: FC<DiagramFormProps> = ({
     }
   }, [storedValue]);
 
-  const { data, error, mutate, isLoading } =
-    useDiagramInstructions(storedValue);
+  const {
+    data: diagram_instruction_data,
+    error: diagram_instruction_data_error,
+    mutate,
+    isLoading,
+  } = useDiagramInstructions(storedValue);
+
+  useEffect(() => {
+    if (diagram_instruction_data_error) {
+      setToast({
+        message: `Error fetching instructions: ${diagram_instruction_data_error.message}`,
+        type: "error",
+      });
+    }
+  }, [diagram_instruction_data_error]);
 
   if (loadingValuesFromStorage) {
     return <Loading message="Loading local storage state..." />;
   }
 
   return (
-    <Formik<DiagramFormValues>
-      initialValues={storedValue}
-      validationSchema={validationSchema}
-      onSubmit={() => {}} // do nothing
-    >
-      {({ values, setFieldValue, errors, handleReset, dirty }) => {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [debouncedValues] = useDebounce(values, 500); // 500ms
+    <>
+      {toast && <Toast {...toast} />}
+      <Formik<DiagramFormValues>
+        initialValues={storedValue}
+        validationSchema={validationSchema}
+        onSubmit={() => {}} // do nothing
+      >
+        {({ values, setFieldValue, errors, handleReset, dirty }) => {
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          const [debouncedValues] = useDebounce(values, 500); // 500ms
 
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useEffect(() => {
-          if (dirty) {
-            console.log("Saving to local storage:", debouncedValues);
-            setStoredValue(debouncedValues);
-          }
-        }, [debouncedValues, dirty]);
-
-        const fullText = values.design_instructions; // for copy to clipboard
-
-        const handlePrepareDesignInstructions = async () => {
-          try {
-            const data = await mutate();
-            if (data && data.payload) {
-              setFieldValue("design_instructions", data.payload);
-            } else {
-              console.error("Unexpected response structure", data);
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          useEffect(() => {
+            if (dirty) {
+              console.log("Saving to local storage:", debouncedValues);
+              setStoredValue(debouncedValues);
             }
-          } catch (error) {
-            console.error("Error fetching instructions:", error);
-          }
-        };
+          }, [debouncedValues, dirty]);
 
-        return (
-          <Form aria-labelledby="formTitle">
-            <FormContent title="Mermaid Diagram GPT Generator">
-              <div className="col-span-1">
-                <SourceFolderSection options={source_folder_options} />
+          const fullText = values.design_instructions; // for copy to clipboard
 
-                <CheckboxGroup
-                  options={[
-                    {
-                      id: "include_folder_tree",
-                      label: "Include Folder Tree",
-                      helpText: "Whether to include the project's folder tree.",
-                    },
-                    {
-                      id: "include_python_code_outline",
-                      label: "Include Python Code Outline",
-                      helpText:
-                        "Whether to include a simple outline of the project's python code",
-                    },
-                  ]}
-                />
+          const handlePrepareDesignInstructions = async () => {
+            try {
+              const data = await mutate();
+              if (data && data.payload) {
+                console.log("Setting field value:", data.payload);
+                setFieldValue("design_instructions", data.payload);
+              } else {
+                console.error("Unexpected response structure", data);
+                setToast({
+                  message: `Unexpected response structure: ${data.message}`,
+                  type: "error",
+                });
+              }
+            } catch (error) {
+              console.error("Error fetching instructions:", error);
+              setToast({
+                message: `Error fetching instructions: ${error}`,
+                type: "error",
+              });
+            }
+          };
 
-                <SelectorWithRadioOptions
-                  selectOptions={diagram_category_options}
-                  optionsObject={diagram_categories}
-                  selectLabel="Select Diagram Category"
-                  selectName="diagram_category"
-                  selectId="diagram_category"
-                  radioName="diagram_option"
-                  selectValue={values.diagram_category}
-                  radioValue={values.diagram_option}
-                  setFieldValue={setFieldValue}
-                  errors={errors}
-                />
+          return (
+            <Form aria-labelledby="formTitle">
+              <FormContent title="Mermaid Diagram GPT Generator">
+                <div className="col-span-1">
+                  <SourceFolderSection options={source_folder_options} />
 
-                <SelectorWithRadioOptions
-                  selectOptions={llm_vendor_options}
-                  optionsObject={llm_vendors}
-                  selectLabel="Select LLM Vendor for Instructions"
-                  selectName="llm_vendor_for_instructions"
-                  selectId="llm_vendor_for_instructions"
-                  radioName="llm_model_for_instructions"
-                  selectValue={values.llm_vendor_for_instructions}
-                  radioValue={values.llm_model_for_instructions}
-                  setFieldValue={setFieldValue}
-                  errors={errors}
-                />
-                <div className="mt-6 flex items-center justify-end gap-x-6">
-                  <GenericButton
-                    label="Prepare Design Instructions"
-                    type="button"
-                    className="bg-blue-600 px-3 py-2 text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                    onClick={handlePrepareDesignInstructions}
+                  <CheckboxGroup
+                    options={[
+                      {
+                        id: "include_folder_tree",
+                        label: "Include Folder Tree",
+                        helpText:
+                          "Whether to include the project's folder tree.",
+                      },
+                      {
+                        id: "include_python_code_outline",
+                        label: "Include Python Code Outline",
+                        helpText:
+                          "Whether to include a simple outline of the project's python code",
+                      },
+                    ]}
                   />
 
-                  <GenericButton
-                    label="Cancel"
-                    type="button"
-                    className="text-gray-900 pl-2 py-2"
-                    onClick={handleReset}
+                  <SelectorWithRadioOptions
+                    selectOptions={diagram_category_options}
+                    optionsObject={diagram_categories}
+                    selectLabel="Select Diagram Category"
+                    selectName="diagram_category"
+                    selectId="diagram_category"
+                    radioName="diagram_option"
+                    selectValue={values.diagram_category}
+                    radioValue={values.diagram_option}
+                    setFieldValue={setFieldValue}
+                    errors={errors}
                   />
 
-                  {error ? (
-                    <div>Error fetching instructions: {error.message}</div>
-                  ) : data ? (
+                  <SelectorWithRadioOptions
+                    selectOptions={llm_vendor_options}
+                    optionsObject={llm_vendors}
+                    selectLabel="Select LLM Vendor for Instructions"
+                    selectName="llm_vendor_for_instructions"
+                    selectId="llm_vendor_for_instructions"
+                    radioName="llm_model_for_instructions"
+                    selectValue={values.llm_vendor_for_instructions}
+                    radioValue={values.llm_model_for_instructions}
+                    setFieldValue={setFieldValue}
+                    errors={errors}
+                  />
+                  <div className="mt-6 flex items-center justify-end gap-x-6">
+                    <GenericButton
+                      label="Prepare Design Instructions"
+                      type="button"
+                      className="bg-blue-600 px-3 py-2 text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                      onClick={handlePrepareDesignInstructions}
+                    />
+
+                    <GenericButton
+                      label="Cancel"
+                      type="button"
+                      className="text-gray-900 pl-2 py-2"
+                      onClick={handleReset}
+                    />
+                  </div>
+                </div>
+                <div className="col-span-1 pt-2">
+                  {diagram_instruction_data ? (
                     <div>hello</div>
                   ) : isLoading ? (
                     <Loading message="Loading design instructions..." />
                   ) : null}
+                  {values.design_instructions ? (
+                    <>
+                      <label
+                        htmlFor="design_instructions"
+                        className="block text-sm text-gray-700 font-medium leading-6"
+                      >
+                        Design Instructions
+                      </label>
+
+                      <ReactMarkdown
+                        components={components}
+                        className=" m-0 p-4 max-w-[600px] overflow-y-auto bg-slate-300 text-slate-500 rounded-md font-bold"
+                      >
+                        {values.design_instructions}
+                      </ReactMarkdown>
+
+                      <div className="p-2">
+                        <CopyToClipboard text={fullText || ""}>
+                          <button
+                            className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
+                            type="button"
+                            onClick={() =>
+                              alert("All content copied to clipboard!")
+                            }
+                          >
+                            <ClipboardIcon className="h-5 w-5 mr-2" />
+                            Copy All Content
+                          </button>
+                        </CopyToClipboard>
+                      </div>
+                    </>
+                  ) : null}
                 </div>
-              </div>
-              <div className="col-span-1 pt-2">
-                {values.design_instructions ? (
-                  <>
-                    <label
-                      htmlFor="design_instructions"
-                      className="block text-sm text-gray-700 font-medium leading-6"
-                    >
-                      Design Instructions
-                    </label>
-
-                    <ReactMarkdown
-                      components={components}
-                      className=" m-0 p-4 max-w-[600px] overflow-y-auto bg-slate-300 text-slate-500 rounded-md font-bold"
-                    >
-                      {values.design_instructions}
-                    </ReactMarkdown>
-
-                    <div className="p-2">
-                      <CopyToClipboard text={fullText || ""}>
-                        <button
-                          className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
-                          type="button"
-                          onClick={() =>
-                            alert("All content copied to clipboard!")
-                          }
-                        >
-                          <ClipboardIcon className="h-5 w-5 mr-2" />
-                          Copy All Content
-                        </button>
-                      </CopyToClipboard>
-                    </div>
-                  </>
-                ) : null}
-              </div>
-            </FormContent>
-          </Form>
-        );
-      }}
-    </Formik>
+              </FormContent>
+            </Form>
+          );
+        }}
+      </Formik>
+    </>
   );
 };
 
