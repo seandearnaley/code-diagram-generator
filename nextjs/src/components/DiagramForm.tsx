@@ -163,7 +163,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
 
                       <ReactMarkdown
                         components={components}
-                        className=" m-0 p-4 max-w-[600px] overflow-y-auto bg-slate-300 text-slate-500 rounded-md"
+                        className=" ml-0 p-4 mr-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md"
                       >
                         {diagram_instruction_data.payload}
                       </ReactMarkdown>
