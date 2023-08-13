@@ -64,7 +64,7 @@ export const SourceFolderSection: FC<SourceFolderSectionProps> = ({
             setInputValue(e.target.value);
           }}
         />
-        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+        {error ? <p className="text-red-500 text-sm mt-1">{error}</p> : null}
       </div>
     </div>
   );

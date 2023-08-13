@@ -15,7 +15,7 @@ uvicorn = "^0.23.2"
 tiktoken = "^0.4.0"
 openai = "^0.27.8"
 pyrate-limiter = "^2.10.0"
-pydantic = "^2.1.1"
+anthropic = "^0.3.9"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.5"
