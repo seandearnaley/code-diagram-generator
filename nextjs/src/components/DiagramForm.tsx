@@ -3,7 +3,6 @@ import {
   CheckboxGroup,
   CodeComponent,
   FormContent,
-  GenericButton,
   Loading,
   SelectorWithRadioOptions,
   SourceFolderSection,
@@ -41,7 +40,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
   source_folder_options,
 }) => {
   const [toast, setToast] = useState<ToastProps | null>(null); // Add a state for managing toast
-  const [designInstructions, setDesignInstructions] = useState("");
   const [loadingValuesFromStorage, setLoadingValuesFromStorage] =
     useState(true);
   const [storedValue, setStoredValue] = useLocalStorage("formValues", {
@@ -65,7 +63,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
   const {
     data: diagram_instruction_data,
     error: diagram_instruction_data_error,
-    mutate,
     isLoading,
   } = useDiagramInstructions(storedValue);
 
@@ -90,11 +87,10 @@ const DiagramForm: FC<DiagramFormProps> = ({
         validationSchema={validationSchema}
         onSubmit={() => {}} // do nothing
       >
-        {({ values, setFieldValue, errors, handleReset, dirty }) => {
-          // eslint-disable-next-line react-hooks/rules-of-hooks
+        {({ values, setFieldValue, errors, dirty }) => {
+          /* eslint-disable react-hooks/rules-of-hooks */
           const [debouncedValues] = useDebounce(values, 500); // 500ms
 
-          // eslint-disable-next-line react-hooks/rules-of-hooks
           useEffect(() => {
             if (dirty) {
               console.log("Saving to local storage:", debouncedValues);
@@ -102,29 +98,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
             }
           }, [debouncedValues, dirty]);
 
-          // const fullText = values.design_instructions; // for copy to clipboard
-
-          const handlePrepareDesignInstructions = async () => {
-            try {
-              const data = await mutate();
-              if (data && data.payload) {
-                console.log("Setting field value:", data.payload);
-                setDesignInstructions(data.payload);
-              } else {
-                console.error("Unexpected response structure", data);
-                setToast({
-                  message: `Unexpected response structure: ${data.message}`,
-                  type: "error",
-                });
-              }
-            } catch (error) {
-              console.error("Error fetching instructions:", error);
-              setToast({
-                message: `Error fetching instructions: ${error}`,
-                type: "error",
-              });
-            }
-          };
+          /* eslint-enable react-hooks/rules-of-hooks */
 
           return (
             <Form aria-labelledby="formTitle">
@@ -174,29 +148,12 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     setFieldValue={setFieldValue}
                     errors={errors}
                   />
-                  <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <GenericButton
-                      label="Prepare Design Instructions"
-                      type="button"
-                      className="bg-blue-600 px-3 py-2 text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                      onClick={handlePrepareDesignInstructions}
-                    />
-
-                    <GenericButton
-                      label="Cancel"
-                      type="button"
-                      className="text-gray-900 pl-2 py-2"
-                      onClick={handleReset}
-                    />
-                  </div>
                 </div>
                 <div className="col-span-1 pt-2">
-                  {diagram_instruction_data ? (
-                    <div>hello</div>
-                  ) : isLoading ? (
+                  {isLoading ? (
                     <Loading message="Loading design instructions..." />
-                  ) : null}
-                  {designInstructions ? (
+                  ) : diagram_instruction_data &&
+                    diagram_instruction_data.payload ? (
                     <>
                       <label
                         htmlFor="design_instructions"
@@ -209,11 +166,13 @@ const DiagramForm: FC<DiagramFormProps> = ({
                         components={components}
                         className=" m-0 p-4 max-w-[600px] overflow-y-auto bg-slate-300 text-slate-500 rounded-md font-bold"
                       >
-                        {designInstructions}
+                        {diagram_instruction_data.payload}
                       </ReactMarkdown>
 
                       <div className="p-2">
-                        <CopyToClipboard text={""}>
+                        <CopyToClipboard
+                          text={diagram_instruction_data.payload}
+                        >
                           <button
                             className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
                             type="button"
