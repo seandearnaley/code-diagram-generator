@@ -8,8 +8,7 @@ import {
   FormContent,
   GenericButton,
   Loading,
-  RadioButtonGroup,
-  SelectField,
+  SelectorWithRadioOptions,
   SourceFolderSection,
 } from "@/components";
 import {
@@ -30,7 +29,6 @@ import {
   validationSchema,
 } from "@/types/DiagramForm.types";
 import ReactMarkdown from "react-markdown";
-import { createOptionChangeHandler } from "../lib/diagramFormHandlers";
 
 const components = {
   code: CodeComponent,
@@ -55,23 +53,14 @@ const DiagramForm: FC<DiagramFormProps> = ({
     design_instructions: "",
   });
 
-  const { data, error, mutate } = useDiagramInstructions(storedValue);
+  const { data, error, mutate, isLoading } =
+    useDiagramInstructions(storedValue);
 
   useEffect(() => {
     if (storedValue) {
       setLoadingValuesFromStorage(false);
     }
   }, [storedValue]);
-
-  const handleDiagramCategoryChange = createOptionChangeHandler(
-    "diagram_category",
-    "diagram_option",
-  );
-
-  const handleLlmVendorChange = createOptionChangeHandler(
-    "llm_vendor_for_instructions",
-    "llm_model_for_instructions",
-  );
 
   if (loadingValuesFromStorage) {
     return <Loading message="Loading local storage state..." />;
@@ -105,11 +94,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
           });
         };
 
-        const diagram_options =
-          diagram_categories[values.diagram_category] || [];
-        const model_options =
-          llm_vendors[values.llm_vendor_for_instructions] || [];
-
         return (
           <Form aria-labelledby="formTitle">
             <FormContent title="Mermaid Diagram GPT Generator">
@@ -132,58 +116,31 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   ]}
                 />
 
-                <SelectField
-                  options={diagram_category_options}
-                  label="Select Diagram Category"
-                  name="diagram_category"
-                  id="diagram_category"
-                  aria-label="Select a diagram category from the list"
-                  onChange={(selected_option) =>
-                    handleDiagramCategoryChange(
-                      selected_option,
-                      diagram_categories,
-                      setFieldValue,
-                    )
-                  }
+                <SelectorWithRadioOptions
+                  selectOptions={diagram_category_options}
+                  optionsObject={diagram_categories}
+                  selectLabel="Select Diagram Category"
+                  selectName="diagram_category"
+                  selectId="diagram_category"
+                  radioName="diagram_option"
+                  selectValue={values.diagram_category}
+                  radioValue={values.diagram_option}
+                  setFieldValue={setFieldValue}
+                  errors={errors}
                 />
 
-                <RadioButtonGroup
-                  options={diagram_options}
-                  name="diagram_option"
-                  categoryKey={values.diagram_category}
-                  onChange={(optionId) => {
-                    setFieldValue("diagram_option", optionId);
-                  }}
+                <SelectorWithRadioOptions
+                  selectOptions={llm_vendor_options}
+                  optionsObject={llm_vendors}
+                  selectLabel="Select LLM Vendor for Instructions"
+                  selectName="llm_vendor_for_instructions"
+                  selectId="llm_vendor_for_instructions"
+                  radioName="llm_model_for_instructions"
+                  selectValue={values.llm_vendor_for_instructions}
+                  radioValue={values.llm_model_for_instructions}
+                  setFieldValue={setFieldValue}
+                  errors={errors}
                 />
-
-                {errors.diagram_option ? (
-                  <div className="text-red-500">{errors.diagram_option}</div>
-                ) : null}
-
-                <SelectField
-                  options={llm_vendor_options}
-                  label="Select LLM Vendor for Instructions"
-                  name="llm_vendor_for_instructions"
-                  id="llm_vendor_for_instructions"
-                  onChange={(vendor) =>
-                    handleLlmVendorChange(vendor, llm_vendors, setFieldValue)
-                  }
-                />
-                <RadioButtonGroup
-                  options={model_options}
-                  name="llm_model_for_instructions"
-                  categoryKey={values.llm_vendor_for_instructions}
-                  onChange={(optionId) => {
-                    setFieldValue("llm_model_for_instructions", optionId);
-                  }}
-                />
-
-                {errors.llm_model_for_instructions ? (
-                  <div className="text-red-500">
-                    {errors.llm_model_for_instructions}
-                  </div>
-                ) : null}
-
                 <div className="mt-6 flex items-center justify-end gap-x-6">
                   <GenericButton
                     label="Prepare Design Instructions"
@@ -203,9 +160,9 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     <div>Error fetching instructions: {error.message}</div>
                   ) : data ? (
                     <div>hello</div>
-                  ) : (
+                  ) : isLoading ? (
                     <Loading message="Loading design instructions..." />
-                  )}
+                  ) : null}
                 </div>
               </div>
               <div className="col-span-1 pt-2">

@@ -16,6 +16,7 @@ type Props = {
   helpText?: string;
   categoryKey?: string;
   onChange?: (optionId: string) => void;
+  value: string;
 };
 
 export const RadioButtonGroup: FC<Props> = ({
@@ -25,6 +26,7 @@ export const RadioButtonGroup: FC<Props> = ({
   helpText,
   categoryKey,
   onChange,
+  value,
 }) => {
   const colorClass = getCategoryColor(categoryKey || ""); // Get the color class for this category
 
@@ -56,6 +58,7 @@ export const RadioButtonGroup: FC<Props> = ({
                       id={`push-everything-${option.id}`}
                       name={name}
                       value={option.id}
+                      checked={value === option.id}
                       className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600 my-auto mr-2 ml-4"
                       onChange={() => onChange && onChange(option.id)}
                     />

@@ -2,8 +2,7 @@ import { SelectField, TextInput } from "@/components";
 import useGitIgnore from "@/hooks/useGitIgnore";
 import { Option } from "@/types/DiagramForm.types";
 import { useFormikContext } from "formik";
-import { FC, useEffect, useState } from "react";
-import { handleSourceFolderChange } from "../lib/diagramFormHandlers";
+import { FC, useEffect } from "react";
 import { DiagramFormValues } from "../types/DiagramForm.types";
 
 type SourceFolderSectionProps = {
@@ -13,19 +12,18 @@ type SourceFolderSectionProps = {
 export const SourceFolderSection: FC<SourceFolderSectionProps> = ({
   options,
 }) => {
-  const [selectedFolder, setSelectedFolder] = useState("");
-  const { values, setFieldValue } = useFormikContext<DiagramFormValues>();
+  const {
+    values: { source_folder_option },
+    setFieldValue,
+  } = useFormikContext<DiagramFormValues>();
   const { fetch, loading, error } = useGitIgnore();
 
   useEffect(() => {
-    if (selectedFolder) {
-      handleSourceFolderChange(fetch)(
-        selectedFolder,
-        setFieldValue,
-        values.source_folder_option,
-      );
-    }
-  }, [selectedFolder]);
+    if (!source_folder_option) return;
+    fetch(source_folder_option).then((gitIgnoreFilePath) => {
+      setFieldValue("git_ignore_file_path", gitIgnoreFilePath || "");
+    });
+  }, [source_folder_option]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
@@ -34,7 +32,10 @@ export const SourceFolderSection: FC<SourceFolderSectionProps> = ({
         label="Select Project Folder"
         name="source_folder_option"
         id="source_folder_option"
-        onChange={(folder: string) => setSelectedFolder(folder)}
+        onChange={(folder: string) =>
+          setFieldValue("source_folder_option", folder)
+        }
+        value={source_folder_option}
         helpText="Select a python project to analyze..."
       />
 
