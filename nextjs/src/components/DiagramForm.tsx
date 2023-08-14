@@ -2,6 +2,7 @@
 import {
   CheckboxGroup,
   CodeComponent,
+  DownwardArrow,
   FormContent,
   Loading,
   SelectorWithRadioOptions,
@@ -21,7 +22,7 @@ import {
   ArrowDownOnSquareIcon,
   ClipboardIcon,
 } from "@heroicons/react/24/solid";
-import { Form, Formik } from "formik";
+import { Field, Form, Formik } from "formik";
 import { FC, HTMLAttributes, useEffect, useRef, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import rehypeRaw from "rehype-raw";
@@ -34,6 +35,7 @@ import {
   validationSchema,
 } from "@/types/DiagramForm.types";
 import ReactMarkdown from "react-markdown";
+
 interface TokenCountData {
   token_count: number;
   est_words: number;
@@ -79,7 +81,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
     useState(true);
 
   const [savingToStorage, setSavingToStorage] = useState(false);
-
+  const [isEditable, setIsEditable] = useState(false);
   const [storedValue, setStoredValue] = useLocalStorage("formValues", {
     source_folder_option: DEFAULT_SOURCE_FOLDER,
     git_ignore_file_path: "",
@@ -108,12 +110,8 @@ const DiagramForm: FC<DiagramFormProps> = ({
     }
   }, [storedValue]);
 
-  const {
-    data: design_directive_data,
-    // error: design_directive_data_error,
-    isLoading,
-    // mutate,
-  } = useDesignDirectives(storedValue);
+  const { data: design_directive_data, isLoading } =
+    useDesignDirectives(storedValue);
 
   useEffect(() => {
     if (design_directive_data && design_directive_data.payload) {
@@ -156,8 +154,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
         }, [debouncedValues, dirty]);
 
         useEffect(() => {
-          console.log("tokenData", tokenData); // Log tokenData
-
           if (tokenData) {
             setTokenCountInfo(tokenData);
           }
@@ -260,13 +256,26 @@ const DiagramForm: FC<DiagramFormProps> = ({
                       the design instructions over multiple lines will help the
                       model generate more coherent instructions.
                     </p>
-                    <ReactMarkdown
-                      components={components}
-                      rehypePlugins={[rehypeRaw]}
-                      className=" ml-0 p-4 mr-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[700px]"
-                    >
-                      {design_directive_data.payload}
-                    </ReactMarkdown>
+
+                    {isEditable ? (
+                      <div className="pr-5">
+                        <Field
+                          as="textarea"
+                          name="payload"
+                          className=" ml-0 p-4 mr-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md resize-none w-full max-h-[700px] h-[700px] pr-5"
+                        >
+                          {design_directive_data.payload}
+                        </Field>
+                      </div>
+                    ) : (
+                      <ReactMarkdown
+                        components={components}
+                        rehypePlugins={[rehypeRaw]}
+                        className=" ml-0 p-4 mr-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[700px]"
+                      >
+                        {design_directive_data.payload}
+                      </ReactMarkdown>
+                    )}
 
                     <div className="p-2">
                       <CopyToClipboard text={design_directive_data.payload}>
@@ -281,6 +290,13 @@ const DiagramForm: FC<DiagramFormProps> = ({
                           Copy All Content
                         </button>
                       </CopyToClipboard>
+                      <button
+                        className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200 mt-2"
+                        type="button"
+                        onClick={() => setIsEditable(!isEditable)}
+                      >
+                        Toggle Edit Mode
+                      </button>
                       {tokenCountInfo && (
                         <p className="text-sm p-4">
                           Tokens: {tokenCountInfo.token_count}, Estimated Words:{" "}
@@ -297,6 +313,10 @@ const DiagramForm: FC<DiagramFormProps> = ({
                         <ArrowDownOnSquareIcon className="h-5 w-5 mr-2" />
                         Generate Design Instructions
                       </button>
+
+                      <div>
+                        <DownwardArrow />
+                      </div>
                     </div>
                   </>
                 ) : null}

@@ -1,5 +1,6 @@
 export { CheckboxGroup } from "./CheckboxGroup";
 export { CodeComponent } from "./CodeComponent";
+export { DownwardArrow } from "./DownwardArrow";
 export { Error } from "./Error";
 export { FormContent } from "./FormContent";
 export { GenericButton } from "./GenericButton";
