@@ -7,6 +7,7 @@ import {
   SelectorWithRadioOptions,
   SourceFolderSection,
 } from "@/components";
+
 import {
   DEFAULT_DIAGRAM_CATEGORY,
   DEFAULT_DIAGRAM_OPTION,
@@ -21,8 +22,9 @@ import {
   ClipboardIcon,
 } from "@heroicons/react/24/solid";
 import { Form, Formik } from "formik";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, HTMLAttributes, useEffect, useRef, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import rehypeRaw from "rehype-raw";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 
@@ -38,6 +40,12 @@ interface TokenCountData {
 }
 const components = {
   code: CodeComponent,
+  h2: ({ ...props }: HTMLAttributes<HTMLHeadingElement>) => (
+    <h2 className="font-bold mt-5 text-lg" {...props} />
+  ),
+  h3: ({ ...props }: HTMLAttributes<HTMLHeadingElement>) => (
+    <h3 className="font-bold mt-5" {...props} />
+  ),
 };
 
 async function fetchTokenCount([url, text, llm_vendor]: [
@@ -254,6 +262,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                     </p>
                     <ReactMarkdown
                       components={components}
+                      rehypePlugins={[rehypeRaw]}
                       className=" ml-0 p-4 mr-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[700px]"
                     >
                       {design_directive_data.payload}

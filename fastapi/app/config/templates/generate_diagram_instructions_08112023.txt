@@ -1,7 +1,7 @@
 I want you to come up with a one pager for an AI designer who runs the same software as you. We want you to derive the context from the attached reports (file system and code outline).  Here is what we intend to build:
 
 ```
-{diagram_category}: {diagram_option}:
+{diagram_category}: {diagram_option}
 
 {description}
 ```
@@ -9,4 +9,4 @@ I want you to come up with a one pager for an AI designer who runs the same soft
 The final product needs to be well written beautiful mermaid code that can run in mermaid cli. Yielding a beautiful diagram.
 
 ## Deliverables
-Come up with a highly detailed brief for a talented designer who specializes in Mermaid diagrams. note: we do not want to want to create any code, we will leave that up the AI designer based on your notes- think of these as instructions to yourself or a colleague that you can layout a plan for your actions before executing the design functions.
+Come up with a highly detailed brief for a talented designer who specializes in Mermaid diagrams. note: we do not want to want to create any code, we will leave that up the AI designer based on your notes- think of these as instructions to yourself or a colleague that you can layout a plan for your actions before executing the design functions.   Use the following information to figure out all the components and design elements that you will need to create the diagram.
