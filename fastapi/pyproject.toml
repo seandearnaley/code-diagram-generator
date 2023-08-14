@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "code-diagram-generator"
 version = "0.1.0"
-description = "Generates code diagrams using LLMs."
+description = "Generate code diagrams using LLMs."
 authors = ["Sean Dearnaley <SeanDearnaley@outlook.com>"]
 readme = "README.md"
 
@@ -16,6 +16,7 @@ tiktoken = "^0.4.0"
 openai = "^0.27.8"
 pyrate-limiter = "^2.10.0"
 anthropic = "^0.3.9"
+openai-functools = "^1.0.97"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.5"

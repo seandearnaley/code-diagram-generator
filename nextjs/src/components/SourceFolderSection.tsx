@@ -54,18 +54,16 @@ export const SourceFolderSection: FC<SourceFolderSectionProps> = ({
         helpText="Select a python project to analyze..."
       />
 
-      <div className="relative">
-        <TextInput
-          name="git_ignore_file_path"
-          label={"GitIgnore File Path" + (loading ? " (Loading...)" : "")}
-          helpText="Enter the path to a file that specify files to ignore for analysis intentionally."
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setManuallyChanged(true);
-            setInputValue(e.target.value);
-          }}
-        />
-        {error ? <p className="text-red-500 text-sm mt-1">{error}</p> : null}
-      </div>
+      <TextInput
+        name="git_ignore_file_path"
+        label={"GitIgnore File Path" + (loading ? " (Loading...)" : "")}
+        helpText="Enter the path to a file that specify files to ignore for analysis intentionally."
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          setManuallyChanged(true);
+          setInputValue(e.target.value);
+        }}
+      />
+      {error ? <p className="text-red-500 text-sm mt-1">{error}</p> : null}
     </div>
   );
 };
