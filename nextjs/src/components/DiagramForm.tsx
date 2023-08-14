@@ -40,6 +40,7 @@ interface TokenCountData {
   token_count: number;
   est_words: number;
 }
+
 const components = {
   code: CodeComponent,
   h2: ({ ...props }: HTMLAttributes<HTMLHeadingElement>) => (
@@ -55,7 +56,7 @@ async function fetchTokenCount([url, text, llm_vendor]: [
   string,
   string,
 ]): Promise<TokenCountData> {
-  console.log("fetchTokenCount called with", url, text, llm_vendor);
+  // console.log("fetchTokenCount called with", url, text, llm_vendor);
 
   const res = await fetch(url, {
     method: "POST",
@@ -63,7 +64,7 @@ async function fetchTokenCount([url, text, llm_vendor]: [
     headers: { "Content-Type": "application/json" },
   });
   const result = await res.json();
-  console.log("fetchTokenCount result:", result);
+  // console.log("fetchTokenCount result:", result);
   return result;
 }
 const DiagramForm: FC<DiagramFormProps> = ({
@@ -91,6 +92,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
     include_python_code_outline: true,
     llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
     llm_model_for_instructions: DEFAULT_LLM_MODEL,
+    // design_instructions: "",
   });
 
   useEffect(() => {
@@ -144,7 +146,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
           ],
           fetchTokenCount,
         );
-        console.log("Token Data:", tokenData, "Error:", error);
         useEffect(() => {
           if (dirty && !isFirstMount.current) {
             setSavingToStorage(true);
@@ -261,11 +262,16 @@ const DiagramForm: FC<DiagramFormProps> = ({
                       <div className="pr-5">
                         <Field
                           as="textarea"
-                          name="payload"
+                          name="design_instructions"
                           className=" ml-0 p-4 mr-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md resize-none w-full max-h-[700px] h-[700px] pr-5"
-                        >
-                          {design_directive_data.payload}
-                        </Field>
+                          value={design_directive_data.payload}
+                          onChange={(e: any) => {
+                            setFieldValue(
+                              "design_instructions",
+                              e.target.value,
+                            );
+                          }}
+                        />
                       </div>
                     ) : (
                       <ReactMarkdown
