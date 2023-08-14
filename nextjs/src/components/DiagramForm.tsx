@@ -2,9 +2,9 @@
 import {
   CheckboxGroup,
   CodeComponent,
-  DownwardArrow,
   FormContent,
   Loading,
+  MermaidDiagram,
   SelectorWithRadioOptions,
   SourceFolderSection,
 } from "@/components";
@@ -18,10 +18,7 @@ import {
 } from "@/config/formDefaults";
 import { useDesignDirectives } from "@/hooks/useDesignDirectives";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import {
-  ArrowDownOnSquareIcon,
-  ClipboardIcon,
-} from "@heroicons/react/24/solid";
+import { BoltIcon, ClipboardIcon } from "@heroicons/react/24/solid";
 import { Field, Form, Formik } from "formik";
 import { FC, HTMLAttributes, useEffect, useRef, useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -56,16 +53,12 @@ async function fetchTokenCount([url, text, llm_vendor]: [
   string,
   string,
 ]): Promise<TokenCountData> {
-  // console.log("fetchTokenCount called with", url, text, llm_vendor);
-
   const res = await fetch(url, {
     method: "POST",
     body: JSON.stringify({ text, llm_vendor }),
     headers: { "Content-Type": "application/json" },
   });
-  const result = await res.json();
-  // console.log("fetchTokenCount result:", result);
-  return result;
+  return res.json();
 }
 const DiagramForm: FC<DiagramFormProps> = ({
   diagram_config: { diagram_categories, diagram_category_options },
@@ -92,7 +85,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
     include_python_code_outline: true,
     llm_vendor_for_instructions: DEFAULT_LLM_VENDOR,
     llm_model_for_instructions: DEFAULT_LLM_MODEL,
-    // design_instructions: "",
   });
 
   useEffect(() => {
@@ -315,14 +307,17 @@ const DiagramForm: FC<DiagramFormProps> = ({
                       <button
                         className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200"
                         type="button"
+                        onClick={() => {
+                          isEditable
+                            ? console.log("is editable", isEditable)
+                            : console.log("is not editable", isEditable);
+                        }}
                       >
-                        <ArrowDownOnSquareIcon className="h-5 w-5 mr-2" />
-                        Generate Design Instructions
+                        <BoltIcon className="h-5 w-5 mr-2" />
+                        Generate Design
                       </button>
 
-                      <div>
-                        <DownwardArrow />
-                      </div>
+                      <MermaidDiagram />
                     </div>
                   </>
                 ) : null}

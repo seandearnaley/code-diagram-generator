@@ -5,6 +5,7 @@ export { Error } from "./Error";
 export { FormContent } from "./FormContent";
 export { GenericButton } from "./GenericButton";
 export { Loading } from "./Loading";
+export { MermaidDiagram } from "./MermaidDiagram";
 export { RadioButtonGroup } from "./RadioButtonGroup";
 export { SelectField } from "./SelectField";
 export { SelectorWithRadioOptions } from "./SelectorWithRadioOptions";
