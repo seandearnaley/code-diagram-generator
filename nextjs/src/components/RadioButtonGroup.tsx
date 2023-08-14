@@ -32,7 +32,9 @@ export const RadioButtonGroup: FC<Props> = ({
 
   return (
     <FieldArray name={name}>
-      <div className={`border-b border-gray-900/10 pb-6 ${colorClass}`}>
+      <div
+        className={`border-b border-gray-900/10 pb-6 ${colorClass} rounded-md`}
+      >
         <div className="mt-2 space-y-10">
           <fieldset>
             {label ? (

@@ -8,4 +8,5 @@ I want you to come up with a one pager for an AI designer who runs the same soft
 
 The final product needs to be well written beautiful mermaid code that can run in mermaid cli. Yielding a beautiful diagram.
 
+## Deliverables
 Come up with a highly detailed brief for a talented designer who specializes in Mermaid diagrams. note: we do not want to want to create any code, we will leave that up the AI designer based on your notes- think of these as instructions to yourself or a colleague that you can layout a plan for your actions before executing the design functions.

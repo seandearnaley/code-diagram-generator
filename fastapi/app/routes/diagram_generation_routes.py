@@ -131,7 +131,7 @@ def construct_payload_dump(
         description=diagram.description if diagram else "",
     )
 
-    dump = template_dump
+    dump = template_dump + "\n\n"
 
     if folder_tree_content:
         dump += f"### Folder Tree:\n```\n{folder_tree_content[:20000]}\n```\n\n"
