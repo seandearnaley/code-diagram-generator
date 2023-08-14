@@ -6,7 +6,7 @@ import { FC } from "react";
 
 import { toPng } from "html-to-image";
 
-import { ArrowDownOnSquareIcon } from "@heroicons/react/24/solid";
+import { ArrowDownOnSquareIcon, BoltIcon } from "@heroicons/react/24/solid";
 
 const mermaid = `
     flowchart TD
@@ -58,13 +58,14 @@ export const MermaidDiagram: FC<Props> = () => {
   return (
     <>
       <button
-        className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200 mt-4"
+        className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200"
         type="button"
         onClick={postMermaid}
       >
-        <ArrowDownOnSquareIcon className="h-5 w-5 mr-2" />
-        Post mermaid
+        <BoltIcon className="h-5 w-5 mr-2" />
+        Generate Design
       </button>
+
       {diagramUrl && (
         <div>
           <div
