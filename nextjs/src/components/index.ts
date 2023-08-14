@@ -1,5 +1,7 @@
 export { CheckboxGroup } from "./CheckboxGroup";
 export { CodeComponent } from "./CodeComponent";
+export { DesignDirectives } from "./DesignDirectives";
+export { DiagramConfiguration } from "./DiagramConfiguration";
 export { DownwardArrow } from "./DownwardArrow";
 export { Error } from "./Error";
 export { FormContent } from "./FormContent";
@@ -9,7 +11,9 @@ export { MermaidDiagram } from "./MermaidDiagram";
 export { RadioButtonGroup } from "./RadioButtonGroup";
 export { SelectField } from "./SelectField";
 export { SelectorWithRadioOptions } from "./SelectorWithRadioOptions";
+export { SourceFolderAndOptions } from "./SourceFolderAndOptions";
 export { SourceFolderSection } from "./SourceFolderSection";
 export { TextArea } from "./TextArea";
 export { TextInput } from "./TextInput";
 export { Toast } from "./Toast";
+export { VendorConfig } from "./VendorConfig";

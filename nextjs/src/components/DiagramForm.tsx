@@ -1,12 +1,11 @@
 "use client";
 import {
-  CheckboxGroup,
-  CodeComponent,
+  DesignDirectives,
+  DiagramConfiguration,
   FormContent,
   Loading,
-  MermaidDiagram,
-  SelectorWithRadioOptions,
-  SourceFolderSection,
+  SourceFolderAndOptions,
+  VendorConfig,
 } from "@/components";
 
 import {
@@ -18,11 +17,8 @@ import {
 } from "@/config/formDefaults";
 import { useDesignDirectives } from "@/hooks/useDesignDirectives";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { ClipboardIcon } from "@heroicons/react/24/solid";
-import { Field, Form, Formik } from "formik";
-import { FC, HTMLAttributes, useEffect, useRef, useState } from "react";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import rehypeRaw from "rehype-raw";
+import { Form, Formik } from "formik";
+import { FC, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 
@@ -31,22 +27,11 @@ import {
   DiagramFormValues,
   validationSchema,
 } from "@/types/DiagramForm.types";
-import ReactMarkdown from "react-markdown";
 
 interface TokenCountData {
   token_count: number;
   est_words: number;
 }
-
-const components = {
-  code: CodeComponent,
-  h2: ({ ...props }: HTMLAttributes<HTMLHeadingElement>) => (
-    <h2 className="font-bold mt-5 text-lg" {...props} />
-  ),
-  h3: ({ ...props }: HTMLAttributes<HTMLHeadingElement>) => (
-    <h3 className="font-bold mt-5" {...props} />
-  ),
-};
 
 async function fetchTokenCount([url, text, llm_vendor]: [
   string,
@@ -167,148 +152,31 @@ const DiagramForm: FC<DiagramFormProps> = ({
               </h2>
             </div>
             <FormContent className="grid grid-flow-row-dense gap-4">
-              {/* Panel 1: SourceFolderSection + CheckboxGroup */}
-              {/* grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 */}
-              <details open className="mb-4">
-                <summary className="cursor-pointer text-lg font-medium text-gray-700">
-                  Source Folder and Options
-                </summary>
-                <div className="mb-2">
-                  <SourceFolderSection options={source_folder_options} />
-
-                  <CheckboxGroup
-                    options={[
-                      {
-                        id: "include_folder_tree",
-                        label: "Include Folder Tree",
-                        helpText:
-                          "Whether to include the project's folder tree.",
-                      },
-                      {
-                        id: "include_python_code_outline",
-                        label: "Include Python Code Outline",
-                        helpText:
-                          "Whether to include a simple outline of the project's python code",
-                      },
-                    ]}
-                  />
-                </div>
-              </details>
-              {/* Panel 2: Diagram Category */}
-              <details open className="mb-4">
-                <summary className="cursor-pointer text-lg font-medium text-gray-700">
-                  Diagram Configuration
-                </summary>
-                <div className="mt-2">
-                  <SelectorWithRadioOptions
-                    selectOptions={diagram_category_options}
-                    optionsObject={diagram_categories}
-                    selectLabel="Select Diagram Category"
-                    selectName="diagram_category"
-                    selectId="diagram_category"
-                    radioName="diagram_option"
-                    selectValue={values.diagram_category}
-                    radioValue={values.diagram_option}
-                    setFieldValue={setFieldValue}
-                    errors={errors}
-                  />
-                </div>
-              </details>
-              {/* Panel 3: LLM Vendors */}
-              <details className="mb-4">
-                <summary className="cursor-pointer text-lg font-medium text-gray-700">
-                  Vendor Config
-                </summary>
-                <div className="mt-2">
-                  <SelectorWithRadioOptions
-                    selectOptions={llm_vendor_options}
-                    optionsObject={llm_vendors}
-                    selectLabel="Select LLM Vendor for Instructions"
-                    selectName="llm_vendor_for_instructions"
-                    selectId="llm_vendor_for_instructions"
-                    radioName="llm_model_for_instructions"
-                    selectValue={values.llm_vendor_for_instructions}
-                    radioValue={values.llm_model_for_instructions}
-                    setFieldValue={setFieldValue}
-                    errors={errors}
-                  />
-                </div>
-              </details>
-              {/* Panel 4: Design Instructions */}
-              <details className="mb-4">
-                <summary className="cursor-pointer text-lg font-medium text-gray-700">
-                  Design Directives
-                </summary>
-                {design_directive_data &&
-                design_directive_data.payload &&
-                !isLoading ? (
-                  <>
-                    <p className="mt-1 text-sm leading-6 text-gray-600  border-gray-900/10 p-4">
-                      This will be used to generate design instructions, which
-                      will then be used to generate the diagram. Spreading out
-                      the design instructions over multiple lines will help the
-                      model generate more coherent instructions.
-                    </p>
-
-                    {isEditable ? (
-                      <div>
-                        <Field
-                          as="textarea"
-                          name="design_instructions"
-                          className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md resize-none w-full max-h-[700px] h-[700px]"
-                          value={design_directive_data.payload}
-                          onChange={(e: any) => {
-                            setFieldValue(
-                              "design_instructions",
-                              e.target.value,
-                            );
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <ReactMarkdown
-                        components={components}
-                        rehypePlugins={[rehypeRaw]}
-                        className=" ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[700px]"
-                      >
-                        {design_directive_data.payload}
-                      </ReactMarkdown>
-                    )}
-
-                    <div className="p-2">
-                      <CopyToClipboard text={design_directive_data.payload}>
-                        <button
-                          className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
-                          type="button"
-                          onClick={() =>
-                            alert("All content copied to clipboard!")
-                          }
-                        >
-                          <ClipboardIcon className="h-5 w-5 mr-2" />
-                          Copy All Content
-                        </button>
-                      </CopyToClipboard>
-                      <button
-                        className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200 mt-2"
-                        type="button"
-                        onClick={() => setIsEditable(!isEditable)}
-                      >
-                        Toggle Edit Mode
-                      </button>
-                      {tokenCountInfo && (
-                        <p className="text-sm p-4">
-                          Tokens: {tokenCountInfo.token_count}, Estimated Words:{" "}
-                          {tokenCountInfo.est_words}
-                        </p>
-                      )}
-                    </div>
-                  </>
-                ) : null}
-
-                <div className="p-2 flex flex-col items-center">
-                  <MermaidDiagram />
-                </div>
-              </details>
+              <SourceFolderAndOptions options={source_folder_options} />
+              <DiagramConfiguration
+                selectOptions={diagram_category_options}
+                optionsObject={diagram_categories}
+                selectValue={values.diagram_category}
+                radioValue={values.diagram_option}
+                setFieldValue={setFieldValue}
+                errors={errors}
+              />
+              <VendorConfig
+                selectOptions={llm_vendor_options}
+                optionsObject={llm_vendors}
+                selectValue={values.llm_vendor_for_instructions}
+                radioValue={values.llm_model_for_instructions}
+                setFieldValue={setFieldValue}
+                errors={errors}
+              />
+              <DesignDirectives
+                design_directive_data={design_directive_data}
+                isLoading={isLoading}
+                isEditable={isEditable}
+                setIsEditable={setIsEditable}
+                setFieldValue={setFieldValue}
+                tokenCountInfo={tokenCountInfo}
+              />
             </FormContent>
           </Form>
         );
