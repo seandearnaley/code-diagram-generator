@@ -151,7 +151,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                 Mermaid Diagram GPT Generator
               </h2>
             </div>
-            <FormContent className="grid grid-flow-row-dense gap-4">
+            <FormContent className="grid-flow-row-dense gap-4">
               <SourceFolderAndOptions options={source_folder_options} />
               <DiagramConfiguration
                 selectOptions={diagram_category_options}
