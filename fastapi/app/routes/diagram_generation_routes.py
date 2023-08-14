@@ -134,9 +134,9 @@ def construct_payload_dump(
     dump = template_dump
 
     if folder_tree_content:
-        dump += f"### Folder Tree:\n```\n{folder_tree_content[:2000]}\n```\n\n"
+        dump += f"### Folder Tree:\n```\n{folder_tree_content[:20000]}\n```\n\n"
     if folder_report_content:
-        dump += f"### Python Report:\n```\n{folder_report_content[:2000]}\n```\n"
+        dump += f"### Python Code Outline:\n```\n{folder_report_content[:20000]}\n```\n"
 
     return dump
 

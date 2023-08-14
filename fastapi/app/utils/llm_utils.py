@@ -14,18 +14,18 @@ def anthropic_sync_count_tokens(text: str) -> int:
     return number_of_tokens
 
 
-def num_tokens_from_string(string: str, model_type: str = OPEN_AI_VENDOR) -> int:
+def num_tokens_from_string(text: str, llm_vendor: str = OPEN_AI_VENDOR) -> int:
     """
     Returns the number of tokens in a text string.
     NOTE: openAI and Anthropics have different token counting mechanisms.
     https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
     """
-    is_anthropic = model_type == ANTHROPIC_AI_VENDOR
+    is_anthropic = llm_vendor == ANTHROPIC_AI_VENDOR
 
     num_tokens = (
-        anthropic_sync_count_tokens(string)
+        anthropic_sync_count_tokens(text)
         if is_anthropic
-        else len(tiktoken.get_encoding("gpt2").encode(string))
+        else len(tiktoken.get_encoding("gpt2").encode(text))
     )
     return num_tokens
 

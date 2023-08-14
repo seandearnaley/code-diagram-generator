@@ -74,7 +74,7 @@ export default async function Home() {
   const default_source_folder = source_folder_options[0]?.id;
 
   return (
-    <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50">
+    <div className="overflow-hidden bg-gray-50">
       <DiagramForm
         diagram_config={diagram_config}
         llm_config={llm_config}

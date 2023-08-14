@@ -3,7 +3,7 @@ import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 import fetcher from "../lib/fetcher";
 
-export const useDiagramInstructions = (payload: DiagramFormValues | null) => {
+export const useDesignDirectives = (payload: DiagramFormValues | null) => {
   const [debouncedPayload] = useDebounce(payload, 500); // ms
   const shouldFetch =
     debouncedPayload &&
