@@ -28,75 +28,27 @@
     ],
     "anthropic": [
       {
-        "name": "Claude v2",
+        "name": "Claude 2 (Major)",
         "id": "claude-2",
         "description": "Claude v2 is an AI chatbot platform introduced by Anthropic that rivals ChatGPT in an exciting and innovative manner. It has redefined how we interact with AI platforms by extending the length of meaningful interactions to an incredible 75,000 words. What sets Claude v2 apart is its commitment to ethical AI. The platform has been designed with a unique “constitution” to prevent the generation of harmful content, making it a responsible addition to the AI community.",
         "max_token_length": 100000
       },
       {
-        "name": "Claude v1",
-        "id": "claude-v1",
-        "description": "Claude v1 is a powerful model that can handle sophisticated dialogue, creative content generation, and detailed instructions.",
-        "max_token_length": 9000
-      },
-      {
-        "name": "Claude v1 100k",
-        "id": "claude-v1-100k",
-        "description": "Claude v1 with a context window of 100,000 tokens is equal to around 75,000 words! This means that Claude can now analyze a large amount of text, equivalent to hundreds of pages, and conversations with Claude can last for hours or even days.",
+        "name": "Claude 2.0 (Latest)",
+        "id": "claude-2.0",
+        "description": "Claude v2 Latest full version",
         "max_token_length": 100000
       },
       {
-        "name": "Claude Instant v1",
-        "id": "claude-instant-v1",
+        "name": "Claude Instant 1 (Major)",
+        "id": "claude-instant-1",
         "description": "Claude Instant v1 is a faster and less expensive model that can handle casual dialogue, text analysis and summarization, and document Q&A.",
         "max_token_length": 9000
       },
       {
-        "name": "Claude Instant v1 100k",
-        "id": "claude-instant-v1-100k",
-        "description": "Claude Instant v1 with a context window of 100,000 tokens is equal to around 75,000 words! This means that Claude can now analyze a large amount of text, equivalent to hundreds of pages, and conversations with Claude can last for hours or even days.",
-        "max_token_length": 100000
-      },
-      {
-        "name": "Claude v1.3",
-        "id": "claude-v1.3",
-        "description": "Claude v1.3 is designed to be safer, less vulnerable to adversarial attacks, and provide equal or better performance across all domains compared to previous versions according to Anthropic.",
-        "max_token_length": 9000
-      },
-      {
-        "name": "Claude v1.3 100k",
-        "id": "claude-v1.3-100k",
-        "description": "I’m sorry but I couldn’t find any information about this specific version.",
-        "max_token_length": 100000
-      },
-      {
-        "name": "Claude v1.2",
-        "id": "claude-v1.2",
-        "description": "I’m sorry but I couldn’t find any information about this specific version.",
-        "max_token_length": 9000
-      },
-      {
-        "name": "Claude v1.0",
-        "id": "claude-v1.0",
-        "description": "I’m sorry but I couldn’t find any information about this specific version.",
-        "max_token_length": 9000
-      },
-      {
-        "name": "Claude Instant v1.1",
-        "id": "claude-instant-v1.1",
-        "description": "Claude Instant v1.1 is a faster and cheaper yet still very capable model that can handle a range of tasks including casual dialogue, text analysis, summarization, and document comprehension.",
-        "max_token_length": 9000
-      },
-      {
-        "name": "Claude Instant v1.1 100k",
-        "id": "claude-instant-v1.1-100k",
-        "description": "Claude Instant v1.1 with a context window of 100,000 tokens is equal to around 75,000 words! This means that Claude can now analyze a large amount of text, equivalent to hundreds of pages, and conversations with Claude can last for hours or even days.",
-        "max_token_length": 100000
-      },
-      {
-        "name": "Claude Instant v1.0",
-        "id": "claude-instant-v1.0",
-        "description": "I’m sorry but I couldn’t find any information about this specific version.",
+        "name": "Claude Instant 1.2 (Latest)",
+        "id": "claude-instant-1.2",
+        "description": "Claude instant 1.2 Latest full version",
         "max_token_length": 9000
       }
     ]

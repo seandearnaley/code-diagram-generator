@@ -1,5 +1,5 @@
 """Pydantic models for FastAPI."""
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
@@ -44,3 +44,17 @@ class LLMConfig(BaseModel):
 
     llm_vendors: Dict[str, List[LLMDefinition]]
     llm_vendor_names: Dict[str, str]
+
+
+class MermaidDesignRequest(BaseModel):
+    """Pydantic model for Mermaid design request."""
+
+    text: str
+    source_folder_option: str
+    diagram_category: str
+    diagram_option: str
+    include_folder_tree: bool
+    include_python_code_outline: bool
+    git_ignore_file_path: Optional[str]
+    llm_vendor_for_instructions: str
+    llm_model_for_instructions: str

@@ -5,7 +5,7 @@ from tempfile import NamedTemporaryFile
 
 from fastapi.responses import FileResponse
 
-from ..models import MermaidScript
+from ..models import MermaidDesignRequest, MermaidScript
 
 
 class MermaidCliError(Exception):
@@ -17,7 +17,7 @@ class MermaidUnexpectedError(Exception):
 
 
 async def create_mermaid_diagram(mermaid_script: MermaidScript):
-    """Generate a mermaid diagram from a mermaid script."""
+    """Generate a mermaid diagram from a mermaid text based script."""
     try:
         # Create temporary files for mermaid script and output svg
         with NamedTemporaryFile(
@@ -50,3 +50,26 @@ async def create_mermaid_diagram(mermaid_script: MermaidScript):
         print("Unexpected Exception:")
         traceback.print_exc()
         raise MermaidUnexpectedError(f"Unexpected error occurred: {str(err)}") from err
+
+
+async def post_mermaid_design_requestx(mermaid_design_request: MermaidDesignRequest):
+    """Generate a mermaid diagram from a mermaid script."""
+    print("Mermaid Design Request:", mermaid_design_request)
+
+    # TODO: HERE IS WHERE THE MAGIC HAPPENS
+    # text completion with function needs to go in here it will take the
+    # mermaid_design_request.text and return a JSON spec for the create_mermaid_diagram
+    # function, it needs to be called with a script pattern similar to the one below.
+    # for now: we only need to capture enough text to complete the script
+    mermaid_script_str = """
+    flowchart TD
+      A[Start] --> B{Is it?}
+      B -- Yes --> C[OK]
+      C --> D[Rethink]
+      D --> B
+      B -- No ----> E[End]
+      """
+
+    return await create_mermaid_diagram(
+        MermaidScript(mermaid_script=mermaid_script_str)
+    )

@@ -1,4 +1,5 @@
 """Service for various folder tools."""
+from fnmatch import fnmatch
 from pathlib import Path
 from typing import List, Optional
 
@@ -6,7 +7,7 @@ from folder_tree_generator import generate_tree
 from python_code_outline import get_report
 
 
-async def find_gitignore(root_folder: str) -> Optional[str]:
+def find_gitignore(root_folder: str) -> Optional[str]:
     """
     Find the first .gitignore file starting from the root directory.
 
@@ -20,6 +21,27 @@ async def find_gitignore(root_folder: str) -> Optional[str]:
         return str(next(Path(root_folder).rglob(".gitignore")))
     except StopIteration:
         return None
+
+
+def read_gitignore_patterns(root_folder: str) -> List[str]:
+    """
+    Read the .gitignore file from the root folder and return the ignore patterns.
+
+    Parameters:
+    - root_folder: The root directory to start searching from.
+
+    Returns:
+    - A list of patterns to ignore, or an empty list if no .gitignore file is found.
+    """
+    gitignore_path = find_gitignore(root_folder)
+    if gitignore_path:
+        with open(gitignore_path, "r", encoding="utf-8") as file:
+            return [
+                line.strip()
+                for line in file.readlines()
+                if line.strip() and not line.startswith("#")
+            ]
+    return []
 
 
 async def folder_tree(
@@ -63,9 +85,6 @@ async def read_python_projects(folder_path: str) -> List[str]:
     """
     Get all folders in a folder that contain a Python project.
 
-    A Python project is defined as a folder that contains at least one .py file
-    or a `pyproject.toml` file.
-
     Parameters:
     - folder_path: The directory path to read.
 
@@ -77,15 +96,19 @@ async def read_python_projects(folder_path: str) -> List[str]:
     if not path.exists() or not path.is_dir():
         return []
 
+    ignore_patterns = read_gitignore_patterns(folder_path)
+
     project_folders: List[str] = []
     for entry in path.iterdir():
-        if entry.is_dir() and contains_python_project(entry):
+        if entry.is_dir() and contains_python_project(entry, ignore_patterns):
             project_folders.append(entry.name)
 
     return project_folders
 
 
-def contains_python_project(directory: Path) -> bool:
+def contains_python_project(
+    directory: Path, ignore_patterns: Optional[List[str]] = None
+) -> bool:
     """
     Recursively check if a directory or any of its subdirectories contain
     a Python project.
@@ -95,17 +118,27 @@ def contains_python_project(directory: Path) -> bool:
 
     Parameters:
     - directory: The directory path to check.
+    - ignore_patterns: List of patterns to ignore (from .gitignore), or None.
 
     Returns:
     - True if the directory or any of its subdirectories contain a Python project,
       False otherwise.
     """
+    if ignore_patterns is None:
+        ignore_patterns = []
+
     for entry in directory.iterdir():
+        # Ignore if the entry matches any of the ignore patterns
+        if any(fnmatch(str(entry), pattern) for pattern in ignore_patterns):
+            continue
+
         if entry.is_file() and (
             entry.name.endswith(".py") or entry.name == "pyproject.toml"
         ):
+            print("a.Found python project:", entry)
             return True
-        if entry.is_dir() and contains_python_project(entry):
+        if entry.is_dir() and contains_python_project(entry, ignore_patterns):
+            print("b.Found python project:", entry)
             return True
 
     return False

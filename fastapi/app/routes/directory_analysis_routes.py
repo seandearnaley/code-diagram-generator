@@ -79,6 +79,6 @@ async def gitignore_file_endpoint(root_folder: str):
                 detail="folder does not exist or is not a directory",
             )
 
-        return await find_gitignore(str(path))
+        return find_gitignore(str(path))
     except ValueError as ex:
         raise HTTPException(status_code=404, detail=str(ex)) from ex
