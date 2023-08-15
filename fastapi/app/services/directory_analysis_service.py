@@ -74,17 +74,38 @@ async def read_python_projects(folder_path: str) -> List[str]:
       If the directory doesn't exist, an empty list is returned.
     """
     path = Path(folder_path)
-
     if not path.exists() or not path.is_dir():
         return []
 
     project_folders: List[str] = []
     for entry in path.iterdir():
-        if entry.is_dir():
-            python_files = list(entry.glob("*.py"))
-            pyproject_files = list(entry.glob("pyproject.toml"))
-
-            if python_files or pyproject_files:
-                project_folders.append(entry.name)
+        if entry.is_dir() and contains_python_project(entry):
+            project_folders.append(entry.name)
 
     return project_folders
+
+
+def contains_python_project(directory: Path) -> bool:
+    """
+    Recursively check if a directory or any of its subdirectories contain
+    a Python project.
+
+    A Python project is defined as a folder that contains at least one .py file
+    or a `pyproject.toml` file.
+
+    Parameters:
+    - directory: The directory path to check.
+
+    Returns:
+    - True if the directory or any of its subdirectories contain a Python project,
+      False otherwise.
+    """
+    for entry in directory.iterdir():
+        if entry.is_file() and (
+            entry.name.endswith(".py") or entry.name == "pyproject.toml"
+        ):
+            return True
+        if entry.is_dir() and contains_python_project(entry):
+            return True
+
+    return False
