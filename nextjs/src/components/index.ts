@@ -16,4 +16,5 @@ export { SourceFolderSection } from "./SourceFolderSection";
 export { TextArea } from "./TextArea";
 export { TextInput } from "./TextInput";
 export { Toast } from "./Toast";
+export { TokenCounter } from "./TokenCounter";
 export { VendorConfig } from "./VendorConfig";

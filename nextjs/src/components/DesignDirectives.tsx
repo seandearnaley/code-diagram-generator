@@ -1,17 +1,23 @@
-import { CodeComponent, MermaidDiagram } from "@/components";
+import { CodeComponent, MermaidDiagram, TokenCounter } from "@/components";
+import { useDesignDirectives } from "@/hooks/useDesignDirectives";
+import { DiagramFormValues } from "@/types/DiagramForm.types";
 import { Field } from "formik";
 import { HTMLAttributes } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
+type SetFieldValue = (
+  field: string,
+  value: any,
+  shouldValidate?: boolean,
+) => void;
+
 interface DesignDirectivesProps {
-  design_directive_data: any;
-  isLoading: boolean | null;
   isEditable: boolean;
-  setIsEditable: any;
-  setFieldValue: any;
-  tokenCountInfo: any;
+  setIsEditable: (value: boolean) => void;
+  setFieldValue: SetFieldValue;
+  payload: DiagramFormValues;
 }
 
 const components = {
@@ -25,16 +31,15 @@ const components = {
 };
 
 export const DesignDirectives: React.FC<DesignDirectivesProps> = ({
-  design_directive_data,
-  isLoading,
   isEditable,
   setIsEditable,
   setFieldValue,
-  tokenCountInfo,
+  payload,
 }) => {
-  return design_directive_data &&
-    design_directive_data.payload &&
-    !isLoading ? (
+  const { data, isLoading } = useDesignDirectives(payload);
+  const textForTokenCount = data?.payload || "";
+
+  return data && data.payload && !isLoading ? (
     <details open className="mb-4">
       <summary className="cursor-pointer text-lg font-medium text-gray-700">
         Design Directives
@@ -53,7 +58,7 @@ export const DesignDirectives: React.FC<DesignDirectivesProps> = ({
               as="textarea"
               name="design_instructions"
               className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md resize-none w-full max-h-[1000px] h-[1000px]"
-              value={design_directive_data.payload}
+              value={data.payload}
               onChange={(e: any) => {
                 setFieldValue("design_instructions", e.target.value);
               }}
@@ -65,12 +70,12 @@ export const DesignDirectives: React.FC<DesignDirectivesProps> = ({
             rehypePlugins={[rehypeRaw]}
             className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[1000px]"
           >
-            {design_directive_data.payload}
+            {data.payload}
           </ReactMarkdown>
         )}
 
         <div className="p-2">
-          <CopyToClipboard text={design_directive_data.payload}>
+          <CopyToClipboard text={data.payload}>
             <button
               className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
               type="button"
@@ -86,12 +91,10 @@ export const DesignDirectives: React.FC<DesignDirectivesProps> = ({
           >
             Toggle Edit Mode
           </button>
-          {tokenCountInfo && (
-            <p className="text-sm p-4">
-              Tokens: {tokenCountInfo.token_count}, Estimated Words:{" "}
-              {tokenCountInfo.est_words}
-            </p>
-          )}
+          <TokenCounter
+            textForTokenCount={textForTokenCount}
+            llm_vendor_for_instructions={payload.llm_vendor_for_instructions}
+          />
         </div>
 
         <div className="p-2 flex flex-col items-center">
