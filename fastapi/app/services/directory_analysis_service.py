@@ -135,10 +135,10 @@ def contains_python_project(
         if entry.is_file() and (
             entry.name.endswith(".py") or entry.name == "pyproject.toml"
         ):
-            print("a.Found python project:", entry)
+            # print("a.Found python project:", entry)
             return True
         if entry.is_dir() and contains_python_project(entry, ignore_patterns):
-            print("b.Found python project:", entry)
+            # print("b.Found python project:", entry)
             return True
 
     return False

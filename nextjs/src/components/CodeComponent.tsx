@@ -24,7 +24,7 @@ export const CodeComponent: React.FC<CustomCodeProps> = ({
 
   return (
     <div className="prose overflow-y-auto bg-slate-500 text-slate-500 rounded-md mt-5 mb-5 max-w-[100vw]">
-      <pre className="max-h-[500px] whitespace-pre-wrap m-0">
+      <pre className="max-h-[500px] m-0">
         {/* Code block */}
         {match && !inline ? (
           <SyntaxHighlighter

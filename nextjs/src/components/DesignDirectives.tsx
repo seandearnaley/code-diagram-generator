@@ -52,7 +52,7 @@ export const DesignDirectives: React.FC<DesignDirectivesProps> = ({
             <Field
               as="textarea"
               name="design_instructions"
-              className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md resize-none w-full max-h-[700px] h-[700px]"
+              className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md resize-none w-full max-h-[1000px] h-[1000px]"
               value={design_directive_data.payload}
               onChange={(e: any) => {
                 setFieldValue("design_instructions", e.target.value);
@@ -63,7 +63,7 @@ export const DesignDirectives: React.FC<DesignDirectivesProps> = ({
           <ReactMarkdown
             components={components}
             rehypePlugins={[rehypeRaw]}
-            className=" ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[700px]"
+            className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[1000px]"
           >
             {design_directive_data.payload}
           </ReactMarkdown>

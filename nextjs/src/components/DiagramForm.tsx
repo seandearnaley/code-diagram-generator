@@ -151,32 +151,36 @@ const DiagramForm: FC<DiagramFormProps> = ({
                 Mermaid Diagram GPT Generator
               </h2>
             </div>
-            <FormContent className="grid-flow-row-dense gap-4">
-              <SourceFolderAndOptions options={source_folder_options} />
-              <DiagramConfiguration
-                selectOptions={diagram_category_options}
-                optionsObject={diagram_categories}
-                selectValue={values.diagram_category}
-                radioValue={values.diagram_option}
-                setFieldValue={setFieldValue}
-                errors={errors}
-              />
-              <VendorConfig
-                selectOptions={llm_vendor_options}
-                optionsObject={llm_vendors}
-                selectValue={values.llm_vendor_for_instructions}
-                radioValue={values.llm_model_for_instructions}
-                setFieldValue={setFieldValue}
-                errors={errors}
-              />
-              <DesignDirectives
-                design_directive_data={design_directive_data}
-                isLoading={isLoading}
-                isEditable={isEditable}
-                setIsEditable={setIsEditable}
-                setFieldValue={setFieldValue}
-                tokenCountInfo={tokenCountInfo}
-              />
+            <FormContent className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-x-4">
+              <div>
+                <SourceFolderAndOptions options={source_folder_options} />
+                <DiagramConfiguration
+                  selectOptions={diagram_category_options}
+                  optionsObject={diagram_categories}
+                  selectValue={values.diagram_category}
+                  radioValue={values.diagram_option}
+                  setFieldValue={setFieldValue}
+                  errors={errors}
+                />
+                <VendorConfig
+                  selectOptions={llm_vendor_options}
+                  optionsObject={llm_vendors}
+                  selectValue={values.llm_vendor_for_instructions}
+                  radioValue={values.llm_model_for_instructions}
+                  setFieldValue={setFieldValue}
+                  errors={errors}
+                />
+              </div>
+              <div>
+                <DesignDirectives
+                  design_directive_data={design_directive_data}
+                  isLoading={isLoading}
+                  isEditable={isEditable}
+                  setIsEditable={setIsEditable}
+                  setFieldValue={setFieldValue}
+                  tokenCountInfo={tokenCountInfo}
+                />
+              </div>
             </FormContent>
           </Form>
         );
