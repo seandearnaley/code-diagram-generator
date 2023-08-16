@@ -16,7 +16,7 @@ openai.organization = os.environ.get("OPENAI_ORG_ID")
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
-rate_limits = (RequestRate(10, Duration.MINUTE),)  # 10 requests a minute
+rate_limits = (RequestRate(60, Duration.MINUTE),)  # 60 requests a minute
 
 # Create the rate limiter / Pyrate Limiter instance
 limiter = Limiter(*rate_limits)
@@ -57,8 +57,13 @@ def complete_text(
                     "mermaid_script": {
                         "type": "string",
                         "description": (
-                            "The mermaid script to generate the diagram from"
+                            "Machine readable mermaid MMD script to generate the"
+                            " diagram"
                         ),
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "notes about the diagram, etc.",
                     },
                 },
                 "required": ["mermaid_script"],
@@ -141,6 +146,7 @@ def complete_openai_text(
 
         if response.choices:
             response_message = response.choices[0].message
+            print("response_message: ", response_message)
             content = response_message.content
 
             if response_message.get("function_call"):

@@ -27,6 +27,43 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
   const [diagramUrl, setDiagramUrl] = useState("");
   const imageRef = useRef(null);
 
+  const [imageDimensions, setImageDimensions] = useState({
+    width: 500,
+    height: 500,
+  });
+
+  // Function to get the dimensions from the SVG content
+  const getSvgDimensions = (svgContent: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgContent, "image/svg+xml");
+    const svgElement = doc.querySelector("svg");
+
+    // Read the width and height attributes if they exist
+    let width = parseFloat(svgElement?.getAttribute("width") || "0");
+    let height = parseFloat(svgElement?.getAttribute("height") || "0");
+
+    // If width and height are not specified, try to parse the viewBox attribute
+    if (width === 0 || height === 0) {
+      const viewBox = svgElement?.getAttribute("viewBox") || "";
+      const [x, y, viewBoxWidth, viewBoxHeight] = viewBox
+        .split(" ")
+        .map(Number);
+      if (viewBoxWidth && viewBoxHeight) {
+        // If only one dimension is specified, calculate the other to maintain aspect ratio
+        if (width === 0 && height !== 0) {
+          width = (viewBoxWidth / viewBoxHeight) * height;
+        } else if (height === 0 && width !== 0) {
+          height = (viewBoxHeight / viewBoxWidth) * width;
+        } else {
+          width = viewBoxWidth;
+          height = viewBoxHeight;
+        }
+      }
+    }
+
+    return { width, height };
+  };
+
   const postMermaid = async () => {
     try {
       const response = await fetch(
@@ -47,6 +84,17 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         setDiagramUrl(url);
+
+        // Extract the dimensions from the SVG content
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target?.result as string;
+          const dimensions = getSvgDimensions(content);
+
+          console.log("dimensions", dimensions);
+          setImageDimensions(dimensions);
+        };
+        reader.readAsText(blob);
       } else {
         console.error("Failed to create diagram:", response.statusText);
       }
@@ -78,19 +126,30 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
 
       {diagramUrl && (
         <div>
+          <div className="mb-4">
+            dimensions: {imageDimensions.width} x {imageDimensions.height}
+          </div>
           <div
-            className="flex justify-center items-center pt-4 pb-4"
+            // className="flex justify-center items-center pt-4 pb-4"
             ref={imageRef}
+            // style={{
+            //   width: `${imageDimensions.width}px`,
+            //   height: `${imageDimensions.height}px`,
+            // }}
           >
             <Image
               src={diagramUrl}
-              style={{ width: "200px", height: "auto" }}
               alt="Mermaid Diagram"
-              width={500}
-              height={500}
+              // style={{
+              //   width: "100%",
+              //   height: "auto",
+              //   objectFit: "contain",
+              // }}
+              width={600}
+              height={600}
             />
           </div>
-          <div>
+          <div className="flex justify-center items-center mt-5">
             <a href={diagramUrl} download="diagram.svg">
               <button
                 className="text-sm font-semibold leading-6 text-black items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200"
