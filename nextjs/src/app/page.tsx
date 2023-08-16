@@ -53,6 +53,8 @@ async function getSourceFolders() {
     cache: "no-store",
   });
 
+  // TODO: add proper error handling
+
   const folders: string[] = await res.json();
 
   return folders.map((folder) => ({
@@ -69,9 +71,6 @@ export default async function Home() {
   const [diagram_config, llm_config, source_folder_options] = await Promise.all(
     [diagram_config_data, llm_config_data, source_folders_data],
   );
-
-  // Assuming you want to use the first source folder as the default
-  const default_source_folder = source_folder_options[0]?.id;
 
   return (
     <div className="overflow-hidden bg-gray-50">

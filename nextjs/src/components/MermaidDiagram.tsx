@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 
+import { DiagramFormValues } from "@/types/DiagramForm.types";
 import { FC } from "react";
 
 import { toPng } from "html-to-image";
@@ -17,21 +18,30 @@ const mermaid = `
       B -- No ----> E[End]
 `;
 
-type Props = {};
+type MermaidDiagramProps = {
+  values: DiagramFormValues;
+  text: string;
+};
 
-export const MermaidDiagram: FC<Props> = () => {
+export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
   const [diagramUrl, setDiagramUrl] = useState("");
   const imageRef = useRef(null);
 
   const postMermaid = async () => {
     try {
-      const response = await fetch("http://localhost:8000/mermaid/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "http://localhost:8000/mermaid_design_request/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text,
+            ...values,
+          }),
         },
-        body: JSON.stringify({ mermaid_script: mermaid }),
-      });
+      );
 
       if (response.ok) {
         const blob = await response.blob();

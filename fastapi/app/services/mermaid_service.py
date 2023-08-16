@@ -5,7 +5,9 @@ from tempfile import NamedTemporaryFile
 
 from fastapi.responses import FileResponse
 
-from ..models import MermaidDesignRequest, MermaidScript
+from ..models import LLMDefinition, MermaidDesignRequest, MermaidScript
+from ..services.llm_service import complete_text
+from ..utils.llm_utils import num_tokens_from_string
 
 
 class MermaidCliError(Exception):
@@ -52,15 +54,34 @@ async def create_mermaid_diagram(mermaid_script: MermaidScript):
         raise MermaidUnexpectedError(f"Unexpected error occurred: {str(err)}") from err
 
 
-async def post_mermaid_design_requestx(mermaid_design_request: MermaidDesignRequest):
+async def post_mermaid_design_requestx(
+    llm_definition: LLMDefinition, mermaid_design_request: MermaidDesignRequest
+):
     """Generate a mermaid diagram from a mermaid script."""
     print("Mermaid Design Request:", mermaid_design_request)
 
-    # TODO: HERE IS WHERE THE MAGIC HAPPENS
-    # text completion with function needs to go in here it will take the
-    # mermaid_design_request.text and return a JSON spec for the create_mermaid_diagram
-    # function, it needs to be called with a script pattern similar to the one below.
-    # for now: we only need to capture enough text to complete the script
+    num_tokens = num_tokens_from_string(mermaid_design_request.text)
+    max_tokens = llm_definition.max_token_length - num_tokens
+
+    print(
+        "Max Tokens:",
+        max_tokens,
+        "for model:",
+        llm_definition.name,
+        llm_definition.max_token_length,
+        "-",
+        num_tokens,
+    )
+
+    completion = complete_text(
+        prompt=mermaid_design_request.text,
+        max_tokens=max_tokens,
+        model=mermaid_design_request.llm_model_for_instructions,
+        vendor=mermaid_design_request.llm_vendor_for_instructions,
+    )
+
+    print("Completion:", completion)
+
     mermaid_script_str = """
     flowchart TD
       A[Start] --> B{Is it?}

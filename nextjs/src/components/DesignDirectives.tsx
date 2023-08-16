@@ -1,12 +1,13 @@
 import { CodeComponent, MermaidDiagram, TokenCounter } from "@/components";
 import { useDesignDirectives } from "@/hooks/useDesignDirectives";
 import { DiagramFormValues } from "@/types/DiagramForm.types";
+import { ClipboardIcon } from "@heroicons/react/24/solid";
 import { Field } from "formik";
-import { HTMLAttributes } from "react";
+import { FC, HTMLAttributes } from "react";
+
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
-
 type SetFieldValue = (
   field: string,
   value: any,
@@ -17,7 +18,7 @@ interface DesignDirectivesProps {
   isEditable: boolean;
   setIsEditable: (value: boolean) => void;
   setFieldValue: SetFieldValue;
-  payload: DiagramFormValues;
+  values: DiagramFormValues;
 }
 
 const components = {
@@ -30,13 +31,13 @@ const components = {
   ),
 };
 
-export const DesignDirectives: React.FC<DesignDirectivesProps> = ({
+export const DesignDirectives: FC<DesignDirectivesProps> = ({
   isEditable,
   setIsEditable,
   setFieldValue,
-  payload,
+  values,
 }) => {
-  const { data, isLoading } = useDesignDirectives(payload);
+  const { data, isLoading } = useDesignDirectives(values);
   const textForTokenCount = data?.payload || "";
 
   return data && data.payload && !isLoading ? (
@@ -81,6 +82,7 @@ export const DesignDirectives: React.FC<DesignDirectivesProps> = ({
               type="button"
               onClick={() => alert("All content copied to clipboard!")}
             >
+              <ClipboardIcon className="h-5 w-5 mr-2" />
               Copy All Content
             </button>
           </CopyToClipboard>
@@ -93,12 +95,12 @@ export const DesignDirectives: React.FC<DesignDirectivesProps> = ({
           </button>
           <TokenCounter
             textForTokenCount={textForTokenCount}
-            llm_vendor_for_instructions={payload.llm_vendor_for_instructions}
+            llm_vendor_for_instructions={values.llm_vendor_for_instructions}
           />
         </div>
 
         <div className="p-2 flex flex-col items-center">
-          <MermaidDiagram />
+          <MermaidDiagram values={values} text={data.payload} />
         </div>
       </>
     </details>

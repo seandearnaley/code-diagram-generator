@@ -3,15 +3,12 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
+from starlette.requests import Request
 
 from fastapi import APIRouter, HTTPException, Query
 
 from ..models import DiagramDefinition
-from ..services.diagram_service import (
-    get_category_by_id,
-    get_diagram_by_id,
-    load_diagram_config,
-)
+from ..services.diagram_service import get_category_by_id, get_diagram_by_id
 from ..services.directory_analysis_service import folder_report, folder_tree
 
 router = APIRouter()
@@ -143,6 +140,7 @@ def construct_payload_dump(
 
 @router.get("/generate_diagram_instructions")
 async def generate_diagram_instructions(
+    request: Request,
     source_folder_option: str = Query(...),
     diagram_category: str = Query(...),
     diagram_option: str = Query(...),
@@ -165,8 +163,7 @@ async def generate_diagram_instructions(
     )
 
     folder_tree_content, folder_report_content = await get_folder_content(payload)
-
-    diagram_config = await load_diagram_config()
+    diagram_config = request.app.state.diagram_config
     diagram = get_diagram_by_id(diagram_config, diagram_option)
     category_name = get_category_by_id(diagram_config, diagram_category)
 

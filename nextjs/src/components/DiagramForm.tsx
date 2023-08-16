@@ -120,7 +120,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   isEditable={isEditable}
                   setIsEditable={setIsEditable}
                   setFieldValue={setFieldValue}
-                  payload={values}
+                  values={values}
                 />
               </div>
             </FormContent>

@@ -26,7 +26,7 @@ def get_source_folder() -> str:
         )
 
     path = Path(source_folder)
-
+    print("path===", path)
     if not path.exists() or not path.is_dir():
         raise HTTPException(
             status_code=500, detail="SOURCE_FOLDER does not exist or is not a directory"

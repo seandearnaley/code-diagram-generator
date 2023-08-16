@@ -11,14 +11,16 @@ from .routes import (
     mermaid_routes,
 )
 from .services.diagram_service import load_diagram_config
+from .services.llm_service import load_llm_config
 
 app = FastAPI(debug=True)
 
 
 @app.on_event("startup")
 async def startup_event():
-    """Load diagram config on startup."""
+    """Load configs on startup."""
     app.state.diagram_config = await load_diagram_config()
+    app.state.llm_config = await load_llm_config()
 
 
 origins = [

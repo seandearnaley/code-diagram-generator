@@ -9,7 +9,7 @@ from openai.openai_object import OpenAIObject
 from pyrate_limiter import Duration, Limiter, RequestRate
 
 from ..config import ANTHROPIC_AI_VENDOR, LLM_CONFIG_PATH
-from ..models import LLMConfig
+from ..models import LLMConfig, LLMDefinition
 from ..utils.llm_utils import validate_max_tokens
 
 openai.organization = os.environ.get("OPENAI_ORG_ID")
@@ -80,23 +80,30 @@ async def load_llm_config() -> LLMConfig:
     )
 
 
+def get_llm_by_id(llm_config: LLMConfig, llm_id: str) -> LLMDefinition | None:
+    """Get a llm config by id from the loaded llm configuration"""
+    for _, llms in llm_config.llm_vendors.items():
+        for llm in llms:
+            if llm.id == llm_id:
+                return llm
+    return None
+
+
 def complete_openai_text(
     prompt: str,
     max_tokens: int,
     model: str,
 ) -> str:
     """Use OpenAI's GPT model to complete text based on the given prompt."""
-
     try:
         response = openai.ChatCompletion.create(
-            model,
-            max_tokens,
+            model=model,
+            max_tokens=max_tokens,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt},
             ],
         )
-
         if not isinstance(response, OpenAIObject):
             raise ValueError("Invalid Response")
 
@@ -111,7 +118,7 @@ def complete_openai_text(
     except ValueError as err:
         return f"OpenAI Client Value error: {err}"
     except OpenAIException as err:
-        return f"OpenAI Client Error: {err}"
+        return f"complete_openai_text Exception: {err}"
 
 
 def complete_anthropic_text(

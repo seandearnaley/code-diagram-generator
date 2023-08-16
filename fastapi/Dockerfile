@@ -4,9 +4,13 @@ FROM python:3.10-slim
 # Set the working directory
 WORKDIR /app
 
-# Set the PYTHONPATH environment variable
+# Declare environment variables
 ENV PYTHONPATH=/app
 ENV SOURCE_FOLDER=/source-repos
+ENV OPENAI_ORG_ID=${OPENAI_ORG_ID}
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+ENV ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y curl gnupg wget libxss1 fonts-liberation chromium
 
