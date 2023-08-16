@@ -4,9 +4,6 @@ async function getDiagramConfig() {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/diagram_config`,
-      {
-        cache: "no-store",
-      },
     );
     const json = await res.json();
 
@@ -30,9 +27,7 @@ async function getDiagramConfig() {
 }
 
 async function getLlmConfig() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/llm_config`, {
-    cache: "no-store",
-  });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/llm_config`);
   const json = await res.json();
 
   const llm_vendor_options = Object.keys(json.llm_vendors).map((key) => ({

@@ -24,15 +24,7 @@ def find_gitignore(root_folder: str) -> Optional[str]:
 
 
 def read_gitignore_patterns(root_folder: str) -> List[str]:
-    """
-    Read the .gitignore file from the root folder and return the ignore patterns.
-
-    Parameters:
-    - root_folder: The root directory to start searching from.
-
-    Returns:
-    - A list of patterns to ignore, or an empty list if no .gitignore file is found.
-    """
+    """Read the patterns from the .gitignore file in the root folder."""
     gitignore_path = find_gitignore(root_folder)
     if gitignore_path:
         with open(gitignore_path, "r", encoding="utf-8") as file:
@@ -109,36 +101,18 @@ async def read_python_projects(folder_path: str) -> List[str]:
 def contains_python_project(
     directory: Path, ignore_patterns: Optional[List[str]] = None
 ) -> bool:
-    """
-    Recursively check if a directory or any of its subdirectories contain
-    a Python project.
-
-    A Python project is defined as a folder that contains at least one .py file
-    or a `pyproject.toml` file.
-
-    Parameters:
-    - directory: The directory path to check.
-    - ignore_patterns: List of patterns to ignore (from .gitignore), or None.
-
-    Returns:
-    - True if the directory or any of its subdirectories contain a Python project,
-      False otherwise.
-    """
+    """Check if a directory contains a Python project."""
     if ignore_patterns is None:
         ignore_patterns = []
 
-    for entry in directory.iterdir():
-        # Ignore if the entry matches any of the ignore patterns
-        if any(fnmatch(str(entry), pattern) for pattern in ignore_patterns):
-            continue
-
-        if entry.is_file() and (
-            entry.name.endswith(".py") or entry.name == "pyproject.toml"
-        ):
-            # print("a.Found python project:", entry)
-            return True
-        if entry.is_dir() and contains_python_project(entry, ignore_patterns):
-            # print("b.Found python project:", entry)
+    for pattern in ["*.py", "pyproject.toml"]:
+        for entry in directory.rglob(pattern):
+            # Check if the entry matches any of the ignore patterns
+            if any(
+                fnmatch(str(entry), ignore_pattern)
+                for ignore_pattern in ignore_patterns
+            ):
+                continue
             return True
 
     return False

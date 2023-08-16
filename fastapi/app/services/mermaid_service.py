@@ -3,11 +3,21 @@ import subprocess
 import traceback
 from tempfile import NamedTemporaryFile
 
+from rich.console import Console
+from rich.markdown import Markdown
+
 from fastapi.responses import FileResponse
 
 from ..models import LLMDefinition, MermaidDesignRequest, MermaidScript
 from ..services.llm_service import complete_text
 from ..utils.llm_utils import num_tokens_from_string
+
+
+def print_markdown(log_str):
+    """Print markdown to console."""
+    markdown = Markdown(log_str)
+    console = Console()
+    console.print(markdown)
 
 
 class MermaidCliError(Exception):
@@ -58,15 +68,19 @@ async def post_mermaid_design_requestx(
     llm_definition: LLMDefinition, mermaid_design_request: MermaidDesignRequest
 ):
     """Generate a mermaid diagram from a mermaid script."""
-    print("Mermaid Design Request:", mermaid_design_request)
+    print("Mermaid Design Request:")
+
+    print_markdown(mermaid_design_request.text)
 
     num_tokens = num_tokens_from_string(mermaid_design_request.text)
-    max_tokens = llm_definition.max_token_length - num_tokens
+    max_tokens = (
+        llm_definition.max_token_length - num_tokens - 300
+    )  # ( 300 for functions and msgs TODO: count that)
 
     print(
         "Max Tokens:",
         max_tokens,
-        "for model:",
+        "using model:",
         llm_definition.name,
         llm_definition.max_token_length,
         "-",
@@ -82,15 +96,4 @@ async def post_mermaid_design_requestx(
 
     print("Completion:", completion)
 
-    mermaid_script_str = """
-    flowchart TD
-      A[Start] --> B{Is it?}
-      B -- Yes --> C[OK]
-      C --> D[Rethink]
-      D --> B
-      B -- No ----> E[End]
-      """
-
-    return await create_mermaid_diagram(
-        MermaidScript(mermaid_script=mermaid_script_str)
-    )
+    return await create_mermaid_diagram(MermaidScript(mermaid_script=completion))

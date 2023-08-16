@@ -1,7 +1,7 @@
 """Service for LLM Models"""
 import json
 import os
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 import openai
 from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
@@ -44,6 +44,28 @@ def complete_text(
 
     validate_max_tokens(max_tokens)
 
+    # Define the function for the OpenAI API
+    functions = [
+        {
+            "name": "create_mermaid_diagram",
+            "description": (
+                "Generate a mermaid diagram from a mermaid text based script"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "mermaid_script": {
+                        "type": "string",
+                        "description": (
+                            "The mermaid script to generate the diagram from"
+                        ),
+                    },
+                },
+                "required": ["mermaid_script"],
+            },
+        }
+    ]
+
     is_anthropic = vendor == ANTHROPIC_AI_VENDOR
 
     try:
@@ -59,9 +81,19 @@ def complete_text(
             )
 
         return complete_openai_text(
-            prompt=prompt,
             max_tokens=max_tokens,
             model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a helpful assistant, you only respond by calling"
+                        " functions."
+                    ),
+                },
+                {"role": "user", "content": prompt},
+            ],
+            functions=functions,
         )
 
     except LLMException as exc:
@@ -90,25 +122,36 @@ def get_llm_by_id(llm_config: LLMConfig, llm_id: str) -> LLMDefinition | None:
 
 
 def complete_openai_text(
-    prompt: str,
     max_tokens: int,
     model: str,
+    messages: list[dict[str, str]],
+    functions: Optional[List[Any]] = None,
 ) -> str:
     """Use OpenAI's GPT model to complete text based on the given prompt."""
     try:
         response = openai.ChatCompletion.create(
             model=model,
             max_tokens=max_tokens,
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt},
-            ],
+            messages=messages,
+            functions=functions,
+            function_call="auto",
         )
         if not isinstance(response, OpenAIObject):
             raise ValueError("Invalid Response")
 
         if response.choices:
-            content = response.choices[0].message.content
+            response_message = response.choices[0].message
+            content = response_message.content
+
+            if response_message.get("function_call"):
+                function_args = json.loads(
+                    response_message["function_call"]["arguments"]
+                )
+                mermaid_script_str = function_args.get("mermaid_script")
+                print(f"mermaid_script_str: {mermaid_script_str}")
+                if mermaid_script_str:
+                    return mermaid_script_str
+
             return content.strip()
 
         return "Response doesn't have choices or choices have no text."
