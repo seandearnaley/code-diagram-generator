@@ -1,33 +1,44 @@
 import { DiagramFormValues } from "@/types/DiagramForm.types";
+import { useEffect } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 import fetcher from "../lib/fetcher";
 
-export const useDesignDirectives = (payload: DiagramFormValues | null) => {
-  const [debouncedPayload] = useDebounce(payload, 500); // ms
-  const shouldFetch =
-    debouncedPayload &&
-    debouncedPayload.source_folder_option !== "" &&
-    debouncedPayload.diagram_category !== "" &&
-    debouncedPayload.diagram_option !== "" &&
-    debouncedPayload.llm_vendor_for_instructions !== "" &&
-    debouncedPayload.llm_model_for_instructions !== "";
+export const useDesignDirectives = (values: DiagramFormValues | null) => {
+  const [debouncedValues] = useDebounce(values, 500); // ms
 
-  // Construct the query parameters from the debounced payload
-  const queryParams = new URLSearchParams({
-    source_folder_option: debouncedPayload?.source_folder_option || "",
-    diagram_category: debouncedPayload?.diagram_category || "",
-    diagram_option: debouncedPayload?.diagram_option || "",
-    include_folder_tree:
-      debouncedPayload?.include_folder_tree?.toString() || "false",
-    include_python_code_outline:
-      debouncedPayload?.include_python_code_outline?.toString() || "false",
-    git_ignore_file_path: debouncedPayload?.git_ignore_file_path || "",
-    llm_vendor_for_instructions:
-      debouncedPayload?.llm_vendor_for_instructions || "",
-    llm_model_for_instructions:
-      debouncedPayload?.llm_model_for_instructions || "",
-  }).toString();
+  useEffect(() => {
+    console.log("values changed");
+  }, [debouncedValues]);
+
+  const shouldFetch =
+    debouncedValues &&
+    Object.values(debouncedValues).every((value) => value !== "");
+
+  let queryParams = "";
+  if (debouncedValues) {
+    const {
+      source_folder_option,
+      diagram_category,
+      diagram_option,
+      include_folder_tree = false,
+      include_python_code_outline = false,
+      git_ignore_file_path,
+      llm_vendor_for_instructions,
+      llm_model_for_instructions,
+    } = debouncedValues;
+
+    queryParams = new URLSearchParams({
+      source_folder_option,
+      diagram_category,
+      diagram_option,
+      include_folder_tree: include_folder_tree.toString(),
+      include_python_code_outline: include_python_code_outline.toString(),
+      git_ignore_file_path,
+      llm_vendor_for_instructions,
+      llm_model_for_instructions,
+    }).toString();
+  }
 
   // Construct the URL with the query parameters
   const url = shouldFetch

@@ -30,8 +30,6 @@ class DiagramPayload(BaseModel):
     include_folder_tree: bool
     include_python_code_outline: bool
     git_ignore_file_path: Optional[Path] = None
-    llm_vendor_for_instructions: str
-    llm_model_for_instructions: str
 
     @validator("source_folder_option")
     @classmethod
@@ -53,8 +51,6 @@ def create_payload(
     include_folder_tree: bool = False,
     include_python_code_outline: bool = False,
     git_ignore_file_path: Optional[str] = None,
-    llm_vendor_for_instructions: str = "",
-    llm_model_for_instructions: str = "",
 ) -> DiagramPayload:
     """Create a payload"""
     return DiagramPayload(
@@ -66,8 +62,6 @@ def create_payload(
         git_ignore_file_path=Path(git_ignore_file_path)
         if git_ignore_file_path
         else None,
-        llm_vendor_for_instructions=llm_vendor_for_instructions,
-        llm_model_for_instructions=llm_model_for_instructions,
     )
 
 
@@ -148,8 +142,6 @@ async def generate_diagram_instructions(
     include_folder_tree: bool = Query(...),
     include_python_code_outline: bool = Query(...),
     git_ignore_file_path: Optional[str] = Query(None),
-    llm_vendor_for_instructions: str = Query(...),
-    llm_model_for_instructions: str = Query(...),
 ):
     """Generate diagram instructions"""
     payload = create_payload(
@@ -159,8 +151,6 @@ async def generate_diagram_instructions(
         include_folder_tree=include_folder_tree,
         include_python_code_outline=include_python_code_outline,
         git_ignore_file_path=git_ignore_file_path,
-        llm_vendor_for_instructions=llm_vendor_for_instructions,
-        llm_model_for_instructions=llm_model_for_instructions,
     )
     logger.info("get diagram payload:", payload)
     folder_tree_content, folder_report_content = await get_folder_content(payload)

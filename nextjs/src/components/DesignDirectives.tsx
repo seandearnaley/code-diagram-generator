@@ -3,11 +3,10 @@ import { useDesignDirectives } from "@/hooks/useDesignDirectives";
 import { DiagramFormValues } from "@/types/DiagramForm.types";
 import { ClipboardIcon } from "@heroicons/react/24/solid";
 import { Field } from "formik";
-import { FC, HTMLAttributes } from "react";
+import React, { FC, HTMLAttributes } from "react";
 
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
 type SetFieldValue = (
   field: string,
   value: any,
@@ -60,15 +59,15 @@ export const DesignDirectives: FC<DesignDirectivesProps> = ({
               name="design_instructions"
               className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md resize-none w-full max-h-[1000px] h-[1000px]"
               value={data.payload}
-              onChange={(e: any) => {
-                setFieldValue("design_instructions", e.target.value);
-              }}
+              // onChange={(e: any) => {
+              //   setFieldValue("design_instructions", e.target.value);
+              // }}
             />
           </div>
         ) : (
           <ReactMarkdown
             components={components}
-            rehypePlugins={[rehypeRaw]}
+            // rehypePlugins={[rehypeRaw]}
             className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[1000px]"
           >
             {data.payload}
@@ -106,3 +105,5 @@ export const DesignDirectives: FC<DesignDirectivesProps> = ({
     </details>
   ) : null;
 };
+
+export default React.memo(DesignDirectives);

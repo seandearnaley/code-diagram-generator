@@ -9,7 +9,7 @@ interface VendorConfigProps {
   errors: any;
 }
 
-export const VendorConfig: React.FC<VendorConfigProps> = ({
+export const VendorModelSelector: React.FC<VendorConfigProps> = ({
   selectOptions,
   optionsObject,
   selectValue,
@@ -18,7 +18,7 @@ export const VendorConfig: React.FC<VendorConfigProps> = ({
   errors,
 }) => {
   return (
-    <details open className="mb-4">
+    <details className="mb-4">
       <summary className="cursor-pointer text-lg font-medium text-gray-700">
         Vendor Config
       </summary>
@@ -41,4 +41,4 @@ export const VendorConfig: React.FC<VendorConfigProps> = ({
   );
 };
 
-export default VendorConfig;
+export default VendorModelSelector;

@@ -31,7 +31,7 @@ export const SelectorWithRadioOptions: FC<Props> = ({
 }) => {
   const handleSelectorChange = (selectedOption: string) => {
     setFieldValue(selectName, selectedOption);
-    setFieldValue(radioName, "");
+    // setFieldValue(radioName, "");
   };
 
   const handleRadioChange = (optionId: string) => {

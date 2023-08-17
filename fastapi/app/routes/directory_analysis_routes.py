@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 from typing import List, Optional
 
+from loguru import logger
+
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import PlainTextResponse
 
@@ -10,7 +12,7 @@ from ..services.directory_analysis_service import (
     find_gitignore,
     folder_report,
     folder_tree,
-    read_python_projects,
+    read_folder,
 )
 
 router = APIRouter()
@@ -62,7 +64,8 @@ async def folder_tree_endpoint(
 async def read_python_projects_endpoint():
     """Endpoint to get all python projects in the source folder."""
     source_folder = get_source_folder()
-    return await read_python_projects(source_folder)
+    logger.error("source_folder=====", source_folder)
+    return await read_folder(source_folder)
 
 
 @router.get("/gitignore_file/", response_model=Optional[str])

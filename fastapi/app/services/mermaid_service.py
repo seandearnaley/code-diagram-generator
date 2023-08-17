@@ -77,7 +77,9 @@ async def create_mermaid_diagram(mermaid_script: MermaidScript):
             )
 
             logger.warning("Mermaid CLI Output:", process.stdout.decode())
-            logger.error("Mermaid CLI Errors:", process.stderr.decode())
+
+            if process.stderr:
+                logger.error("Mermaid CLI Errors:", process.stderr.decode())
 
             # Return generated svg
             return FileResponse(temp_out.name, media_type="image/svg+xml")

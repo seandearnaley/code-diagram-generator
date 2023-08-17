@@ -5,7 +5,7 @@ import {
   FormContent,
   Loading,
   SourceFolderAndOptions,
-  VendorConfig,
+  VendorModelSelector,
 } from "@/components";
 
 import {
@@ -81,6 +81,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
 
         useEffect(() => {
           if (dirty && !isFirstMount.current) {
+            console.log("dirty", dirty);
             setSavingToStorage(true);
             setStoredValue(debouncedValues);
             setSavingToStorage(false);
@@ -106,7 +107,9 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   setFieldValue={setFieldValue}
                   errors={errors}
                 />
-                <VendorConfig
+              </div>
+              <div>
+                <VendorModelSelector
                   selectOptions={llm_vendor_options}
                   optionsObject={llm_vendors}
                   selectValue={values.llm_vendor_for_instructions}
@@ -114,8 +117,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   setFieldValue={setFieldValue}
                   errors={errors}
                 />
-              </div>
-              <div>
                 <DesignDirectives
                   isEditable={isEditable}
                   setIsEditable={setIsEditable}
