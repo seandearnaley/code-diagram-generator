@@ -1,0 +1,14 @@
+```
+{diagram_category}: {diagram_option}
+
+{description}
+```
+Your task is to create a {diagram_option} from the attached code outline.
+
+## Deliverables
+
+- The final product needs to be well written mermaid code that can be parsed with mermaid cli.  Important that strings are properly escaped, references aren't made to things that don't exist and everything is machine readable- this is going to be passed into a unit test for evaluation.  Syntax errors will be considered a failure.
+
+- It should be a beautiful diagram.  Demonstrate your ability.  Make sure it shows all concepts of the diagram category.
+
+- Remember function takes plain text input. Should not contain encodings like \n, \t, etc.

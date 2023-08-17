@@ -34,77 +34,6 @@ class AnthropicException(Exception):
     """Exception raised when there is an error with the Anthropic API"""
 
 
-def complete_text(
-    prompt: str,
-    max_tokens: int,
-    model: str,
-    vendor: str,
-) -> str:
-    """LLM orchestrator"""
-
-    validate_max_tokens(max_tokens)
-
-    # Define the function for the OpenAI API
-    functions = [
-        {
-            "name": "create_mermaid_diagram",
-            "description": (
-                "Generate a mermaid diagram from a mermaid text based script"
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "mermaid_script": {
-                        "type": "string",
-                        "description": (
-                            "Machine readable mermaid MMD script to generate the"
-                            " diagram"
-                        ),
-                    },
-                    "notes": {
-                        "type": "string",
-                        "description": "notes about the diagram, etc.",
-                    },
-                },
-                "required": ["mermaid_script"],
-            },
-        }
-    ]
-
-    is_anthropic = vendor == ANTHROPIC_AI_VENDOR
-
-    try:
-        limiter.ratelimit("complete_text")
-
-        # delegate to the appropriate completion method
-
-        if is_anthropic:
-            return complete_anthropic_text(
-                prompt=prompt,
-                max_tokens=max_tokens,
-                model=model,
-            )
-
-        return complete_openai_text(
-            max_tokens=max_tokens,
-            model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a helpful assistant, you only respond by calling"
-                        " functions."
-                    ),
-                },
-                {"role": "user", "content": prompt},
-            ],
-            functions=functions,
-        )
-
-    except LLMException as exc:
-        return f"Error completing text: {exc}"
-
-
 async def load_llm_config() -> LLMConfig:
     """Reads diagram configuration from a JSON file"""
     with LLM_CONFIG_PATH.open(encoding="utf-8") as json_file:
@@ -124,6 +53,37 @@ def get_llm_by_id(llm_config: LLMConfig, llm_id: str) -> LLMDefinition | None:
             if llm.id == llm_id:
                 return llm
     return None
+
+
+def complete_text(
+    max_tokens: int,
+    model: str,
+    vendor: str,
+    messages: list[dict[str, str]],
+    functions: Optional[List[Any]] = None,
+) -> str:
+    """LLM orchestrator"""
+
+    validate_max_tokens(max_tokens)
+
+    is_anthropic = vendor == ANTHROPIC_AI_VENDOR
+    try:
+        limiter.ratelimit("complete_text")
+
+        # delegate to the appropriate completion method
+        if is_anthropic:
+            return complete_anthropic_text(
+                max_tokens=max_tokens, model=model, messages=messages
+            )
+
+        return complete_openai_text(
+            max_tokens=max_tokens,
+            model=model,
+            messages=messages,
+            functions=functions,
+        )
+    except LLMException as exc:
+        return f"Error completing text: {exc}"
 
 
 def complete_openai_text(
@@ -153,10 +113,12 @@ def complete_openai_text(
                 function_args = json.loads(
                     response_message["function_call"]["arguments"]
                 )
-                mermaid_script_str = function_args.get("mermaid_script")
-                print(f"mermaid_script_str: {mermaid_script_str}")
-                if mermaid_script_str:
-                    return mermaid_script_str
+                mermaid_diagram_text_definition_str = function_args.get(
+                    "mermaid_diagram_text_definition"
+                )
+                print(f" {mermaid_diagram_text_definition_str}")
+                if mermaid_diagram_text_definition_str:
+                    return mermaid_diagram_text_definition_str
 
             return content.strip()
 
@@ -170,17 +132,28 @@ def complete_openai_text(
         return f"complete_openai_text Exception: {err}"
 
 
+def format_anthropic_prompt(messages: list[dict[str, str]]) -> str:
+    """Format the messages into a prompt for the anthropic api"""
+    prompt = ""
+    for message in messages:
+        if message["role"] == "user":
+            prompt += f"{HUMAN_PROMPT} {message['content']}"
+        elif message["role"] == "assistant":
+            prompt += f"{AI_PROMPT} {message['content']}"
+    return prompt
+
+
 def complete_anthropic_text(
-    prompt: str,
     max_tokens: int,
     model: str,
+    messages: list[dict[str, str]],
 ) -> str:
     """Use Anthropic's model to complete text based on the given prompt."""
-
     try:
         anthropic_client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        prompt = format_anthropic_prompt(messages)
         response = anthropic_client.completions.create(
-            prompt=f"{HUMAN_PROMPT} {prompt}{AI_PROMPT}",
+            prompt=prompt,
             stop_sequences=[HUMAN_PROMPT],
             model=model,
             max_tokens_to_sample=max_tokens,

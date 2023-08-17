@@ -1,5 +1,9 @@
 """Main module for FastAPI app."""
 
+import sys
+
+from loguru import logger
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,6 +16,10 @@ from .routes import (
 )
 from .services.diagram_service import load_diagram_config
 from .services.llm_service import load_llm_config
+
+logger.add(
+    sys.stdout, colorize=True, format="<green>{time}</green> <level>{message}</level>"
+)
 
 app = FastAPI(debug=True)
 

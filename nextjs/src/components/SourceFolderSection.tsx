@@ -18,7 +18,7 @@ export const SourceFolderSection: FC<SourceFolderSectionProps> = ({
     values: { source_folder_option, git_ignore_file_path },
     setFieldValue,
   } = useFormikContext<DiagramFormValues>();
-  const { fetch, loading, error } = useGitIgnore();
+  const { getIgnorePath, loading, error } = useGitIgnore();
 
   const [manuallyChanged, setManuallyChanged] = useLocalStorage(
     "manuallyChanged",
@@ -30,7 +30,10 @@ export const SourceFolderSection: FC<SourceFolderSectionProps> = ({
 
   useEffect(() => {
     if (!source_folder_option) return;
-    fetch(source_folder_option).then((gitIgnoreFilePath) => {
+    getIgnorePath(source_folder_option).then((gitIgnoreFilePath) => {
+      // if saved git ignore file path the same don't update it
+      if (manuallyChanged) return;
+
       setFieldValue("git_ignore_file_path", gitIgnoreFilePath || "");
     });
   }, [source_folder_option, manuallyChanged]); // eslint-disable-line react-hooks/exhaustive-deps

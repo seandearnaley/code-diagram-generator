@@ -126,7 +126,7 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
 
       {diagramUrl && (
         <div>
-          <div className="mb-4">
+          <div className="flex justify-center mb-4">
             dimensions: {imageDimensions.width} x {imageDimensions.height}
           </div>
           <div

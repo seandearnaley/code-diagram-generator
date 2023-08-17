@@ -29,7 +29,7 @@ export default function useGitIgnore() {
     }
   };
 
-  const fetch = async (folder: string) => {
+  const getIgnorePath = async (folder: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -42,5 +42,5 @@ export default function useGitIgnore() {
     }
   };
 
-  return { fetch, loading, error };
+  return { getIgnorePath, loading, error };
 }

@@ -2,6 +2,7 @@
 from pathlib import Path
 from typing import Optional, Tuple
 
+from loguru import logger
 from pydantic import BaseModel, validator  # pylint: disable=no-name-in-module
 from starlette.requests import Request
 
@@ -118,7 +119,7 @@ def construct_payload_dump(
     """Construct payload dump"""
     template_path = (
         Path(__file__).parent.parent
-        / "config/templates/generate_diagram_instructions_08112023.txt"
+        / "templates/generate_diagram_instructions_08112023.txt"
     )
     template = load_template(str(template_path))
 
@@ -161,7 +162,7 @@ async def generate_diagram_instructions(
         llm_vendor_for_instructions=llm_vendor_for_instructions,
         llm_model_for_instructions=llm_model_for_instructions,
     )
-
+    logger.info("get diagram payload:", payload)
     folder_tree_content, folder_report_content = await get_folder_content(payload)
     diagram_config = request.app.state.diagram_config
     diagram = get_diagram_by_id(diagram_config, diagram_option)

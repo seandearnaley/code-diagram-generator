@@ -18,6 +18,7 @@ pyrate-limiter = "^2.10.0"
 anthropic = "^0.3.9"
 openai-functools = "^1.0.97"
 rich = "^13.5.2"
+loguru = "^0.7.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.5"

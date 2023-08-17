@@ -3,6 +3,7 @@ import subprocess
 import traceback
 from tempfile import NamedTemporaryFile
 
+from loguru import logger
 from rich.console import Console
 from rich.markdown import Markdown
 
@@ -18,6 +19,34 @@ def print_markdown(log_str):
     markdown = Markdown(log_str)
     console = Console()
     console.print(markdown)
+
+
+# make this line up to create_mermaid_diagram, try functools
+MERMAID_FUNCTIONS = [
+    {
+        "name": "create_mermaid_diagram",
+        "description": "Generate a mermaid diagram from a mermaid text based script",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "mermaid_diagram_text_definition": {
+                    "type": "string",
+                    "description": (
+                        "mermaid diagram text definition. plain text input. Should"
+                        " not contain encodings like \n, \t, etc."
+                    ),
+                },
+                "notes_markdown": {
+                    "type": "string",
+                    "description": (
+                        "markdown formatted notes about the diagram, readme and more"
+                    ),
+                },
+            },
+            "required": ["mermaid_diagram_text_definition"],
+        },
+    }
+]
 
 
 class MermaidCliError(Exception):
@@ -47,19 +76,19 @@ async def create_mermaid_diagram(mermaid_script: MermaidScript):
                 capture_output=True,
             )
 
-            print("Mermaid CLI Output:", process.stdout.decode())
-            print("Mermaid CLI Errors:", process.stderr.decode())
+            logger.warning("Mermaid CLI Output:", process.stdout.decode())
+            logger.error("Mermaid CLI Errors:", process.stderr.decode())
 
             # Return generated svg
             return FileResponse(temp_out.name, media_type="image/svg+xml")
 
     except subprocess.CalledProcessError as err:
-        print("Exception Details:")
-        print(err.stderr.decode())
+        logger.error("Exception Details:")
+        logger.error(err.stderr.decode())
         traceback.print_exc()
         raise MermaidCliError(f"Mermaid CLI failed: {err.stderr.decode()}") from err
     except Exception as err:
-        print("Unexpected Exception:")
+        logger.error("Unexpected Exception:")
         traceback.print_exc()
         raise MermaidUnexpectedError(f"Unexpected error occurred: {str(err)}") from err
 
@@ -68,17 +97,15 @@ async def post_mermaid_design_requestx(
     llm_definition: LLMDefinition, mermaid_design_request: MermaidDesignRequest
 ):
     """Generate a mermaid diagram from a mermaid script."""
-    print("Mermaid Design Request:")
-
-    print_markdown(mermaid_design_request.text)
+    logger.debug("Mermaid Design Request", mermaid_design_request.text[:300])
 
     num_tokens = num_tokens_from_string(mermaid_design_request.text)
     max_tokens = (
         llm_definition.max_token_length - num_tokens - 300
     )  # ( 300 for functions and msgs TODO: count that)
 
-    print(
-        "Max Tokens:",
+    logger.info(
+        "Starting Job:",
         max_tokens,
         "using model:",
         llm_definition.name,
@@ -88,12 +115,22 @@ async def post_mermaid_design_requestx(
     )
 
     completion = complete_text(
-        prompt=mermaid_design_request.text,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a helpful assistant specialized in writing"
+                    " professional system diagrams using mermaid js."
+                ),
+            },
+            {"role": "user", "content": mermaid_design_request.text},
+        ],
         max_tokens=max_tokens,
         model=mermaid_design_request.llm_model_for_instructions,
         vendor=mermaid_design_request.llm_vendor_for_instructions,
+        functions=MERMAID_FUNCTIONS,
     )
 
-    print("Completion:", completion)
+    logger.info("Completion:", completion)
 
     return await create_mermaid_diagram(MermaidScript(mermaid_script=completion))

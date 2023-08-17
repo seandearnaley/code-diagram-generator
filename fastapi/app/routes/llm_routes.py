@@ -32,7 +32,7 @@ async def token_count(request: TextRequest) -> Dict[str, Union[int, str]]:
     """Endpoint to count words in text."""
     count = num_tokens_from_string(request.text, request.llm_vendor)
     return {
-        "token_count": count,
+        "token_count": 0,  # count,
         "llm_vendor": request.llm_vendor,
         "est_words": estimate_word_count(count),
     }
