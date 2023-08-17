@@ -18,6 +18,7 @@ import {
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Form, Formik } from "formik";
 import { FC, useEffect, useRef, useState } from "react";
+
 import { useDebounce } from "use-debounce";
 
 import {
@@ -35,7 +36,6 @@ const DiagramForm: FC<DiagramFormProps> = ({
     useState(true);
 
   const [savingToStorage, setSavingToStorage] = useState(false);
-  const [isEditable, setIsEditable] = useState(false);
   const [storedValue, setStoredValue] = useLocalStorage("formValues", {
     source_folder_option: DEFAULT_SOURCE_FOLDER,
     git_ignore_file_path: "",
@@ -77,11 +77,10 @@ const DiagramForm: FC<DiagramFormProps> = ({
     >
       {({ values, setFieldValue, errors, dirty }) => {
         /* eslint-disable react-hooks/rules-of-hooks */
-        const [debouncedValues] = useDebounce(values, 500);
 
+        const [debouncedValues] = useDebounce(values, 500);
         useEffect(() => {
           if (dirty && !isFirstMount.current) {
-            console.log("dirty", dirty);
             setSavingToStorage(true);
             setStoredValue(debouncedValues);
             setSavingToStorage(false);
@@ -117,12 +116,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   setFieldValue={setFieldValue}
                   errors={errors}
                 />
-                <DesignDirectives
-                  isEditable={isEditable}
-                  setIsEditable={setIsEditable}
-                  setFieldValue={setFieldValue}
-                  values={values}
-                />
+                <DesignDirectives values={values} />
               </div>
             </FormContent>
           </Form>

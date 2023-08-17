@@ -3,20 +3,12 @@ import { useDesignDirectives } from "@/hooks/useDesignDirectives";
 import { DiagramFormValues } from "@/types/DiagramForm.types";
 import { ClipboardIcon } from "@heroicons/react/24/solid";
 import { Field } from "formik";
-import React, { FC, HTMLAttributes } from "react";
+import React, { FC, HTMLAttributes, useState } from "react";
 
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import ReactMarkdown from "react-markdown";
-type SetFieldValue = (
-  field: string,
-  value: any,
-  shouldValidate?: boolean,
-) => void;
 
 interface DesignDirectivesProps {
-  isEditable: boolean;
-  setIsEditable: (value: boolean) => void;
-  setFieldValue: SetFieldValue;
   values: DiagramFormValues;
 }
 
@@ -30,15 +22,14 @@ const components = {
   ),
 };
 
-export const DesignDirectives: FC<DesignDirectivesProps> = ({
-  isEditable,
-  setIsEditable,
-  setFieldValue,
-  values,
-}) => {
+export const DesignDirectives: FC<DesignDirectivesProps> = ({ values }) => {
+  const [isEditable, setIsEditable] = useState(false);
+
   const { data, isLoading } = useDesignDirectives(values);
   const textForTokenCount = data?.payload || "";
-  console.log("data", data, "isLoading", isLoading);
+
+  console.log("data", data, "isLoading", isLoading, values);
+
   return data && data.payload && !isLoading ? (
     <details open className="mb-4">
       <summary className="cursor-pointer text-lg font-medium text-gray-700">

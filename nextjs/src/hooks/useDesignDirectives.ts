@@ -1,15 +1,10 @@
 import { DiagramFormValues } from "@/types/DiagramForm.types";
-import { useEffect } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 import fetcher from "../lib/fetcher";
 
 export const useDesignDirectives = (values: DiagramFormValues | null) => {
   const [debouncedValues] = useDebounce(values, 500); // ms
-
-  useEffect(() => {
-    console.log("values changed");
-  }, [debouncedValues]);
 
   const shouldFetch =
     debouncedValues &&

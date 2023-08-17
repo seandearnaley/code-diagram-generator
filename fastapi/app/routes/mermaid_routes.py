@@ -9,14 +9,14 @@ from ..services.llm_service import get_llm_by_id
 from ..services.mermaid_service import (
     MermaidCliError,
     MermaidUnexpectedError,
-    post_mermaid_design_requestx,
+    mermaid_request,
 )
 
 router = APIRouter()
 
 
 @router.post("/mermaid_design_request/")
-async def post_mermaid_design_request_endpoint(
+async def mermaid_request_endpoint(
     request: Request,
     mermaid_design_request: MermaidDesignRequest = Body(...),
 ):
@@ -35,9 +35,7 @@ async def post_mermaid_design_request_endpoint(
         )
 
     try:
-        return await post_mermaid_design_requestx(
-            llm_definition, mermaid_design_request
-        )
+        return await mermaid_request(llm_definition, mermaid_design_request)
     except MermaidCliError as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
     except MermaidUnexpectedError as ex:

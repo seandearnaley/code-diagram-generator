@@ -95,7 +95,7 @@ async def create_mermaid_diagram(mermaid_script: MermaidScript):
         raise MermaidUnexpectedError(f"Unexpected error occurred: {str(err)}") from err
 
 
-async def post_mermaid_design_requestx(
+async def mermaid_request(
     llm_definition: LLMDefinition, mermaid_design_request: MermaidDesignRequest
 ):
     """Generate a mermaid diagram from a mermaid script."""
