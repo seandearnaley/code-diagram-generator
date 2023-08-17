@@ -38,7 +38,7 @@ export const DesignDirectives: FC<DesignDirectivesProps> = ({
 }) => {
   const { data, isLoading } = useDesignDirectives(values);
   const textForTokenCount = data?.payload || "";
-
+  console.log("data", data, "isLoading", isLoading);
   return data && data.payload && !isLoading ? (
     <details open className="mb-4">
       <summary className="cursor-pointer text-lg font-medium text-gray-700">
