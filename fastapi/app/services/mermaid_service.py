@@ -1,4 +1,5 @@
 """Mermaid Service Module"""
+import json
 import re
 import subprocess
 from tempfile import NamedTemporaryFile
@@ -10,33 +11,7 @@ from fastapi.responses import FileResponse
 from ..models import LLMDefinition, MermaidDesignRequest, MermaidModel
 from ..services.llm_service import complete_text
 from ..utils.llm_utils import num_tokens_from_string
-
-# make this line up to create_mermaid_diagram, try functools
-MERMAID_FUNCTIONS = [
-    {
-        "name": "create_mermaid_diagram",
-        "description": "Generate a mermaid diagram from a mermaid text based script",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "mermaid_diagram_text_definition": {
-                    "type": "string",
-                    "description": (
-                        "mermaid diagram text definition. plain text input. Should"
-                        " not contain encodings like \n, \t, etc."
-                    ),
-                },
-                "notes_markdown": {
-                    "type": "string",
-                    "description": (
-                        "markdown formatted notes about the diagram, readme and more"
-                    ),
-                },
-            },
-            "required": ["mermaid_diagram_text_definition"],
-        },
-    }
-]
+from ..utils.log_utils import print_markdown
 
 
 class MermaidCliError(Exception):
@@ -57,9 +32,6 @@ def extract_error_message(error_text: str) -> str:
 
 async def create_mermaid_diagram(mermaid_model: MermaidModel):
     """Generate a mermaid diagram from a mermaid text based script."""
-
-    if mermaid_model.mermaid_script.strip() == "":
-        raise MermaidUnexpectedError("Mermaid script is empty")
 
     try:
         logger.info(f"Attempt for Mermaid Script: {mermaid_model}")
@@ -90,12 +62,25 @@ async def create_mermaid_diagram(mermaid_model: MermaidModel):
 
     except subprocess.CalledProcessError as err:
         logger.error(f"Exception Details: {extract_error_message(err.stderr.decode())}")
-        # traceback.print_exc()
         raise MermaidCliError(f"Mermaid CLI failed: {err.stderr.decode()}") from err
     except MermaidUnexpectedError as err:
-        logger.error("Unexpected Exception:")
-        # traceback.print_exc()
         raise MermaidUnexpectedError(f"Unexpected error occurred: {err}") from err
+
+
+def openai_mermaid_fn_callback(response) -> str:
+    """Callback function for mermaid diagram generation."""
+    if response.choices:
+        response_message = response.choices[0].message
+        if response_message.get("function_call"):
+            function_args = json.loads(response_message["function_call"]["arguments"])
+            mermaid_diagram_text_definition_str = function_args.get(
+                "mermaid_diagram_text_definition"
+            )
+            if mermaid_diagram_text_definition_str:
+                print_markdown(f"def str:\n\n{mermaid_diagram_text_definition_str}")
+                return mermaid_diagram_text_definition_str
+        return response_message.content.strip()
+    return "Response doesn't have choices or choices have no text."
 
 
 async def mermaid_request(
@@ -115,6 +100,16 @@ async def mermaid_request(
         f" {llm_definition.name} "
     )
 
+    # NOTE diagram_type is supposedly the list of mermaid diagram types GPT supports
+    # from 2021 but the CLI we use is more up to date, it may be possible to teach LLM's
+    # to generate mermaid diagrams for other types using n-shot learning
+    # mermaid docs, examples etc.
+
+    # notes_markdown and diagram_type aren't actually used on the diagram renderer, they
+    # are there simply to help the LLM spread out it's answer, more tokens out tends to
+    # have higher performance.  diagram_type helps steer the token sample to the correct
+    # diagram type
+
     mermaid_script = complete_text(
         messages=[
             {
@@ -129,9 +124,56 @@ async def mermaid_request(
         max_tokens=max_tokens,
         model=mermaid_design_request.llm_model_for_instructions,
         vendor=mermaid_design_request.llm_vendor_for_instructions,
-        functions=MERMAID_FUNCTIONS,
+        functions=[
+            {
+                "name": "create_mermaid_diagram",
+                "description": (
+                    "Generate a mermaid diagram from a mermaid text based script"
+                ),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "mermaid_diagram_text_definition": {
+                            "type": "string",
+                            "description": (
+                                "mermaid diagram text definition. plain text input."
+                                " Should not contain encodings like \n, \t, etc."
+                            ),
+                        },
+                        "notes_markdown": {
+                            "type": "string",
+                            "description": (
+                                "markdown formatted notes about the diagram, readme etc"
+                            ),
+                        },
+                        "diagram_type": {
+                            "type": "string",
+                            "enum": [
+                                "flowchart",
+                                "sequence",
+                                "gantt",
+                                "class",
+                                "state",
+                                "pie",
+                                "git",
+                                "entityRelationship",
+                                "user-journey",
+                                "requirement",
+                            ],
+                            "description": "Type of mermaid diagram to be created.",
+                        },
+                    },
+                    "required": ["mermaid_diagram_text_definition"],
+                },
+            }
+        ],
+        callback=openai_mermaid_fn_callback,
     )
 
-    logger.info(f"complete_text mermaid_script: {mermaid_script}")
+    # if mermaid_script is empty after being trimmed/stripped, raise an error
+    if not mermaid_script.strip():
+        raise ValueError("Mermaid script is empty")
+
+    print_markdown(f"mermaid_script:\n\n{mermaid_script}")
 
     return await create_mermaid_diagram(MermaidModel(mermaid_script=mermaid_script))

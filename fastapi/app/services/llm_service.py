@@ -1,15 +1,12 @@
 """Service for LLM Models"""
 import json
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import openai
 from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
-from loguru import logger
 from openai.openai_object import OpenAIObject
 from pyrate_limiter import Duration, Limiter, RequestRate
-from rich.console import Console
-from rich.markdown import Markdown
 
 from ..config import ANTHROPIC_AI_VENDOR, LLM_CONFIG_PATH
 from ..models import LLMConfig, LLMDefinition
@@ -17,13 +14,6 @@ from ..utils.llm_utils import validate_max_tokens
 
 openai.organization = os.environ.get("OPENAI_ORG_ID")
 openai.api_key = os.environ.get("OPENAI_API_KEY")
-
-
-def print_markdown(log_str):
-    """Print markdown to console."""
-    markdown = Markdown(log_str)
-    console = Console()
-    console.print(markdown)
 
 
 rate_limits = (RequestRate(60, Duration.MINUTE),)  # 60 requests a minute
@@ -71,6 +61,7 @@ def complete_text(
     vendor: str,
     messages: list[dict[str, str]],
     functions: Optional[List[Any]] = None,
+    callback: Optional[Callable[[Any], str]] = None,
 ) -> str:
     """LLM orchestrator"""
 
@@ -91,6 +82,7 @@ def complete_text(
             model=model,
             messages=messages,
             functions=functions,
+            callback=callback,
         )
     except LLMException as exc:
         return f"Error completing text: {exc}"
@@ -101,6 +93,7 @@ def complete_openai_text(
     model: str,
     messages: list[dict[str, str]],
     functions: Optional[List[Any]] = None,
+    callback: Optional[Callable[[Any], str]] = None,
 ) -> str:
     """Use OpenAI's GPT model to complete text based on the given prompt."""
     try:
@@ -114,25 +107,8 @@ def complete_openai_text(
         if not isinstance(response, OpenAIObject):
             raise ValueError("Invalid Response")
 
-        if response.choices:
-            response_message = response.choices[0].message
-            logger.info(
-                f"response_message: {response_message}",
-            )
-            content = response_message.content
-
-            if response_message.get("function_call"):
-                function_args = json.loads(
-                    response_message["function_call"]["arguments"]
-                )
-                mermaid_diagram_text_definition_str = function_args.get(
-                    "mermaid_diagram_text_definition"
-                )
-                print_markdown(f"def str:\n\n{mermaid_diagram_text_definition_str}")
-                if mermaid_diagram_text_definition_str:
-                    return mermaid_diagram_text_definition_str
-
-            return content.strip()
+        if callback:
+            return callback(response)
 
         return "Response doesn't have choices or choices have no text."
 
