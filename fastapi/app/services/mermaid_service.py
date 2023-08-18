@@ -13,6 +13,48 @@ from ..services.llm_service import complete_text
 from ..utils.llm_utils import num_tokens_from_string
 from ..utils.log_utils import print_markdown
 
+MERMAID_SCRIPT_FUNCTION_DEFINITIONS = [
+    {
+        "name": "create_mermaid_diagram",
+        "description": "Generate a mermaid diagram from a mermaid text based script",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "mermaid_diagram_text_definition": {
+                    "type": "string",
+                    "description": (
+                        "mermaid diagram text definition. plain text input."
+                        " Should not contain encodings like \n, \t, etc."
+                    ),
+                },
+                "notes_markdown": {
+                    "type": "string",
+                    "description": (
+                        "markdown formatted notes about the diagram, readme etc"
+                    ),
+                },
+                "diagram_type": {
+                    "type": "string",
+                    "enum": [
+                        "flowchart",
+                        "sequence",
+                        "gantt",
+                        "class",
+                        "state",
+                        "pie",
+                        "git",
+                        "entityRelationship",
+                        "user-journey",
+                        "requirement",
+                    ],
+                    "description": "Type of mermaid diagram to be created.",
+                },
+            },
+            "required": ["mermaid_diagram_text_definition"],
+        },
+    }
+]
+
 
 class MermaidCliError(Exception):
     """Exception raised when the mermaid-cli fails."""
@@ -110,63 +152,23 @@ async def mermaid_request(
     # have higher performance.  diagram_type helps steer the token sample to the correct
     # diagram type
 
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a helpful assistant specialized in writing"
+                " professional system diagrams using mermaid js."
+            ),
+        },
+        {"role": "user", "content": mermaid_design_request.text},
+    ]
+
     mermaid_script = complete_text(
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You are a helpful assistant specialized in writing"
-                    " professional system diagrams using mermaid js."
-                ),
-            },
-            {"role": "user", "content": mermaid_design_request.text},
-        ],
+        messages=messages,
         max_tokens=max_tokens,
         model=mermaid_design_request.llm_model_for_instructions,
         vendor=mermaid_design_request.llm_vendor_for_instructions,
-        functions=[
-            {
-                "name": "create_mermaid_diagram",
-                "description": (
-                    "Generate a mermaid diagram from a mermaid text based script"
-                ),
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "mermaid_diagram_text_definition": {
-                            "type": "string",
-                            "description": (
-                                "mermaid diagram text definition. plain text input."
-                                " Should not contain encodings like \n, \t, etc."
-                            ),
-                        },
-                        "notes_markdown": {
-                            "type": "string",
-                            "description": (
-                                "markdown formatted notes about the diagram, readme etc"
-                            ),
-                        },
-                        "diagram_type": {
-                            "type": "string",
-                            "enum": [
-                                "flowchart",
-                                "sequence",
-                                "gantt",
-                                "class",
-                                "state",
-                                "pie",
-                                "git",
-                                "entityRelationship",
-                                "user-journey",
-                                "requirement",
-                            ],
-                            "description": "Type of mermaid diagram to be created.",
-                        },
-                    },
-                    "required": ["mermaid_diagram_text_definition"],
-                },
-            }
-        ],
+        functions=MERMAID_SCRIPT_FUNCTION_DEFINITIONS,
         callback=openai_mermaid_fn_callback,
     )
 
@@ -176,4 +178,8 @@ async def mermaid_request(
 
     print_markdown(f"mermaid_script:\n\n{mermaid_script}")
 
-    return await create_mermaid_diagram(MermaidModel(mermaid_script=mermaid_script))
+    markdown_svg = await create_mermaid_diagram(
+        MermaidModel(mermaid_script=mermaid_script)
+    )
+
+    return markdown_svg
