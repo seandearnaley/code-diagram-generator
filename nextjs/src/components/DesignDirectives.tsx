@@ -1,4 +1,4 @@
-import { CodeComponent, MermaidDiagram, TokenCounter } from "@/components";
+import { CodeComponent, MermaidDiagram } from "@/components";
 import { useDesignDirectives } from "@/hooks/useDesignDirectives";
 import { DiagramFormValues } from "@/types/DiagramForm.types";
 import { ClipboardIcon } from "@heroicons/react/24/solid";
@@ -83,10 +83,10 @@ export const DesignDirectives: FC<DesignDirectivesProps> = ({ values }) => {
           >
             Toggle Edit Mode
           </button>
-          <TokenCounter
+          {/* <TokenCounter
             textForTokenCount={textForTokenCount}
             llm_vendor_for_instructions={values.llm_vendor_for_instructions}
-          />
+          /> */}
         </div>
 
         <div className="p-2 flex flex-col items-center">

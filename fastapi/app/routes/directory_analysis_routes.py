@@ -3,8 +3,6 @@ import os
 from pathlib import Path
 from typing import List, Optional
 
-from loguru import logger
-
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import PlainTextResponse
 
@@ -64,7 +62,6 @@ async def folder_tree_endpoint(
 async def read_python_projects_endpoint():
     """Endpoint to get all python projects in the source folder."""
     source_folder = get_source_folder()
-    logger.error("source_folder=====", source_folder)
     return await read_folder(source_folder)
 
 

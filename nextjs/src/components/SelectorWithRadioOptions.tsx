@@ -34,10 +34,6 @@ export const SelectorWithRadioOptions: FC<Props> = ({
     // setFieldValue(radioName, "");
   };
 
-  const handleRadioChange = (optionId: string) => {
-    setFieldValue(radioName, optionId);
-  };
-
   const radioOptions = optionsObject[selectValue] || [];
 
   return (
@@ -56,7 +52,6 @@ export const SelectorWithRadioOptions: FC<Props> = ({
           options={radioOptions}
           name={radioName}
           categoryKey={selectValue}
-          onChange={handleRadioChange}
           value={radioValue}
         />
       )}

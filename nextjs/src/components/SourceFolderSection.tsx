@@ -31,9 +31,6 @@ export const SourceFolderSection: FC<SourceFolderSectionProps> = ({
   useEffect(() => {
     if (!source_folder_option) return;
     getIgnorePath(source_folder_option).then((gitIgnoreFilePath) => {
-      // if saved git ignore file path the same don't update it
-      if (manuallyChanged) return;
-
       setFieldValue("git_ignore_file_path", gitIgnoreFilePath || "");
     });
   }, [source_folder_option, manuallyChanged]); // eslint-disable-line react-hooks/exhaustive-deps

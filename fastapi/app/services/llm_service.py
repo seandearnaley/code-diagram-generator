@@ -5,8 +5,11 @@ from typing import Any, Dict, List, Optional
 
 import openai
 from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
+from loguru import logger
 from openai.openai_object import OpenAIObject
 from pyrate_limiter import Duration, Limiter, RequestRate
+from rich.console import Console
+from rich.markdown import Markdown
 
 from ..config import ANTHROPIC_AI_VENDOR, LLM_CONFIG_PATH
 from ..models import LLMConfig, LLMDefinition
@@ -14,6 +17,13 @@ from ..utils.llm_utils import validate_max_tokens
 
 openai.organization = os.environ.get("OPENAI_ORG_ID")
 openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+
+def print_markdown(log_str):
+    """Print markdown to console."""
+    markdown = Markdown(log_str)
+    console = Console()
+    console.print(markdown)
 
 
 rate_limits = (RequestRate(60, Duration.MINUTE),)  # 60 requests a minute
@@ -106,7 +116,9 @@ def complete_openai_text(
 
         if response.choices:
             response_message = response.choices[0].message
-            print("response_message: ", response_message)
+            logger.info(
+                f"response_message: {response_message}",
+            )
             content = response_message.content
 
             if response_message.get("function_call"):
@@ -116,7 +128,7 @@ def complete_openai_text(
                 mermaid_diagram_text_definition_str = function_args.get(
                     "mermaid_diagram_text_definition"
                 )
-                print(f" {mermaid_diagram_text_definition_str}")
+                print_markdown(f"def str:\n\n{mermaid_diagram_text_definition_str}")
                 if mermaid_diagram_text_definition_str:
                     return mermaid_diagram_text_definition_str
 

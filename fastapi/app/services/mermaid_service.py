@@ -1,25 +1,15 @@
 """Mermaid Service Module"""
+import re
 import subprocess
-import traceback
 from tempfile import NamedTemporaryFile
 
 from loguru import logger
-from rich.console import Console
-from rich.markdown import Markdown
 
 from fastapi.responses import FileResponse
 
-from ..models import LLMDefinition, MermaidDesignRequest, MermaidScript
+from ..models import LLMDefinition, MermaidDesignRequest, MermaidModel
 from ..services.llm_service import complete_text
 from ..utils.llm_utils import num_tokens_from_string
-
-
-def print_markdown(log_str):
-    """Print markdown to console."""
-    markdown = Markdown(log_str)
-    console = Console()
-    console.print(markdown)
-
 
 # make this line up to create_mermaid_diagram, try functools
 MERMAID_FUNCTIONS = [
@@ -57,15 +47,29 @@ class MermaidUnexpectedError(Exception):
     """Exception raised when an unexpected error occurs."""
 
 
-async def create_mermaid_diagram(mermaid_script: MermaidScript):
+def extract_error_message(error_text: str) -> str:
+    """Extract the error message from the mermaid-cli output."""
+    match = re.search(r"^(.*?)(?:\n\s*at )", error_text, flags=re.MULTILINE | re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    return error_text.strip()
+
+
+async def create_mermaid_diagram(mermaid_model: MermaidModel):
     """Generate a mermaid diagram from a mermaid text based script."""
+
+    if mermaid_model.mermaid_script.strip() == "":
+        raise MermaidUnexpectedError("Mermaid script is empty")
+
     try:
+        logger.info(f"Attempt for Mermaid Script: {mermaid_model}")
+
         # Create temporary files for mermaid script and output svg
         with NamedTemporaryFile(
             delete=False, suffix=".mmd"
         ) as temp_in, NamedTemporaryFile(delete=False, suffix=".svg") as temp_out:
             # Write mermaid script to temporary input file
-            temp_in.write(mermaid_script.mermaid_script.encode())
+            temp_in.write(mermaid_model.mermaid_script.encode())
             temp_in.close()
             temp_out.close()
 
@@ -76,30 +80,29 @@ async def create_mermaid_diagram(mermaid_script: MermaidScript):
                 capture_output=True,
             )
 
-            logger.warning("Mermaid CLI Output:", process.stdout.decode())
+            logger.warning(f"Mermaid CLI Output: {process.stdout.decode()}")
 
             if process.stderr:
-                logger.error("Mermaid CLI Errors:", process.stderr.decode())
+                logger.error(f"Mermaid CLI Errors: {process.stderr.decode()}")
 
             # Return generated svg
             return FileResponse(temp_out.name, media_type="image/svg+xml")
 
     except subprocess.CalledProcessError as err:
-        logger.error("Exception Details:")
-        logger.error(err.stderr.decode())
-        traceback.print_exc()
+        logger.error(f"Exception Details: {extract_error_message(err.stderr.decode())}")
+        # traceback.print_exc()
         raise MermaidCliError(f"Mermaid CLI failed: {err.stderr.decode()}") from err
-    except Exception as err:
+    except MermaidUnexpectedError as err:
         logger.error("Unexpected Exception:")
-        traceback.print_exc()
-        raise MermaidUnexpectedError(f"Unexpected error occurred: {str(err)}") from err
+        # traceback.print_exc()
+        raise MermaidUnexpectedError(f"Unexpected error occurred: {err}") from err
 
 
 async def mermaid_request(
     llm_definition: LLMDefinition, mermaid_design_request: MermaidDesignRequest
 ):
     """Generate a mermaid diagram from a mermaid script."""
-    logger.debug("Mermaid Design Request", mermaid_design_request.text[:300])
+    logger.debug(f"Mermaid Design Request: {mermaid_design_request}")
 
     num_tokens = num_tokens_from_string(mermaid_design_request.text)
     max_tokens = (
@@ -107,16 +110,12 @@ async def mermaid_request(
     )  # ( 300 for functions and msgs TODO: count that)
 
     logger.info(
-        "Starting Job:",
-        max_tokens,
-        "using model:",
-        llm_definition.name,
-        llm_definition.max_token_length,
-        "-",
-        num_tokens,
+        "Starting Generate Design with Complete Text LLM fn: max tokens:"
+        f" {max_tokens} ({llm_definition.max_token_length} - {num_tokens}) using model:"
+        f" {llm_definition.name} "
     )
 
-    completion = complete_text(
+    mermaid_script = complete_text(
         messages=[
             {
                 "role": "system",
@@ -133,6 +132,6 @@ async def mermaid_request(
         functions=MERMAID_FUNCTIONS,
     )
 
-    logger.info("Completion:", completion)
+    logger.info(f"complete_text mermaid_script: {mermaid_script}")
 
-    return await create_mermaid_diagram(MermaidScript(mermaid_script=completion))
+    return await create_mermaid_diagram(MermaidModel(mermaid_script=mermaid_script))

@@ -152,7 +152,7 @@ async def generate_diagram_instructions(
         include_python_code_outline=include_python_code_outline,
         git_ignore_file_path=git_ignore_file_path,
     )
-    logger.info("get diagram payload:", payload)
+    logger.info(f"get diagram payload: {payload}")
     folder_tree_content, folder_report_content = await get_folder_content(payload)
     diagram_config = request.app.state.diagram_config
     diagram = get_diagram_by_id(diagram_config, diagram_option)

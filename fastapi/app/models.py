@@ -9,7 +9,7 @@ from pydantic import BaseModel  # pylint: disable=no-name-in-module
 # we should update to pydantic 2 ASAP---> its faster
 
 
-class MermaidScript(BaseModel):
+class MermaidModel(BaseModel):
     """Pydantic model for Mermaid script."""
 
     mermaid_script: str

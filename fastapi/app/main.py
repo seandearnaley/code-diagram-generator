@@ -17,9 +17,11 @@ from .routes import (
 from .services.diagram_service import load_diagram_config
 from .services.llm_service import load_llm_config
 
-logger.add(
-    sys.stdout, colorize=True, format="<green>{time}</green> <level>{message}</level>"
-)
+# , format="<green>{time}</green> <level>{message}</level>"
+
+# this will remove the default handler and add a new one
+logger.remove()
+logger.add(sys.stdout, colorize=True)
 
 app = FastAPI(debug=True)
 
