@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 import openai
 from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
+from loguru import logger
 from openai.openai_object import OpenAIObject
 from pyrate_limiter import Duration, Limiter, RequestRate
 
@@ -64,7 +65,7 @@ def complete_text(
     callback: Optional[Callable[[Any], str]] = None,
 ) -> str:
     """LLM orchestrator"""
-
+    logger.info(f"Starting Complete Text: messages: {messages}")
     validate_max_tokens(max_tokens)
 
     is_anthropic = vendor == ANTHROPIC_AI_VENDOR

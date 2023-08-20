@@ -12,7 +12,7 @@ from pydantic import BaseModel  # pylint: disable=no-name-in-module
 class MermaidModel(BaseModel):
     """Pydantic model for Mermaid script."""
 
-    mermaid_script: str
+    mermaid_def_str: str
 
 
 class DiagramDefinition(BaseModel):

@@ -3,6 +3,7 @@ import json
 import re
 import subprocess
 from tempfile import NamedTemporaryFile
+from typing import Tuple, Union
 
 from loguru import logger
 
@@ -72,7 +73,9 @@ def extract_error_message(error_text: str) -> str:
     return error_text.strip()
 
 
-async def create_mermaid_diagram(mermaid_model: MermaidModel):
+async def create_mermaid_diagram(
+    mermaid_model: MermaidModel,
+) -> Tuple[Union[FileResponse, None], str]:
     """Generate a mermaid diagram from a mermaid text based script."""
 
     try:
@@ -83,7 +86,7 @@ async def create_mermaid_diagram(mermaid_model: MermaidModel):
             delete=False, suffix=".mmd"
         ) as temp_in, NamedTemporaryFile(delete=False, suffix=".svg") as temp_out:
             # Write mermaid script to temporary input file
-            temp_in.write(mermaid_model.mermaid_script.encode())
+            temp_in.write(mermaid_model.mermaid_def_str.encode())
             temp_in.close()
             temp_out.close()
 
@@ -100,11 +103,11 @@ async def create_mermaid_diagram(mermaid_model: MermaidModel):
                 logger.error(f"Mermaid CLI Errors: {process.stderr.decode()}")
 
             # Return generated svg
-            return FileResponse(temp_out.name, media_type="image/svg+xml")
-
+        return FileResponse(temp_out.name, media_type="image/svg+xml"), ""
     except subprocess.CalledProcessError as err:
-        logger.error(f"Exception Details: {extract_error_message(err.stderr.decode())}")
-        raise MermaidCliError(f"Mermaid CLI failed: {err.stderr.decode()}") from err
+        error_message = extract_error_message(err.stderr.decode())
+        logger.error(f"Mermaid CLI failed: {error_message}")
+        return None, error_message
     except MermaidUnexpectedError as err:
         raise MermaidUnexpectedError(f"Unexpected error occurred: {err}") from err
 
@@ -114,6 +117,7 @@ def openai_mermaid_fn_callback(response) -> str:
     if response.choices:
         response_message = response.choices[0].message
         if response_message.get("function_call"):
+            logger.debug(f"response_message: {response_message}")
             function_args = json.loads(response_message["function_call"]["arguments"])
             mermaid_def_str = function_args.get("mermaid_diagram_text_definition")
             if mermaid_def_str:
@@ -133,12 +137,6 @@ async def mermaid_request(
     max_tokens = (
         llm_definition.max_token_length - num_tokens - 300
     )  # ( 300 for functions and msgs TODO: count that)
-
-    logger.info(
-        "Starting Generate Design with Complete Text: max tokens:"
-        f" {max_tokens} ({llm_definition.max_token_length} - {num_tokens}) using model:"
-        f" {llm_definition.name} "
-    )
 
     # NOTE diagram_type is supposedly the list of mermaid diagram types GPT supports
     # from 2021 but the CLI we use is more up to date, it may be possible to teach LLM's
@@ -161,23 +159,49 @@ async def mermaid_request(
         {"role": "user", "content": mermaid_design_request.text},
     ]
 
-    mermaid_script = complete_text(
-        messages=messages,
-        max_tokens=max_tokens,
-        model=mermaid_design_request.llm_model_for_instructions,
-        vendor=mermaid_design_request.llm_vendor_for_instructions,
-        functions=MERMAID_SCRIPT_FUNCTION_DEFINITIONS,
-        callback=openai_mermaid_fn_callback,
-    )
+    retries = 3
+    for _ in range(retries):
+        logger.info(
+            "Starting Generate Design with Complete Text: max tokens:"
+            f" {max_tokens} ({llm_definition.max_token_length} - {num_tokens}) using"
+            f" model: {llm_definition.name} "
+        )
+        mermaid_def_str = complete_text(
+            messages=messages,
+            max_tokens=max_tokens,
+            model=mermaid_design_request.llm_model_for_instructions,
+            vendor=mermaid_design_request.llm_vendor_for_instructions,
+            functions=MERMAID_SCRIPT_FUNCTION_DEFINITIONS,
+            callback=openai_mermaid_fn_callback,
+        )
 
-    # if mermaid_script is empty after being trimmed/stripped, raise an error
-    if not mermaid_script.strip():
-        raise ValueError("Mermaid script is empty")
+        # if mermaid_def_str is empty after being trimmed/stripped, raise an error
+        if not mermaid_def_str.strip():
+            raise ValueError("Mermaid definition is empty")
 
-    print_markdown(f"mermaid_script:\n\n{mermaid_script}")
+        logger.info(f"mermaid_def_str:\n\n{mermaid_def_str}")
 
-    markdown_svg = await create_mermaid_diagram(
-        MermaidModel(mermaid_script=mermaid_script)
-    )
+        markdown_svg, error_message = await create_mermaid_diagram(
+            MermaidModel(mermaid_def_str=mermaid_def_str)
+        )
 
-    return markdown_svg
+        # Adding user's message if there was an error
+        if error_message:
+            logger.error(f"Mermaid Error: {error_message}")
+            # Adding assistant's message with mermaid definition
+            messages.append({"role": "assistant", "content": mermaid_def_str})
+
+            messages.append(
+                {
+                    "role": "user",
+                    "content": (
+                        "Sorry but that definition did not work, maybe there was a"
+                        " syntax mistake, could you take a look at this error and try"
+                        f" again:\n``` {error_message}```"
+                    ),
+                }
+            )
+            continue
+        return markdown_svg
+
+    raise MermaidCliError(f"Mermaid CLI failed after {retries} attempts")
