@@ -115,12 +115,10 @@ def openai_mermaid_fn_callback(response) -> str:
         response_message = response.choices[0].message
         if response_message.get("function_call"):
             function_args = json.loads(response_message["function_call"]["arguments"])
-            mermaid_diagram_text_definition_str = function_args.get(
-                "mermaid_diagram_text_definition"
-            )
-            if mermaid_diagram_text_definition_str:
-                print_markdown(f"def str:\n\n{mermaid_diagram_text_definition_str}")
-                return mermaid_diagram_text_definition_str
+            mermaid_def_str = function_args.get("mermaid_diagram_text_definition")
+            if mermaid_def_str:
+                print_markdown(f"def str:\n\n{mermaid_def_str}")
+                return mermaid_def_str
         return response_message.content.strip()
     return "Response doesn't have choices or choices have no text."
 
@@ -137,7 +135,7 @@ async def mermaid_request(
     )  # ( 300 for functions and msgs TODO: count that)
 
     logger.info(
-        "Starting Generate Design with Complete Text LLM fn: max tokens:"
+        "Starting Generate Design with Complete Text: max tokens:"
         f" {max_tokens} ({llm_definition.max_token_length} - {num_tokens}) using model:"
         f" {llm_definition.name} "
     )
@@ -149,7 +147,7 @@ async def mermaid_request(
 
     # notes_markdown and diagram_type aren't actually used on the diagram renderer, they
     # are there simply to help the LLM spread out it's answer, more tokens out tends to
-    # have higher performance.  diagram_type helps steer the token sample to the correct
+    # have higher performance.  diagram_type helps steer the sampler to the correct
     # diagram type
 
     messages = [
