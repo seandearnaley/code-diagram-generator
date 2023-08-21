@@ -4,6 +4,7 @@ import {
   DiagramConfiguration,
   FormContent,
   Loading,
+  MermaidDiagram,
   SourceFolderAndOptions,
   VendorModelSelector,
 } from "@/components";
@@ -15,6 +16,7 @@ import {
   DEFAULT_LLM_VENDOR,
   DEFAULT_SOURCE_FOLDER,
 } from "@/config/formDefaults";
+import { useDesignDirectives } from "@/hooks/useDesignDirectives";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Form, Formik } from "formik";
 import { FC, useEffect, useRef, useState } from "react";
@@ -78,6 +80,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
       {({ values, setFieldValue, errors, dirty }) => {
         /* eslint-disable react-hooks/rules-of-hooks */
 
+        const { data, isLoading } = useDesignDirectives(values);
         const [debouncedValues] = useDebounce(values, 500);
         useEffect(() => {
           if (dirty && !isFirstMount.current) {
@@ -106,8 +109,7 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   setFieldValue={setFieldValue}
                   errors={errors}
                 />
-              </div>
-              <div>
+
                 <VendorModelSelector
                   selectOptions={llm_vendor_options}
                   optionsObject={llm_vendors}
@@ -116,9 +118,16 @@ const DiagramForm: FC<DiagramFormProps> = ({
                   setFieldValue={setFieldValue}
                   errors={errors}
                 />
-                <DesignDirectives values={values} />
+              </div>
+              <div>
+                {/* if not loading show the design Directives */}
+                {/* {!isLoading && <DesignDirectives text={data?.payload} />} */}
+                <DesignDirectives text={data?.payload} />
               </div>
             </FormContent>
+            <div className="pt-5">
+              <MermaidDiagram values={values} text={data?.payload} />
+            </div>
           </Form>
         );
       }}

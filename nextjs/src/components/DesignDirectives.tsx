@@ -1,6 +1,4 @@
-import { CodeComponent, MermaidDiagram } from "@/components";
-import { useDesignDirectives } from "@/hooks/useDesignDirectives";
-import { DiagramFormValues } from "@/types/DiagramForm.types";
+import { CodeComponent } from "@/components";
 import { ClipboardIcon } from "@heroicons/react/24/solid";
 import { Field } from "formik";
 import React, { FC, HTMLAttributes, useState } from "react";
@@ -9,7 +7,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import ReactMarkdown from "react-markdown";
 
 interface DesignDirectivesProps {
-  values: DiagramFormValues;
+  text: string;
 }
 
 const components = {
@@ -22,15 +20,12 @@ const components = {
   ),
 };
 
-export const DesignDirectives: FC<DesignDirectivesProps> = ({ values }) => {
+export const DesignDirectives: FC<DesignDirectivesProps> = ({ text }) => {
   const [isEditable, setIsEditable] = useState(false);
 
-  const { data, isLoading } = useDesignDirectives(values);
-  const textForTokenCount = data?.payload || "";
+  // const textForTokenCount = data?.payload || "";
 
-  console.log("data", data, "isLoading", isLoading, values);
-
-  return data && data.payload && !isLoading ? (
+  return text ? (
     <details open className="mb-4">
       <summary className="cursor-pointer text-lg font-medium text-gray-700">
         Design Directives
@@ -49,7 +44,7 @@ export const DesignDirectives: FC<DesignDirectivesProps> = ({ values }) => {
               as="textarea"
               name="design_instructions"
               className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md resize-none w-full max-h-[1000px] h-[1000px]"
-              value={data.payload}
+              value={text}
               // onChange={(e: any) => {
               //   setFieldValue("design_instructions", e.target.value);
               // }}
@@ -61,12 +56,12 @@ export const DesignDirectives: FC<DesignDirectivesProps> = ({ values }) => {
             // rehypePlugins={[rehypeRaw]}
             className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[1000px]"
           >
-            {data.payload}
+            {text}
           </ReactMarkdown>
         )}
 
         <div className="p-2">
-          <CopyToClipboard text={data.payload}>
+          <CopyToClipboard text={text}>
             <button
               className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer"
               type="button"
@@ -87,10 +82,6 @@ export const DesignDirectives: FC<DesignDirectivesProps> = ({ values }) => {
             textForTokenCount={textForTokenCount}
             llm_vendor_for_instructions={values.llm_vendor_for_instructions}
           /> */}
-        </div>
-
-        <div className="p-2 flex flex-col items-center">
-          <MermaidDiagram values={values} text={data.payload} />
         </div>
       </>
     </details>

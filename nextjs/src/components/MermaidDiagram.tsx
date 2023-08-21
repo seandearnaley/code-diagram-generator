@@ -1,10 +1,10 @@
 "use client";
-import Image from "next/image";
 import { useRef, useState } from "react";
 
 import { DiagramFormValues } from "@/types/DiagramForm.types";
 import { FC } from "react";
 
+import SVGRenderer from "@/components/SVGRenderer";
 import getSvgDimensions from "@/lib/getSvgDimensions";
 import { ArrowDownOnSquareIcon, BoltIcon } from "@heroicons/react/24/solid";
 import { toPng } from "html-to-image";
@@ -73,69 +73,55 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
   };
 
   return (
-    <>
-      <button
-        className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200"
-        type="button"
-        onClick={postMermaid}
-      >
-        <BoltIcon className="h-5 w-5 mr-2" />
-        Generate Design
-      </button>
-
-      {diagramUrl && (
-        <div>
-          <div className="flex justify-center mb-4">
-            dimensions: {imageDimensions.width} x {imageDimensions.height}
-          </div>
-          <div
-            // className="flex justify-center items-center pt-4 pb-4"
-            ref={imageRef}
-            // style={{
-            //   width: `${imageDimensions.width}px`,
-            //   height: `${imageDimensions.height}px`,
-            // }}
+    <div className="flex justify-center mb-4">
+      <div>
+        <div className="flex justify-center mb-4">
+          <button
+            className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200"
+            type="button"
+            onClick={postMermaid}
           >
-            <Image
-              src={diagramUrl}
-              alt="Mermaid Diagram"
-              // style={{
-              //   width: "100%",
-              //   height: "auto",
-              //   objectFit: "contain",
-              // }}
-              width={600}
-              height={600}
-            />
-          </div>
-          <div className="flex justify-center items-center mt-5">
-            <a href={diagramUrl} download="diagram.svg">
+            <BoltIcon className="h-5 w-5 mr-2" />
+            Generate Design
+          </button>
+        </div>
+        {diagramUrl && (
+          <>
+            <div className="flex justify-center mb-4">
+              dimensions: {imageDimensions.width} x {imageDimensions.height}
+            </div>
+            <div ref={imageRef}>
+              <SVGRenderer svgBlobUrl={diagramUrl} />
+            </div>
+            <div className="flex justify-center items-center mt-5">
+              <a href={diagramUrl} download="diagram.svg">
+                <button
+                  className="text-sm font-semibold leading-6 text-black items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200"
+                  type="button"
+                  onClick={postMermaid}
+                >
+                  <div className="flex">
+                    <ArrowDownOnSquareIcon className="h-5 w-5 mr-2" />
+                    Download SVG
+                  </div>
+                </button>
+              </a>
+
               <button
-                className="text-sm font-semibold leading-6 text-black items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200"
+                className="text-sm font-semibold leading-6 text-black items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200 ml-6"
                 type="button"
-                onClick={postMermaid}
+                onClick={downloadPng}
               >
                 <div className="flex">
                   <ArrowDownOnSquareIcon className="h-5 w-5 mr-2" />
-                  Download SVG
+                  Download PNG
                 </div>
               </button>
-            </a>
-
-            <button
-              className="text-sm font-semibold leading-6 text-black items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200 ml-6"
-              type="button"
-              onClick={downloadPng}
-            >
-              <div className="flex">
-                <ArrowDownOnSquareIcon className="h-5 w-5 mr-2" />
-                Download PNG
-              </div>
-            </button>
-          </div>
-        </div>
-      )}
-    </>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 
