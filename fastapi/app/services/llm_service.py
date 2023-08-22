@@ -1,7 +1,7 @@
 """Service for LLM Models"""
 import json
 import os
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import openai
 from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
@@ -62,8 +62,8 @@ def complete_text(
     vendor: str,
     messages: list[dict[str, str]],
     functions: Optional[List[Any]] = None,
-    callback: Optional[Callable[[Any], str]] = None,
-) -> str:
+    callback: Optional[Callable[[Any], Union[Tuple[str, str, str], str]]] = None,
+) -> Union[Tuple[str, str, str], str]:
     """LLM orchestrator"""
     logger.info(f"Starting Complete Text: messages: {messages}")
     validate_max_tokens(max_tokens)
@@ -86,7 +86,7 @@ def complete_text(
             callback=callback,
         )
     except LLMException as exc:
-        return f"Error completing text: {exc}"
+        raise LLMException(f"Error completing text: {exc}") from exc
 
 
 def complete_openai_text(
@@ -94,8 +94,8 @@ def complete_openai_text(
     model: str,
     messages: list[dict[str, str]],
     functions: Optional[List[Any]] = None,
-    callback: Optional[Callable[[Any], str]] = None,
-) -> str:
+    callback: Optional[Callable[[Any], Union[Tuple[str, str, str], str]]] = None,
+) -> Union[Tuple[str, str, str], str]:
     """Use OpenAI's GPT model to complete text based on the given prompt."""
     try:
         response = openai.ChatCompletion.create(
@@ -114,11 +114,11 @@ def complete_openai_text(
         return "Response doesn't have choices or choices have no text."
 
     except openai.OpenAIError as err:
-        return f"OpenAI Client Error: {err}"
+        raise OpenAIException(f"OpenAI Client Error: {err}") from err
     except ValueError as err:
-        return f"OpenAI Client Value error: {err}"
+        raise OpenAIException(f"OpenAI Client Value error: {err}, {err.args}") from err
     except OpenAIException as err:
-        return f"complete_openai_text Exception: {err}"
+        raise OpenAIException(f"complete_openai_text Exception: {err}") from err
 
 
 def format_anthropic_prompt(messages: list[dict[str, str]]) -> str:
@@ -150,4 +150,4 @@ def complete_anthropic_text(
 
         return response.completion.strip()
     except AnthropicException as err:
-        return f"Anthropic Client Error: {err}"
+        raise AnthropicException(f"Anthropic Client Error: {err}") from err
