@@ -1,0 +1,16 @@
+graph TB
+  A["Web Browser"] -- "HTTP API Request" --> B["Load Balancer"]
+  B -- "HTTP Request" --> C["Crossover"]
+  style C fill:#99cc99
+  C -- "Talks to" --> D["Redis"]
+  C -- "Talks to" --> E["MySQL"]
+  C -- "Downstream API Request" --> F["Multiplex"]
+  F -- "Returns Job ID" --> C
+  C -- "Long Poll API Request" --> G["Evaluator"]
+  G -- "API Call" --> F
+  G -- "API Call" --> H["Result-Fetcher"]
+  H -- "Downloads Results" --> I["S3 or GCP Cloud Buckets"]
+  I -- "Results Stream" --> G
+  G -- "Results Stream" --> C
+  C -- "API Response" --> B
+  B -- "API Response" --> A
