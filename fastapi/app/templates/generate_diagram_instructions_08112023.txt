@@ -12,3 +12,26 @@ Your task is to create a {diagram_option} from the attached code outline.
 - It should be a beautiful diagram.  Demonstrate your ability.  Make sure it shows all concepts of the diagram category.
 
 - Remember function takes plain text input. Should not contain encodings like \n, \t, etc.
+
+Use the create_mermaid_diagram function to create your diagram.  Example of well formed mermaid markdown embedded in JSON:
+
+```
+"mermaid_diagram_text_definition": "
+graph TB
+  A["Web Browser"] -- "HTTP API Request" --> B["Load Balancer"]
+  B -- "HTTP Request" --> C["Crossover"]
+  style C fill:#99cc99
+  C -- "Talks to" --> D["Redis"]
+  C -- "Talks to" --> E["MySQL"]
+  C -- "Downstream API Request" --> F["Multiplex"]
+  F -- "Returns Job ID" --> C
+  C -- "Long Poll API Request" --> G["Evaluator"]
+  G -- "API Call" --> F
+  G -- "API Call" --> H["Result-Fetcher"]
+  H -- "Downloads Results" --> I["S3 or GCP Cloud Buckets"]
+  I -- "Results Stream" --> G
+  G -- "Results Stream" --> C
+  C -- "API Response" --> B
+  B -- "API Response" --> A
+"
+```

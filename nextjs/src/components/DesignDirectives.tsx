@@ -18,6 +18,9 @@ const components = {
   h3: ({ ...props }: HTMLAttributes<HTMLHeadingElement>) => (
     <h3 className="font-bold mt-5" {...props} />
   ),
+  p: ({ ...props }: HTMLAttributes<HTMLHeadingElement>) => (
+    <p className="mt-5" {...props} />
+  ),
 };
 
 export const DesignDirectives: FC<DesignDirectivesProps> = ({ text }) => {

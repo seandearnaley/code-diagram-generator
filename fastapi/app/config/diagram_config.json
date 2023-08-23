@@ -136,57 +136,68 @@
     "entity_relationship_diagram": [
       {
         "id": "erDiagram1",
-        "name": "Customer Relations",
-        "description": "This diagram shows the CUSTOMER entity and its relationships with other entities such as ORDERS and PRODUCTS."
+        "name": "User Authentication System",
+        "description": "This diagram illustrates the USER entity, its attributes, and its relationships with other entities such as ROLE, PERMISSIONS, and SESSION."
       },
       {
         "id": "erDiagram2",
-        "name": "Inventory Management",
-        "description": "This diagram represents the PRODUCT entity, its attributes, and its relationships with entities like SUPPLIERS and INVENTORY."
+        "name": "Code Repository Management",
+        "description": "This diagram shows the REPOSITORY entity and its relationships with BRANCHES, COMMITS, CONTRIBUTORS, and ISSUES."
       },
       {
         "id": "erDiagram3",
-        "name": "Employee Management",
-        "description": "This diagram illustrates the EMPLOYEE entity, depicting its relationships with other entities such as DEPARTMENT and JOB ROLES."
+        "name": "Issue Tracking System",
+        "description": "This diagram represents the ISSUE entity, its attributes, and its relationships with other entities like PROJECT, USER, and COMMENTS."
       },
       {
         "id": "erDiagram4",
-        "name": "Billing and Payment",
-        "description": "This diagram focuses on the PAYMENT entity, showing its attributes and relationships with entities like CUSTOMER and INVOICES."
+        "name": "User Management",
+        "description": "This diagram depicts the USER entity, along with relationships to entities like PROFILE, ROLES, and PERMISSIONS."
       },
       {
         "id": "erDiagram5",
-        "name": "Service Provision",
-        "description": "This diagram outlines the SERVICE entity and its relationships with other entities such as CUSTOMER and SERVICE PROVIDERS."
+        "name": "Content Management",
+        "description": "This diagram outlines the CONTENT entity and its relationships with CATEGORIES, TAGS, and AUTHORS."
+      },
+      {
+        "id": "erDiagram6",
+        "name": "Order Processing",
+        "description": "This diagram illustrates the ORDER entity, its attributes, and relationships with CUSTOMER, PRODUCT, and PAYMENT entities."
       }
     ],
     "user_journey_diagram": [
       {
         "id": "userJourney1",
-        "name": "Customer Checkout Journey",
-        "description": "This diagram illustrates the journey a customer takes to select products, add them to the cart, and complete the checkout process."
+        "name": "Developer Collaboration Flow",
+        "description": "This diagram depicts the journey developers take from cloning a repository, making changes, submitting pull requests, to merging code."
       },
       {
         "id": "userJourney2",
-        "name": "User Registration Journey",
-        "description": "This diagram depicts the steps involved in a user registering for an account, including filling out details, email verification, and profile setup."
+        "name": "Continuous Integration Pipeline",
+        "description": "This diagram illustrates the journey a code commit takes through the CI pipeline, including building, testing, reviewing, and deploying."
       },
       {
         "id": "userJourney3",
-        "name": "Product Search and Filtering Journey",
-        "description": "This diagram outlines the journey users take to search for products, apply filters, and view product details."
+        "name": "User Onboarding Flow",
+        "description": "This diagram outlines the journey a new user takes from signing up, getting oriented, to becoming an active participant in the platform."
       },
       {
         "id": "userJourney4",
-        "name": "Customer Support Interaction Journey",
-        "description": "This diagram shows the journey of a customer seeking support, including navigating to the support page, selecting a support option, and interacting with support staff."
+        "name": "User Registration Flow",
+        "description": "This diagram represents the journey of user registration, from initial signup, verification, profile creation, to successful login."
       },
       {
         "id": "userJourney5",
-        "name": "User Content Creation Journey",
-        "description": "This diagram illustrates the steps a user takes to create and publish content within the platform, including drafting, editing, previewing, and publishing."
+        "name": "Product Purchase Flow",
+        "description": "This diagram illustrates the steps a user takes to search, select, add to cart, and complete the purchase of a product."
+      },
+      {
+        "id": "userJourney6",
+        "name": "User Feedback Submission",
+        "description": "This diagram outlines the journey a user follows to submit feedback, including navigation, form filling, submission, and acknowledgment."
       }
     ],
+
     "gantt_diagram": [
       {
         "id": "ganttDiagram1",
@@ -202,6 +213,26 @@
         "id": "ganttDiagram3",
         "name": "Maintenance Schedule",
         "description": "This Gantt chart outlines the schedule for regular maintenance tasks, including updates, bug fixes, and performance optimizations."
+      },
+      {
+        "id": "ganttDiagram4",
+        "name": "Release Planning",
+        "description": "This Gantt chart illustrates the planning timeline for a software release, including phases such as design, development, testing, and deployment."
+      },
+      {
+        "id": "ganttDiagram5",
+        "name": "Sprint Schedule",
+        "description": "This Gantt chart outlines the schedule for a development sprint, detailing tasks, dependencies, progress, and milestones."
+      },
+      {
+        "id": "ganttDiagram6",
+        "name": "Software Development Lifecycle",
+        "description": "This Gantt chart represents the timeline for a generic software development lifecycle, from requirement analysis to deployment and maintenance."
+      },
+      {
+        "id": "ganttDiagram7",
+        "name": "Product Launch Schedule",
+        "description": "This Gantt chart outlines the timeline for launching a new product, including design, development, marketing, and launch events."
       }
     ],
     "pie_chart": [
@@ -219,6 +250,36 @@
         "id": "pieChart3",
         "name": "System Resource Usage",
         "description": "This pie chart shows the allocation of system resources such as memory, CPU, and storage."
+      },
+      {
+        "id": "pieChart4",
+        "name": "Codebase Language Distribution",
+        "description": "This pie chart represents the distribution of programming languages used within the codebase, highlighting the primary and secondary languages."
+      },
+      {
+        "id": "pieChart5",
+        "name": "Bug Priority Levels",
+        "description": "This pie chart illustrates the proportion of bugs categorized by priority levels such as critical, high, medium, and low."
+      },
+      {
+        "id": "pieChart6",
+        "name": "Application Layer Resource Usage",
+        "description": "This pie chart shows the allocation of resources across different application layers such as frontend, backend, database, and caching."
+      },
+      {
+        "id": "pieChart7",
+        "name": "Task Status Distribution",
+        "description": "This pie chart shows the distribution of tasks by their statuses such as Completed, In Progress, On Hold, and Not Started."
+      },
+      {
+        "id": "pieChart8",
+        "name": "User Engagement Metrics",
+        "description": "This pie chart illustrates the engagement of users across various site features like searches, page views, interactions, and social shares."
+      },
+      {
+        "id": "pieChart9",
+        "name": "Budget Allocation",
+        "description": "This pie chart represents the allocation of a project budget across categories like Development, Marketing, Operations, and Support."
       }
     ],
     "quadrant_chart": [
@@ -236,6 +297,16 @@
         "id": "quadrantChart3",
         "name": "Customer Segmentation",
         "description": "This quadrant chart represents customers based on their value and engagement, providing insights into customer relationships and marketing strategies."
+      },
+      {
+        "id": "quadrantChart4",
+        "name": "Technology Evaluation",
+        "description": "This quadrant chart classifies technologies into categories like Emerging, Established, Niche, and Legacy based on market presence and capability."
+      },
+      {
+        "id": "quadrantChart5",
+        "name": "Feature Prioritization",
+        "description": "This quadrant chart helps prioritize features by plotting them against criteria such as User Value and Development Effort."
       }
     ],
     "requirement_diagram": [
@@ -253,6 +324,11 @@
         "id": "requirementDiagram3",
         "name": "User Requirements",
         "description": "This diagram focuses on user-related requirements, illustrating how they connect to system functionalities and constraints."
+      },
+      {
+        "id": "requirementDiagram4",
+        "name": "User Story Mapping",
+        "description": "This diagram shows the relationship between user stories, epics, and themes, providing a visual representation of the product backlog."
       }
     ],
     "gitgraph_diagram": [
@@ -270,6 +346,21 @@
         "id": "gitgraphDiagram3",
         "name": "Hotfix Branching Strategy",
         "description": "This Git Graph illustrates the branching strategy for hotfixes, including the creation, development, and merging of hotfix branches."
+      },
+      {
+        "id": "gitgraphDiagram4",
+        "name": "Feature Branch Workflow",
+        "description": "This Git graph illustrates the workflow of creating, reviewing, and merging feature branches within the main codebase."
+      },
+      {
+        "id": "gitgraphDiagram5",
+        "name": "Release Branch Workflow",
+        "description": "This Git graph represents the process of managing release branches, including creation, bug fixing, merging, and tagging."
+      },
+      {
+        "id": "gitgraphDiagram6",
+        "name": "Hotfix Workflow",
+        "description": "This Git graph shows the flow of handling hotfixes, including branch creation from the master, fixing, testing, merging, and deployment."
       }
     ],
     "c4_diagram": [
@@ -292,11 +383,41 @@
     "mindmap": [
       {
         "id": "mindmap1",
+        "name": "Project Planning Mindmap",
+        "description": "This mindmap organizes project components like Goals, Milestones, Teams, Resources, Risks, and Timelines, allowing for a comprehensive overview of the project."
+      },
+      {
+        "id": "mindmap2",
+        "name": "Software Architecture Mindmap",
+        "description": "This mindmap details the architecture of a software system, including Layers, Components, Interfaces, Dependencies, and Technologies used."
+      },
+      {
+        "id": "mindmap3",
+        "name": "User Experience (UX) Design Mindmap",
+        "description": "This mindmap explores aspects of UX design, such as User Personas, Journey Maps, Wireframes, Prototypes, and User Testing."
+      },
+      {
+        "id": "mindmap4",
+        "name": "Development Workflow Mindmap",
+        "description": "This mindmap illustrates the development workflow, including Planning, Coding, Testing, Reviewing, Deploying, and Monitoring."
+      },
+      {
+        "id": "mindmap5",
+        "name": "Team Collaboration Mindmap",
+        "description": "This mindmap outlines collaboration tools and practices within a team, such as Communication Channels, Collaboration Platforms, Document Sharing, and Meeting Schedules."
+      },
+      {
+        "id": "mindmap6",
+        "name": "Product Feature Mindmap",
+        "description": "This mindmap organizes product features into categories and subcategories, showing the relationship and hierarchy of different functionalities within the product."
+      },
+      {
+        "id": "mindmap7",
         "name": "Project Overview",
         "description": "This mindmap organizes the key concepts, goals, and stakeholders for the project, showing their relationships."
       },
       {
-        "id": "mindmap2",
+        "id": "mindmap8",
         "name": "System Architecture",
         "description": "This mindmap visually represents the architecture of the system, connecting major components, technologies, and dependencies."
       }
@@ -341,6 +462,64 @@
         "name": "Data Flow Analysis",
         "description": "Illustrates the flow of data through your application's components, helping in identifying data sources, transformations, and sinks."
       }
+    ],
+    "software_architecture_diagram": [
+      {
+        "id": "saDiagram1",
+        "name": "Microservices Architecture",
+        "description": "This diagram illustrates the various microservices within the system and how they interact with each other through APIs, databases, and messaging queues."
+      },
+      {
+        "id": "saDiagram2",
+        "name": "MVC Design Pattern",
+        "description": "This diagram outlines the Model-View-Controller design pattern, depicting the interactions between user, view, controller, and model."
+      },
+      {
+        "id": "saDiagram3",
+        "name": "Dependency Injection",
+        "description": "This diagram represents the injection of dependencies into a class, allowing for more flexible, maintainable, and testable code."
+      }
+    ],
+    "development_workflow_diagram": [
+      {
+        "id": "devFlow1",
+        "name": "Continuous Integration & Deployment",
+        "description": "This diagram describes the CI/CD pipeline, including code commit, build, automated tests, staging, and deployment to production."
+      },
+      {
+        "id": "devFlow2",
+        "name": "Agile Development Process",
+        "description": "This diagram shows the stages of the Agile development process, from sprint planning to daily standup, development, review, and retrospective."
+      }
+    ],
+    "cloud_infrastructure_diagram": [
+      {
+        "id": "cloudInfra1",
+        "name": "AWS Architecture",
+        "description": "This diagram represents the Amazon Web Services cloud infrastructure, including EC2 instances, S3 buckets, Lambda functions, and VPC networks."
+      },
+      {
+        "id": "cloudInfra2",
+        "name": "Kubernetes Cluster",
+        "description": "This diagram illustrates a Kubernetes cluster architecture, showing nodes, pods, services, and the interactions between them."
+      }
+    ],
+    "performance_metrics_chart": [
+      {
+        "id": "perfMetric1",
+        "name": "Response Time Distribution",
+        "description": "This chart illustrates the distribution of response times for API calls, highlighting areas for potential optimization."
+      },
+      {
+        "id": "perfMetric2",
+        "name": "Error Rate Monitoring",
+        "description": "This chart tracks the error rates in the system, categorizing them by type and frequency to facilitate quicker resolution."
+      },
+      {
+        "id": "perfMetric3",
+        "name": "System Load Over Time",
+        "description": "This chart shows the system load over time, including CPU, memory, and network usage, to understand trends and anticipate scaling needs."
+      }
     ]
   },
   "diagram_category_names": {
@@ -359,6 +538,10 @@
     "mindmap": "Mindmap",
     "timeline_diagram": "Timeline Diagram",
     "zenuml_sequence_diagram": "ZenUML Sequence Diagram",
-    "flow_analysis_diagram": "Flow Analysis Diagram"
+    "flow_analysis_diagram": "Flow Analysis Diagram",
+    "software_architecture_diagram": "Software Architecture Diagram",
+    "development_workflow_diagram": "Development Workflow Diagram",
+    "cloud_infrastructure_diagram": "Cloud Infrastructure Diagram",
+    "performance_metrics_chart": "Performance Metrics Chart"
   }
 }

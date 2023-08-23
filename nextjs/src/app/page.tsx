@@ -4,6 +4,9 @@ async function getDiagramConfig() {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/diagram_config`,
+      {
+        next: { revalidate: 500 },
+      },
     );
     const json = await res.json();
 
