@@ -4,13 +4,10 @@ from starlette.requests import Request
 
 from fastapi import APIRouter, Body, HTTPException
 
+from ..exceptions import MermaidUnexpectedError
 from ..models import MermaidDesignRequest
 from ..services.llm_service import get_llm_by_id
-from ..services.mermaid_service import (
-    MermaidCliError,
-    MermaidUnexpectedError,
-    mermaid_request,
-)
+from ..services.mermaid_service import MermaidCliError, mermaid_request
 
 router = APIRouter()
 

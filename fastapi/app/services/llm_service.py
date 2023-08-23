@@ -10,6 +10,7 @@ from openai.openai_object import OpenAIObject
 from pyrate_limiter import Duration, Limiter, RequestRate
 
 from ..config import ANTHROPIC_AI_VENDOR, LLM_CONFIG_PATH
+from ..exceptions import AnthropicException, LLMException, OpenAIException
 from ..models import LLMConfig, LLMDefinition
 from ..utils.llm_utils import validate_max_tokens
 
@@ -21,18 +22,6 @@ rate_limits = (RequestRate(60, Duration.MINUTE),)  # 60 requests a minute
 
 # Create the rate limiter / Pyrate Limiter instance
 limiter = Limiter(*rate_limits)
-
-
-class LLMException(Exception):
-    """Base exception for LLM errors"""
-
-
-class OpenAIException(Exception):
-    """Exception raised when there is an error with the OpenAI API"""
-
-
-class AnthropicException(Exception):
-    """Exception raised when there is an error with the Anthropic API"""
 
 
 async def load_llm_config() -> LLMConfig:

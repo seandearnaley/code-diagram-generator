@@ -45,7 +45,13 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
       );
 
       if (response.ok) {
-        const blob = await response.blob();
+        console.log("response", response);
+        const responseBody = await response.json(); // Parse JSON response
+        const { svgBlobUrl, notes_markdown, diagram_type } = responseBody; // Extract additional data
+
+        console.log("notes_markdown", notes_markdown);
+        console.log("diagram_type", diagram_type);
+        const blob = await fetch(svgBlobUrl).then((res) => res.blob()); // Fetch SVG blob
         const url = URL.createObjectURL(blob);
         setDiagramUrl(url);
 
