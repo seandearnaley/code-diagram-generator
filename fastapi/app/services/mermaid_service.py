@@ -31,7 +31,8 @@ MERMAID_SCRIPT_FUNCTION_DEFINITIONS = [
                 "notes_markdown": {
                     "type": "string",
                     "description": (
-                        "markdown formatted notes about the diagram, readme etc"
+                        "markdown formatted notes about the diagram,"
+                        " explanation of diagram and various components"
                     ),
                 },
                 "diagram_type": {
@@ -128,19 +129,19 @@ async def mermaid_request(
     ]
 
     retries = 3
-    for i in range(retries):
+    for _ in range(retries):
         logger.info(
             "Starting Generate Design with Complete Text: max tokens:"
             f" {max_tokens} ({llm_definition.max_token_length} - {num_tokens}) using"
             f" model: {llm_definition.name} "
         )
 
-        if i > 0:
-            messages.pop(1)
+        # if i > 0:
+        #     messages.pop(1)
 
         result = complete_text(
             messages=messages,
-            max_tokens=max_tokens,
+            max_tokens=min(max_tokens, 2000),
             model=mermaid_design_request.llm_model_for_instructions,
             vendor=mermaid_design_request.llm_vendor_for_instructions,
             functions=MERMAID_SCRIPT_FUNCTION_DEFINITIONS,

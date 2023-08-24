@@ -1,27 +1,29 @@
 "use client";
-import { useRef, useState } from "react";
-
+import { CodeComponent } from "@/components";
 import { DiagramFormValues } from "@/types/DiagramForm.types";
-import { FC } from "react";
+import { FC, useRef, useState } from "react";
 
 import SVGRenderer from "@/components/SVGRenderer";
 import getSvgDimensions from "@/lib/getSvgDimensions";
 import { ArrowDownOnSquareIcon, BoltIcon } from "@heroicons/react/24/solid";
 
 import { toPng } from "html-to-image";
+import ReactMarkdown from "react-markdown";
 
 type MermaidDiagramProps = {
   values: DiagramFormValues;
   text: string;
 };
 
+const components = {
+  code: CodeComponent,
+};
 export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [diagramUrl, setDiagramUrl] = useState("");
   const imageRef = useRef(null);
   const [notesMarkdown, setNotesMarkdown] = useState("");
-  const [diagramType, setDiagramType] = useState("");
 
   const [imageDimensions, setImageDimensions] = useState({
     width: 500,
@@ -47,10 +49,6 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
       );
 
       if (response.ok) {
-        // const blob = await response.blob();
-        // const url = URL.createObjectURL(blob);
-        // setDiagramUrl(url);
-
         const data = await response.json();
 
         console.log("response data", data);
@@ -58,8 +56,8 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
         const url = URL.createObjectURL(blob);
         setDiagramUrl(url);
         setNotesMarkdown(data.notes_markdown);
-        setDiagramType(data.diagram_type);
-        // Extract the dimensions from the SVG content
+        // setDiagramType(data.diagram_type);
+        // Attempt extract the dimensions from the SVG content
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = e.target?.result as string;
@@ -99,23 +97,17 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
       <div>
         {error ? <p className="text-red-500 text-sm mt-1">{error}</p> : null}
         {/* Loading Modal */}
-        {loading && (
+        {loading ? (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
             <div className="p-4 bg-white rounded-md">
               <p className="mb-2 text-gray-600 flex items-center">
                 Generating design...
                 <span className="ml-2 w-5 h-5 border-2 border-blue-500 rounded-full animate-spin"></span>{" "}
-                {/* Adding the spinning icon */}
               </p>
-              {/* <div className="relative w-full h-2 bg-gray-200 rounded-md">
-                <div
-                  className="absolute left-0 h-2 bg-blue-500 rounded-md"
-                  style={{ width: `${progress}%` }}
-                />
-              </div> */}
             </div>
           </div>
-        )}
+        ) : null}
+        {/* Generate Button */}
         <div className="flex justify-center mb-4">
           <button
             className="text-sm font-semibold leading-6 text-black flex items-center cursor-pointer border-2 border-slate-300 rounded-md p-2 bg-slate-200"
@@ -126,17 +118,13 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
             Generate Design
           </button>
         </div>
-        {diagramUrl && (
+        {/* Diagram + Notes Response */}
+        {diagramUrl ? (
           <>
             <div className="flex justify-center mb-4">
-              <div>
-                <h2>Notes</h2>
-                <p>{notesMarkdown}</p>
-              </div>
-              <div>
-                <h2>Diagram Type</h2>
-                <p>{diagramType}</p>
-              </div>
+              <ReactMarkdown className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[1000px]">
+                {notesMarkdown}
+              </ReactMarkdown>
             </div>
             <div className="flex justify-center mb-4">
               dimensions: {imageDimensions.width} x {imageDimensions.height}
@@ -169,7 +157,7 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
               </button>
             </div>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
