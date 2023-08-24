@@ -20,6 +20,8 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
   const [loading, setLoading] = useState(false);
   const [diagramUrl, setDiagramUrl] = useState("");
   const imageRef = useRef(null);
+  const [notesMarkdown, setNotesMarkdown] = useState("");
+  const [diagramType, setDiagramType] = useState("");
 
   const [imageDimensions, setImageDimensions] = useState({
     width: 500,
@@ -45,10 +47,18 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
       );
 
       if (response.ok) {
-        const blob = await response.blob();
+        // const blob = await response.blob();
+        // const url = URL.createObjectURL(blob);
+        // setDiagramUrl(url);
+
+        const data = await response.json();
+
+        console.log("response data", data);
+        const blob = new Blob([data.markdown_svg], { type: "image/svg+xml" });
         const url = URL.createObjectURL(blob);
         setDiagramUrl(url);
-
+        setNotesMarkdown(data.notes_markdown);
+        setDiagramType(data.diagram_type);
         // Extract the dimensions from the SVG content
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -118,6 +128,16 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
         </div>
         {diagramUrl && (
           <>
+            <div className="flex justify-center mb-4">
+              <div>
+                <h2>Notes</h2>
+                <p>{notesMarkdown}</p>
+              </div>
+              <div>
+                <h2>Diagram Type</h2>
+                <p>{diagramType}</p>
+              </div>
+            </div>
             <div className="flex justify-center mb-4">
               dimensions: {imageDimensions.width} x {imageDimensions.height}
             </div>

@@ -197,6 +197,19 @@ async def mermaid_request(
                 }
             )
             continue
-        return markdown_svg
+
+        if markdown_svg is None:
+            raise MermaidCliError("Mermaid CLI failed to generate diagram")
+
+        # Read the SVG content from the file
+        with open(markdown_svg.path, "r", encoding="utf-8") as file:
+            svg_content = file.read()
+
+        logger.debug(f"markdown_svg: {markdown_svg}")
+        return {
+            "markdown_svg": svg_content,
+            "notes_markdown": notes_markdown,
+            "diagram_type": diagram_type,
+        }
 
     raise MermaidCliError(f"Mermaid CLI failed after {retries} attempts")
