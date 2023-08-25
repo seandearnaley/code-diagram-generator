@@ -1,5 +1,6 @@
 """Mermaid Service Module"""
 
+import asyncio
 import json
 from typing import Tuple, Union
 
@@ -11,55 +12,8 @@ from ..services.llm_service import complete_text
 from ..utils.llm_utils import num_tokens_from_string
 from ..utils.log_utils import print_markdown
 from ..utils.mermaid_utils import sanitize_markdown_js
+from .mermaid_function_defs import MERMAID_SCRIPT_FUNCTION_DEFINITIONS
 from .mermaid_generator import create_mermaid_diagram
-
-MERMAID_SCRIPT_FUNCTION_DEFINITIONS = [
-    {
-        "name": "create_mermaid_diagram",
-        "description": "Generate a mermaid diagram from a mermaid text based script",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "mermaid_diagram_text_definition": {
-                    "type": "string",
-                    "description": (
-                        "mermaid definition. plain text input. Should not"
-                        " contain encodings like \n, \t, etc. should be properly"
-                        " escaped for embedding in json"
-                    ),
-                },
-                "notes_markdown": {
-                    "type": "string",
-                    "description": (
-                        "markdown formatted notes about the diagram,"
-                        " explanation of diagram and various components"
-                    ),
-                },
-                "diagram_type": {
-                    "type": "string",
-                    "enum": [
-                        "flowchart",
-                        "sequence",
-                        "gantt",
-                        "class",
-                        "state",
-                        "pie",
-                        "git",
-                        "entityRelationship",
-                        "user-journey",
-                        "requirement",
-                    ],
-                    "description": "Type of mermaid diagram to be created.",
-                },
-            },
-            "required": [
-                "mermaid_diagram_text_definition",
-                "notes_markdown",
-                "diagram_type",
-            ],
-        },
-    }
-]
 
 
 def openai_mermaid_fn_callback(response) -> Union[Tuple[str, str, str], str]:
@@ -95,7 +49,11 @@ def openai_mermaid_fn_callback(response) -> Union[Tuple[str, str, str], str]:
 
 
 async def mermaid_request(
-    llm_definition: LLMDefinition, mermaid_design_request: MermaidDesignRequest
+    llm_definition: LLMDefinition,
+    mermaid_design_request: MermaidDesignRequest,
+    convo_retries: int = 4,  # Number of conversation retries
+    overall_retries: int = 3,  # Number of overall retries
+    parallel_tasks: int = 2,  # Number of parallel tasks
 ):
     """Generate a mermaid diagram from a mermaid script."""
     logger.debug(f"Mermaid Design Request: {mermaid_design_request}")
@@ -105,17 +63,7 @@ async def mermaid_request(
         llm_definition.max_token_length - num_tokens - 400
     )  # ( 300 for functions and msgs TODO: count that)
 
-    # todo update max_tokens with retries
-
-    # NOTE diagram_type is supposedly the list of mermaid diagram types GPT supports
-    # from 2021 but the CLI we use is more up to date, it may be possible to teach LLM's
-    # to generate mermaid diagrams for other types using n-shot learning
-    # mermaid docs, examples etc.
-
-    # notes_markdown and diagram_type aren't actually used on the diagram renderer, they
-    # are there simply to help the LLM spread out it's answer, more tokens out tends to
-    # have higher performance.  diagram_type helps steer the sampler to the correct
-    # diagram type
+    # todo update max_tokens with retries OR langchain
 
     messages = [
         {
@@ -128,8 +76,7 @@ async def mermaid_request(
         {"role": "user", "content": mermaid_design_request.text},
     ]
 
-    retries = 3
-    for _ in range(retries):
+    for _ in range(convo_retries):
         logger.info(
             "Starting Generate Design with Complete Text: max tokens:"
             f" {max_tokens} ({llm_definition.max_token_length} - {num_tokens}) using"
@@ -149,7 +96,7 @@ async def mermaid_request(
         )
 
         if isinstance(result, str):
-            logger.info("Response was msg")
+            logger.info("result is a string, retry the conversation")
 
             messages.append({"role": "assistant", "content": result})
 
@@ -167,9 +114,6 @@ async def mermaid_request(
 
         mermaid_def_str, notes_markdown, diagram_type = result
 
-        logger.info(f"notes_markdown: {notes_markdown}")
-        logger.info(f"diagram_type: {diagram_type}")
-
         # if mermaid_def_str is empty after being trimmed/stripped, raise an error
         if not mermaid_def_str.strip():
             raise ValueError("Mermaid definition is empty")
@@ -180,9 +124,8 @@ async def mermaid_request(
             MermaidModel(mermaid_def_str=mermaid_def_str)
         )
 
-        # Adding user's message if there was an error
         if error_message:
-            logger.error(f"Mermaid Error: {error_message}")
+            logger.error(f"error message, push the conversation: {error_message}")
             # Adding assistant's message with mermaid definition
             messages.append({"role": "assistant", "content": mermaid_def_str})
 
@@ -213,4 +156,24 @@ async def mermaid_request(
             "diagram_type": diagram_type,
         }
 
-    raise MermaidCliError(f"Mermaid CLI failed after {retries} attempts")
+    # If the function hasn't returned by now, it means all conversation retries
+    # have failed So we retry the whole function
+    for _ in range(overall_retries):
+        tasks = [
+            mermaid_request(
+                llm_definition,
+                mermaid_design_request,
+                convo_retries,
+                overall_retries,
+                parallel_tasks,
+            )
+            for _ in range(parallel_tasks)
+        ]
+        results = await asyncio.gather(*tasks)
+
+        # If any of the tasks succeeded, return the result
+        for result in results:
+            if result is not None:
+                return result
+
+    raise MermaidCliError(f"Mermaid CLI failed after {convo_retries} attempts")
