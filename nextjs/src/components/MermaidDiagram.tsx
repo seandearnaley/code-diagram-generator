@@ -50,14 +50,10 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
 
       if (response.ok) {
         const data = await response.json();
-
-        console.log("response data", data);
         const blob = new Blob([data.markdown_svg], { type: "image/svg+xml" });
         const url = URL.createObjectURL(blob);
         setDiagramUrl(url);
         setNotesMarkdown(data.explanation);
-        // setDiagramType(data.diagram_type);
-        // Attempt extract the dimensions from the SVG content
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = e.target?.result as string;
