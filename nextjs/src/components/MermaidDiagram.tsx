@@ -55,7 +55,7 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
         const blob = new Blob([data.markdown_svg], { type: "image/svg+xml" });
         const url = URL.createObjectURL(blob);
         setDiagramUrl(url);
-        setNotesMarkdown(data.notes_markdown);
+        setNotesMarkdown(data.explanation);
         // setDiagramType(data.diagram_type);
         // Attempt extract the dimensions from the SVG content
         const reader = new FileReader();
@@ -122,7 +122,7 @@ export const MermaidDiagram: FC<MermaidDiagramProps> = ({ values, text }) => {
         {diagramUrl ? (
           <>
             <div className="flex justify-center mb-4">
-              <ReactMarkdown className="ml-0 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[1000px]">
+              <ReactMarkdown className="m-5 p-4 overflow-y-auto bg-slate-300 text-slate-500 rounded-md max-h-[1000px]">
                 {notesMarkdown}
               </ReactMarkdown>
             </div>

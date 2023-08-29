@@ -1,6 +1,4 @@
-// CodeComponent.tsx
 import { ClipboardIcon } from "@heroicons/react/24/solid";
-
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { CodeProps } from "react-markdown/lib/ast-to-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -11,7 +9,7 @@ type CustomCodeProps = CodeProps & {
 };
 
 export const CodeComponent: React.FC<CustomCodeProps> = ({
-  inline = false,
+  inline,
   className,
   children,
 }) => {
@@ -22,11 +20,14 @@ export const CodeComponent: React.FC<CustomCodeProps> = ({
     alert("Code copied to clipboard!");
   };
 
+  if (inline) {
+    return <code>{children}</code>;
+  }
+
   return (
     <div className="prose overflow-y-auto bg-slate-500 text-slate-500 rounded-md mt-5 mb-5 max-w-[100vw]">
       <pre className="max-h-[500px] m-0">
-        {/* Code block */}
-        {match && !inline ? (
+        {match ? (
           <SyntaxHighlighter
             style={tomorrow}
             language={match[1] || ""}

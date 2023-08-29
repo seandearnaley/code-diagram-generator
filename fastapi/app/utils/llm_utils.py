@@ -1,6 +1,8 @@
 """ Utility functions for the Large Language Models. """
 
 import math
+
+# Import Collection from typing
 from typing import Any, Dict, List, Union
 
 import tiktoken
@@ -8,7 +10,7 @@ from anthropic import Anthropic
 
 from ..config import ANTHROPIC_AI_VENDOR, OPEN_AI_VENDOR
 
-ValueType = Union[str, List[str]]
+ValueType = Union[str, List[str], Any]
 FunctionParameterProperty = Dict[str, ValueType]
 FunctionParameters = Dict[str, FunctionParameterProperty]
 FunctionType = Dict[str, Union[str, FunctionParameters]]
@@ -89,7 +91,7 @@ def calculate_function_tokens(function: FunctionType, encoding: Any) -> int:
 
 
 def num_tokens_from_functions(
-    functions: List[FunctionType], model: str = "gpt-3.5-turbo-0613"
+    functions: List[FunctionType], model: str = "gpt-3.5-turbo"
 ) -> int:
     """Return the number of tokens used by a list of functions."""
     try:

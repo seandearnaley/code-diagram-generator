@@ -94,14 +94,14 @@ def sanitize_markdown_js(markdown_js: str) -> str:
         str: The sanitized markdown JS string.
     """
     # Regex to match Mermaid diagram text definition enclosed with backticks
-    diagram_pattern = re_compile(r'"mermaid_diagram_text_definition":\s*`([^`]*)`')
+    diagram_pattern = re_compile(r'"diagram_text_definition":\s*`([^`]*)`')
     match = diagram_pattern.search(markdown_js)
     if match:
-        mermaid_diagram_text_definition = match.group(1)
+        diagram_text_definition = match.group(1)
 
         # Trimming and sanitizing the diagram text definition
         sanitized_diagram_text_definition = sanitize_escape_sequences(
-            mermaid_diagram_text_definition.strip()
+            diagram_text_definition.strip()
         )
         trimmed_diagram_text_definition = trim_invalid_statements(
             sanitized_diagram_text_definition
@@ -109,7 +109,7 @@ def sanitize_markdown_js(markdown_js: str) -> str:
 
         # Replacing the original diagram text definition with the sanitized version
         markdown_js = markdown_js.replace(
-            f"`{mermaid_diagram_text_definition}`",
+            f"`{diagram_text_definition}`",
             f'"{trimmed_diagram_text_definition}"',
         )
 

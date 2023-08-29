@@ -6,13 +6,14 @@ from typing import Tuple, Union
 
 from loguru import logger
 
+from ..components.enhanced_conversation_buffer import EnhancedConversationBuffer
 from ..exceptions import MermaidCliError
 from ..models import LLMDefinition, MermaidDesignRequest, MermaidModel
 from ..services.llm_service import complete_text
-from ..utils.llm_utils import num_tokens_from_string
+from ..utils.llm_utils import num_tokens_from_functions, num_tokens_from_string
 from ..utils.log_utils import print_markdown
 from ..utils.mermaid_utils import sanitize_markdown_js
-from .mermaid_function_defs import MERMAID_SCRIPT_FUNCTION_DEFINITIONS
+from .diagram_function_defs import DIAGRAM_FUNCTION_DEFINITIONS
 from .mermaid_generator import create_mermaid_diagram
 
 
@@ -37,13 +38,13 @@ def openai_mermaid_fn_callback(response) -> Union[Tuple[str, str, str], str]:
                     f" {response_message['function_call']['arguments']}"
                 )
                 raise err  # Re-raise the exception if you want it to propagate
-            mermaid_def_str = function_args.get("mermaid_diagram_text_definition")
+            mermaid_def_str = function_args.get("diagram_text_definition")
 
-            notes_markdown = function_args.get("notes_markdown").strip("\n")
+            explanation = function_args.get("explanation").strip("\n")
             diagram_type = function_args.get("diagram_type")
             if mermaid_def_str:
                 print_markdown(f"def str:\n\n{mermaid_def_str}")
-                return mermaid_def_str, notes_markdown, diagram_type
+                return mermaid_def_str, explanation, diagram_type
         return response_message.content.strip()
     return "Response doesn't have choices or choices have no text."
 
@@ -59,22 +60,38 @@ async def mermaid_request(
     logger.debug(f"Mermaid Design Request: {mermaid_design_request}")
 
     num_tokens = num_tokens_from_string(mermaid_design_request.text)
-    max_tokens = (
-        llm_definition.max_token_length - num_tokens - 400
-    )  # ( 300 for functions and msgs TODO: count that)
 
-    # todo update max_tokens with retries OR langchain
+    function_num_tokens = num_tokens_from_functions(
+        DIAGRAM_FUNCTION_DEFINITIONS, model=llm_definition.id
+    )
 
-    messages = [
+    logger.debug(f"function_num_tokens: {function_num_tokens}")
+
+    max_tokens = llm_definition.max_token_length - num_tokens - function_num_tokens
+
+    # Debug logs
+    logger.debug(f"max_tokens: {max_tokens}")
+    logger.debug(f"llm_definition.max_token_length: {llm_definition.max_token_length}")
+    logger.debug(f"num_tokens from mermaid_design_request.text: {num_tokens}")
+
+    buffer = EnhancedConversationBuffer(
+        max_tokens=llm_definition.max_token_length - function_num_tokens,
+        num_tokens_from_string=num_tokens_from_string,
+    )
+
+    logger.debug(f"Initialized buffer with max_tokens: {max_tokens}")
+
+    # Add initial system and user messages to the buffer
+    buffer.add_message(
         {
             "role": "system",
             "content": (
-                "You are a helpful assistant specialized in writing"
-                " professional system diagrams using mermaid js."
+                "You are a helpful assistant specialized in writing professional system"
+                " diagrams using mermaid js."
             ),
-        },
-        {"role": "user", "content": mermaid_design_request.text},
-    ]
+        }
+    )
+    buffer.add_message({"role": "user", "content": mermaid_design_request.text})
 
     for _ in range(convo_retries):
         logger.info(
@@ -85,34 +102,36 @@ async def mermaid_request(
 
         # if i > 0:
         #     messages.pop(1)
+        logger.debug(f"Buffer state before complete_text: {buffer.buffer_as_messages}")
 
         result = complete_text(
-            messages=messages,
-            max_tokens=min(max_tokens, 2000),
+            messages=buffer.buffer_as_messages,
+            max_tokens=max_tokens,
             model=mermaid_design_request.llm_model_for_instructions,
             vendor=mermaid_design_request.llm_vendor_for_instructions,
-            functions=MERMAID_SCRIPT_FUNCTION_DEFINITIONS,
+            functions=DIAGRAM_FUNCTION_DEFINITIONS,
             callback=openai_mermaid_fn_callback,
         )
 
+        logger.debug(f"Buffer state after complete_text: {buffer.buffer_as_messages}")
+
         if isinstance(result, str):
             logger.info("result is a string, retry the conversation")
+            buffer.add_message({"role": "assistant", "content": result})
 
-            messages.append({"role": "assistant", "content": result})
-
-            messages.append(
+            buffer.add_message(
                 {
                     "role": "user",
                     "content": (
                         "Sorry that definition did not work, maybe there was a"
                         " syntax mistake, could you try"
-                        " the create_mermaid_diagram function again?```"
+                        " the create_mermaid_diagram function again?"
                     ),
                 }
             )
             continue
 
-        mermaid_def_str, notes_markdown, diagram_type = result
+        mermaid_def_str, explanation, diagram_type = result
 
         # if mermaid_def_str is empty after being trimmed/stripped, raise an error
         if not mermaid_def_str.strip():
@@ -127,9 +146,9 @@ async def mermaid_request(
         if error_message:
             logger.error(f"error message, push the conversation: {error_message}")
             # Adding assistant's message with mermaid definition
-            messages.append({"role": "assistant", "content": mermaid_def_str})
+            buffer.add_message({"role": "assistant", "content": mermaid_def_str})
 
-            messages.append(
+            buffer.add_message(
                 {
                     "role": "user",
                     "content": (
@@ -152,7 +171,7 @@ async def mermaid_request(
         logger.debug(f"markdown_svg: {markdown_svg}")
         return {
             "markdown_svg": svg_content,
-            "notes_markdown": notes_markdown,
+            "explanation": explanation,
             "diagram_type": diagram_type,
         }
 

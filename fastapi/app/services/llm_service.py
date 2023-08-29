@@ -91,6 +91,7 @@ def complete_openai_text(
             model=model,
             max_tokens=max_tokens,
             messages=messages,
+            # temperature=0.3,
             functions=functions,
             function_call="auto",
         )

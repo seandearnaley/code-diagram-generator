@@ -35,6 +35,16 @@
         "id": "flowchart7",
         "name": "Deployment Flowchart",
         "description": "This flowchart outlines the deployment process of the application, including building, packaging, and deploying to various environments."
+      },
+      {
+        "id": "flowchart8",
+        "name": "Error Handling Flowchart",
+        "description": "This flowchart illustrates the error handling process in the application, including the different error types and their handling."
+      },
+      {
+        "id": "flowchart9",
+        "name": "Process Flow Diagram",
+        "description": "A Process Flow Diagram (PFD) is a graphical representation used to illustrate the sequence and interactions of various tasks or steps involved in a process or system. It serves as a roadmap that shows how different processes are interlinked and helps in understanding, analyzing, and optimizing a process. In engineering, PFDs are often used to depict the high-level functioning of a system, usually highlighting the major components and the flow of materials or information within that system.s."
       }
     ],
     "sequence_diagram": [
@@ -82,26 +92,31 @@
     "class_diagram": [
       {
         "id": "classDiagram1",
+        "name": "Class Diagram for Object-Oriented Design",
+        "description": "In Object-Oriented Design (OOD), a Class Diagram describes the static structure of a system by illustrating its classes, attributes, methods, and the relationships among them. It serves as a blueprint for developing the software, akin to how architectural plans serve for building construction."
+      },
+      {
+        "id": "classDiagram2",
         "name": "System Structure",
         "description": "This diagram illustrates the classes in the system, their attributes, methods, and the relationships among them."
       },
       {
-        "id": "classDiagram2",
+        "id": "classDiagram3",
         "name": "User Interaction Classes",
         "description": "This diagram focuses on the classes related to user interactions, showing their attributes, methods, and how they interact with other parts of the system."
       },
       {
-        "id": "classDiagram3",
+        "id": "classDiagram4",
         "name": "Service Integration Classes",
         "description": "This diagram illustrates the classes involved in integrating different services, including their methods and relationships with other classes."
       },
       {
-        "id": "classDiagram4",
+        "id": "classDiagram5",
         "name": "Data Processing Classes",
         "description": "This diagram depicts the classes responsible for data processing, their attributes, methods, and how they interact with data storage and retrieval classes."
       },
       {
-        "id": "classDiagram5",
+        "id": "classDiagram6",
         "name": "Utility Classes",
         "description": "This diagram outlines the utility classes within the system, showing their common methods and relationships."
       }

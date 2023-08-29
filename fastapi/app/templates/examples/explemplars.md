@@ -1,20 +1,3 @@
-```
-{diagram_category}: {diagram_option}
-
-{description}
-```
-Your task is to create a {diagram_option} Diagram using mermaid js markdown. You will be given a code outline and a folder structure to base your design on.
-
-## Deliverables
-
-- The final product needs to be well written mermaid code that can be parsed with mermaid CLI.  strings should be properly escaped, this is going to be passed into a unit test for machine evaluation. syntax errors will be considered a failure.  avoid invalid control, escape characters and other lexical errors.
-
-- It should be a beautiful diagram. Make sure it shows all concepts of the diagram category and the code context.
-
-- Remember the function takes plain text input. Should not contain encodings like \n, \t, etc.  Function parameters should be trimmed/stripped appropriately.  Consider your diagram carefully to come up with the right visuals.
-
-Here are some simple examples, we want some more advanced and thoughtful:
-
 ### 1. Flowchart for User Authentication
 
 ```mermaid
@@ -89,6 +72,3 @@ stateDiagram-v2
 ```
 
 **Explanation**: This state diagram represents an order management process, starting from a "New" state. After placing an order, it moves to "Processing," then to "Shipped," and finally to "Delivered," concluding the order process.
-
-------------------
-I want you to use this application as the context for your diagram:
