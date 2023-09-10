@@ -6,7 +6,7 @@ services:
       - ./fastapi/.env
     volumes:
       - ./fastapi:/app
-      - /Users/seandearnaley/Documents/GitHub/:/source-repos
+      - ${SOURCE_REPOS_PATH}:/source-repos
     ports:
       - 8000:8000
   nextjs:
