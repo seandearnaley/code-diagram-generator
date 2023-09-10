@@ -42,9 +42,11 @@ code-diagram-generator/
 
 ## Installation
 
+I recommend running `docker-compose up` to run the application. Make sure you set your repo path in the root .env (rename .env.example) If you want to run the application locally, follow these steps:
+
 1. Clone this repository to your local machine.
-2. Navigate to the `fastapi/` directory and set up the FastAPI backend.
-3. Navigate to the `nextjs/` directory and set up the Next.js frontend.
+2. Navigate to the `fastapi/` directory and set up the FastAPI backend. (change your env.example)
+3. Navigate to the `nextjs/` directory and set up the Next.js frontend. (install etc.)
 4. Configure Docker Compose if you want to run the services using Docker containers.
 
 ## Running the Application
@@ -60,8 +62,8 @@ To run the application locally, follow these steps:
 2. Start the Next.js frontend:
 
    - Navigate to the `nextjs/` directory.
-   - Install the Node.js dependencies using `npm install`.
-   - Run the Next.js development server using `npm run dev`.
+   - Install the Node.js dependencies using `pnpm install`.
+   - Run the Next.js development server using `pnpm run dev`.
 
 3. Access the application:
    - The FastAPI backend will be running at `http://localhost:8000`.
