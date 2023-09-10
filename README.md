@@ -1,6 +1,8 @@
-# Code Diagram Generator Monorepo
+# Code Diagram Generator
 
 This monorepo contains a code diagram generator application built using FastAPI on the backend and Next.js 13 on the frontend.
+
+![Code Diagram Generator](fullcapture.png?raw=true)
 
 ## Table of Contents
 
