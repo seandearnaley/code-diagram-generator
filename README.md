@@ -49,6 +49,14 @@ I recommend running `docker-compose up` to run the application. Make sure you se
 3. Navigate to the `nextjs/` directory and set up the Next.js frontend. (install etc.)
 4. Configure Docker Compose if you want to run the services using Docker containers.
 
+configure diagrams here:
+
+fastapi/app/config/diagram_config.json
+
+modify the directive template (it doesn't need all the examples):
+
+fastapi/app/templates/generate_diagram_instructions_08112023.txt
+
 ## Running the Application
 
 To run the application locally, follow these steps:
