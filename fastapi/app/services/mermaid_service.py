@@ -2,7 +2,7 @@
 
 import asyncio
 import json
-from typing import Tuple, Union
+from typing import Callable, Dict, Tuple, Union
 
 from loguru import logger
 
@@ -17,36 +17,98 @@ from .diagram_function_defs import DIAGRAM_FUNCTION_DEFINITIONS
 from .mermaid_generator import create_mermaid_diagram
 
 
+def create_buffer(max_tokens: int, num_tokens_from_string_fn: Callable):
+    """Creates an enhanced conversation buffer."""
+    return EnhancedConversationBuffer(max_tokens, num_tokens_from_string_fn)
+
+
 def openai_mermaid_fn_callback(response) -> Union[Tuple[str, str, str], str]:
     """Callback function for mermaid diagram generation."""
-    if response.choices:
-        response_message = response.choices[0].message
-        if response_message.get("function_call"):
-            logger.debug(f"response_message: {response_message}")
+    if not response.choices:
+        return "Response doesn't have choices or choices have no text."
 
-            try:
-                sanitized_string = sanitize_markdown_js(
-                    response_message["function_call"]["arguments"]
-                )
+    response_message = response.choices[0].message
+    if response_message.get("function_call"):
+        logger.debug(f"response_message: {response_message}")
 
-                logger.debug(f"sanitized_string: {sanitized_string}")
-                function_args = json.loads(sanitized_string)
-            except json.JSONDecodeError as err:
-                # Log or print the JSON string to investigate further
-                print(
-                    "JSON string that caused error:"
-                    f" {response_message['function_call']['arguments']}"
-                )
-                raise err  # Re-raise the exception if you want it to propagate
-            mermaid_def_str = function_args.get("diagram_text_definition")
+        try:
+            sanitized_string = sanitize_markdown_js(
+                response_message["function_call"]["arguments"]
+            )
 
-            explanation = function_args.get("explanation").strip("\n")
-            diagram_type = function_args.get("diagram_type")
-            if mermaid_def_str:
-                print_markdown(f"def str:\n\n{mermaid_def_str}")
-                return mermaid_def_str, explanation, diagram_type
-        return response_message.content.strip()
-    return "Response doesn't have choices or choices have no text."
+            logger.debug(f"sanitized_string: {sanitized_string}")
+            function_args = json.loads(sanitized_string)
+        except json.JSONDecodeError as err:
+            # Log or print the JSON string to investigate further
+            print(
+                "JSON string that caused error:"
+                f" {response_message['function_call']['arguments']}"
+            )
+            raise err  # Re-raise the exception if you want it to propagate
+        mermaid_def_str = function_args.get("diagram_text_definition")
+
+        explanation = function_args.get("explanation").strip("\n")
+        diagram_type = function_args.get("diagram_type")
+        if mermaid_def_str:
+            print_markdown(f"def str:\n\n{mermaid_def_str}")
+            return mermaid_def_str, explanation, diagram_type
+    return response_message.content.strip()
+
+
+async def init_buffer(
+    buffer: EnhancedConversationBuffer, mermaid_design_request: MermaidDesignRequest
+):
+    """Initialize the buffer with the initial messages."""
+    buffer.add_messages(
+        [
+            {
+                "role": "system",
+                "content": (
+                    "You are a helpful assistant specialized in writing professional"
+                    " system diagrams."
+                ),
+            },
+            {"role": "user", "content": mermaid_design_request.text},
+        ]
+    )
+
+
+async def buffer_add_errormsg(
+    buffer: EnhancedConversationBuffer, mermaid_def_str: str, error_message: str
+):
+    """Buffer the error message."""
+    # Adding assistant's message with mermaid definition
+    buffer.add_messages(
+        [
+            {"role": "assistant", "content": mermaid_def_str},
+            {
+                "role": "user",
+                "content": (
+                    "Sorry but that definition did not work, maybe there was a"
+                    " syntax mistake, could you take a look at this error and try"
+                    " the function again:\n```"
+                    f" {error_message}```"
+                ),
+            },
+        ]
+    )
+
+
+async def buffer_result_is_str(buffer: EnhancedConversationBuffer, result: str):
+    """Buffer the result if it is a string."""
+    buffer.add_messages(
+        [
+            {"role": "assistant", "content": result},
+            {
+                "role": "user",
+                "content": (
+                    "Sorry that definition did not work, maybe there was a"
+                    " syntax mistake, could you try"
+                    " the function again?"
+                ),
+            },
+        ]
+    )
 
 
 async def mermaid_request(
@@ -55,58 +117,41 @@ async def mermaid_request(
     convo_retries: int = 4,  # Number of conversation retries
     overall_retries: int = 3,  # Number of overall retries
     parallel_tasks: int = 2,  # Number of parallel tasks
-):
+    buffer_factory: Callable[..., EnhancedConversationBuffer] = create_buffer,
+    token_util: Callable[..., int] = num_tokens_from_functions,
+) -> Union[Dict[str, str], Tuple[str, str, str], str]:
     """Generate a mermaid diagram from a mermaid script."""
     logger.debug(f"Mermaid Design Request: {mermaid_design_request}")
 
-    num_tokens = num_tokens_from_string(mermaid_design_request.text)
-
-    function_num_tokens = num_tokens_from_functions(
+    function_num_tokens = token_util(
         DIAGRAM_FUNCTION_DEFINITIONS, model=llm_definition.id
     )
 
     logger.debug(f"function_num_tokens: {function_num_tokens}")
 
-    max_tokens = llm_definition.max_token_length - num_tokens - function_num_tokens
+    num_tokens = num_tokens_from_string(mermaid_design_request.text)
+    buffer_max_tokens = llm_definition.max_token_length - function_num_tokens
+    complete_text_max_tokens = buffer_max_tokens - num_tokens
 
-    # Debug logs
-    logger.debug(f"max_tokens: {max_tokens}")
-    logger.debug(f"llm_definition.max_token_length: {llm_definition.max_token_length}")
-    logger.debug(f"num_tokens from mermaid_design_request.text: {num_tokens}")
+    # Ensure they are positive
+    buffer_max_tokens = max(buffer_max_tokens, 1)
+    complete_text_max_tokens = max(complete_text_max_tokens, 1)
 
-    buffer = EnhancedConversationBuffer(
-        max_tokens=llm_definition.max_token_length - function_num_tokens,
-        num_tokens_from_string=num_tokens_from_string,
-    )
+    buffer = buffer_factory(buffer_max_tokens, num_tokens_from_string)
 
-    logger.debug(f"Initialized buffer with max_tokens: {max_tokens}")
+    logger.debug(f"Initialized buffer with max_tokens: {buffer_max_tokens}")
 
-    # Add initial system and user messages to the buffer
-    buffer.add_message(
-        {
-            "role": "system",
-            "content": (
-                "You are a helpful assistant specialized in writing professional system"
-                " diagrams using mermaid js."
-            ),
-        }
-    )
-    buffer.add_message({"role": "user", "content": mermaid_design_request.text})
+    await init_buffer(buffer, mermaid_design_request)
 
     for _ in range(convo_retries):
-        logger.info(
-            "Starting Generate Design with Complete Text: max tokens:"
-            f" {max_tokens} ({llm_definition.max_token_length} - {num_tokens}) using"
-            f" model: {llm_definition.name} "
-        )
-
-        # if i > 0:
-        #     messages.pop(1)
         logger.debug(f"Buffer state before complete_text: {buffer.buffer_as_messages}")
+
+        # Calculate the max tokens for this iteration of complete_text
+        iteration_max_tokens = min(complete_text_max_tokens, 2000)
 
         result = complete_text(
             messages=buffer.buffer_as_messages,
-            max_tokens=max_tokens,
+            max_tokens=iteration_max_tokens,
             model=mermaid_design_request.llm_model_for_instructions,
             vendor=mermaid_design_request.llm_vendor_for_instructions,
             functions=DIAGRAM_FUNCTION_DEFINITIONS,
@@ -117,48 +162,23 @@ async def mermaid_request(
 
         if isinstance(result, str):
             logger.info("result is a string, retry the conversation")
-            buffer.add_message({"role": "assistant", "content": result})
-
-            buffer.add_message(
-                {
-                    "role": "user",
-                    "content": (
-                        "Sorry that definition did not work, maybe there was a"
-                        " syntax mistake, could you try"
-                        " the create_mermaid_diagram function again?"
-                    ),
-                }
-            )
+            await buffer_result_is_str(buffer, result)
             continue
 
         mermaid_def_str, explanation, diagram_type = result
 
-        # if mermaid_def_str is empty after being trimmed/stripped, raise an error
         if not mermaid_def_str.strip():
             raise ValueError("Mermaid definition is empty")
 
-        logger.info(f"mermaid_def_str:\n\n{mermaid_def_str}")
+        logger.info(f"mermaid_def_str: {mermaid_def_str}")
 
-        markdown_svg, error_message = await create_mermaid_diagram(
+        markdown_svg, err_message = await create_mermaid_diagram(
             MermaidModel(mermaid_def_str=mermaid_def_str)
         )
 
-        if error_message:
-            logger.error(f"error message, push the conversation: {error_message}")
-            # Adding assistant's message with mermaid definition
-            buffer.add_message({"role": "assistant", "content": mermaid_def_str})
-
-            buffer.add_message(
-                {
-                    "role": "user",
-                    "content": (
-                        "Sorry but that definition did not work, maybe there was a"
-                        " syntax mistake, could you take a look at this error and try"
-                        " the create_mermaid_diagram function again:\n```"
-                        f" {error_message}```"
-                    ),
-                }
-            )
+        if err_message:
+            logger.error(f"error message, push error into conversation: {err_message}")
+            await buffer_add_errormsg(buffer, mermaid_def_str, err_message)
             continue
 
         if markdown_svg is None:
@@ -169,6 +189,7 @@ async def mermaid_request(
             svg_content = file.read()
 
         logger.debug(f"markdown_svg: {markdown_svg}")
+
         return {
             "markdown_svg": svg_content,
             "explanation": explanation,
@@ -191,8 +212,9 @@ async def mermaid_request(
         results = await asyncio.gather(*tasks)
 
         # If any of the tasks succeeded, return the result
+        # need to try to make the algo have simple return types
         for result in results:
             if result is not None:
                 return result
 
-    raise MermaidCliError(f"Mermaid CLI failed after {convo_retries} attempts")
+    raise MermaidCliError(f"Mermaid CLI failed after {overall_retries} attempts")

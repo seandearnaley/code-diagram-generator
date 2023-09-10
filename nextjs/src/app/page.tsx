@@ -48,7 +48,7 @@ async function getLlmConfig() {
 
 async function getSourceFolders() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/source_folders`, {
-    next: { revalidate: 500 },
+    cache: "no-cache",
   });
 
   // TODO: add proper error handling

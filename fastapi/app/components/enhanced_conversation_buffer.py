@@ -29,6 +29,11 @@ class EnhancedConversationBuffer:
         self.buffer.append(message)
         self.flush_buffer()
 
+    def add_messages(self, messages: List[Dict[str, str]]) -> None:
+        """Adds multiple messages to the buffer."""
+        for message in messages:
+            self.add_message(message)
+
     def flush_buffer(self) -> None:
         """Flushes the buffer to keep it under the max token count."""
         while self.current_tokens > self.max_tokens:
