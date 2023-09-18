@@ -1,6 +1,6 @@
 # Code Diagram Generator
 
-This monorepo contains a code diagram generator application built using FastAPI on the backend and Next.js 13 on the frontend.
+This monorepo contains a code diagram generator application built using FastAPI on the backend and Next.js 13/Tailwind CSS on the frontend.
 
 ![Code Diagram Generator](fullcapture.png?raw=true)
 
