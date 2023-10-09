@@ -20,6 +20,7 @@ openai-functools = "^1.0.97"
 rich = "^13.5.2"
 loguru = "^0.7.0"
 langchain = "^0.0.273"
+lark-parser = "^0.12.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.5"
