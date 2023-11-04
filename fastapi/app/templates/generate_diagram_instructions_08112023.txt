@@ -13,7 +13,7 @@ Your task is to create a {diagram_option} Diagram using mermaid js markdown. You
 
 - Remember the function takes plain text input. Should not contain encodings like \n, \t, etc.  Function parameters should be trimmed/stripped appropriately.  Consider your diagram carefully to come up with the right visuals.
 
-Here are some simple examples, we want some more advanced and thoughtful:
+Here are some simple examples, we want something more advanced and much more thoughtful:
 
 ### 1. Flowchart for User Authentication
 
@@ -91,4 +91,8 @@ stateDiagram-v2
 **Explanation**: This state diagram represents an order management process, starting from a "New" state. After placing an order, it moves to "Processing," then to "Shipped," and finally to "Delivered," concluding the order process.
 
 ------------------
+
+
+Take a deep breath and work on this problem step-by-step to make sure you have the right answer.
+
 I want you to use this application as the context for your diagram:
