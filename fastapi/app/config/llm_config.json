@@ -22,9 +22,16 @@
       {
         "name": "GPT 4 32k",
         "id": "gpt-4-32k",
-        "description": "GPT-4 also offers an extended 32,000 token context-length model, which is being rolled out separately to the 8k model. This model has the same capabilities as the base GPT-4 model but with 4x the context length.",
+        "description": "GPT-4 32k",
         "max_token_length": 32768
-      }
+      },
+      {
+        "name": "GPT 4 128k 1106 preview",
+        "id": "gpt-4-1106-preview",
+        "description": "GPT-4-turbo",
+        "max_token_length": 128000
+      }      
+
     ],
     "anthropic": [
       {
