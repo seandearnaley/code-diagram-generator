@@ -30,30 +30,35 @@
         "id": "gpt-4-1106-preview",
         "description": "GPT-4-turbo",
         "max_token_length": 128000
-      }      
-
+      },
+      {
+        "name": "GPT 4 128k 0125 preview",
+        "id": "gpt-4-0125-preview",
+        "description": "GPT-4-turbo",
+        "max_token_length": 128000
+      }
     ],
     "anthropic": [
       {
-        "name": "Claude 2 (Major)",
-        "id": "claude-2",
+        "name": "Claude 2.1",
+        "id": "claude-2.1",
         "description": "Claude v2 is an AI chatbot platform introduced by Anthropic that rivals ChatGPT in an exciting and innovative manner. It has redefined how we interact with AI platforms by extending the length of meaningful interactions to an incredible 75,000 words. What sets Claude v2 apart is its commitment to ethical AI. The platform has been designed with a unique “constitution” to prevent the generation of harmful content, making it a responsible addition to the AI community.",
         "max_token_length": 100000
       },
       {
-        "name": "Claude 2.0 (Latest)",
+        "name": "Claude 2.0",
         "id": "claude-2.0",
         "description": "Claude v2 Latest full version",
         "max_token_length": 100000
       },
       {
-        "name": "Claude Instant 1 (Major)",
+        "name": "Claude Instant 1",
         "id": "claude-instant-1",
         "description": "Claude Instant v1 is a faster and less expensive model that can handle casual dialogue, text analysis and summarization, and document Q&A.",
         "max_token_length": 9000
       },
       {
-        "name": "Claude Instant 1.2 (Latest)",
+        "name": "Claude Instant 1.2",
         "id": "claude-instant-1.2",
         "description": "Claude instant 1.2 Latest full version",
         "max_token_length": 9000
