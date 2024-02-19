@@ -1,12 +1,13 @@
 """Service for LLM Models"""
 import json
 import os
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
-import openai
 from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
 from loguru import logger
-from openai.openai_object import OpenAIObject
+from openai import OpenAI
+from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
+from openai.types.shared_params import FunctionDefinition
 from pyrate_limiter import Duration, Limiter, RequestRate
 
 from ..config import ANTHROPIC_AI_VENDOR, LLM_CONFIG_PATH
@@ -14,8 +15,9 @@ from ..exceptions import AnthropicException, LLMException, OpenAIException
 from ..models import LLMConfig, LLMDefinition
 from ..utils.llm_utils import validate_max_tokens
 
-openai.organization = os.environ.get("OPENAI_ORG_ID")
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+client = OpenAI()
+# openai.organization = os.environ.get("OPENAI_ORG_ID")
+# openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
 rate_limits = (RequestRate(60, Duration.MINUTE),)  # 60 requests a minute
@@ -49,7 +51,7 @@ def complete_text(
     max_tokens: int,
     model: str,
     vendor: str,
-    messages: list[dict[str, str]],
+    messages: Any,
     functions: Optional[List[Any]] = None,
     callback: Optional[Callable[[Any], Union[Tuple[str, str, str], str]]] = None,
 ) -> Union[Tuple[str, str, str], str]:
@@ -81,30 +83,34 @@ def complete_text(
 def complete_openai_text(
     max_tokens: int,
     model: str,
-    messages: list[dict[str, str]],
-    functions: Optional[List[Any]] = None,
+    messages: Iterable[ChatCompletionMessageParam],
+    functions: List[FunctionDefinition] | None = None,
     callback: Optional[Callable[[Any], Union[Tuple[str, str, str], str]]] = None,
 ) -> Union[Tuple[str, str, str], str]:
     """Use OpenAI's GPT model to complete text based on the given prompt."""
     try:
-        response = openai.ChatCompletion.create(
+        tools: List[ChatCompletionToolParam] = (
+            [
+                {"type": "function", "function": function_definition}
+                for function_definition in functions
+            ]
+            if functions is not None
+            else []
+        )
+
+        response = client.chat.completions.create(
             model=model,
             max_tokens=max_tokens,
             messages=messages,
-            # temperature=0.3,
-            functions=functions,
-            function_call="auto",
+            tools=tools,
+            tool_choice="auto",
         )
-        if not isinstance(response, OpenAIObject):
-            raise ValueError("Invalid Response")
 
         if callback:
             return callback(response)
 
         return "Response doesn't have choices or choices have no text."
 
-    except openai.OpenAIError as err:
-        raise OpenAIException(f"OpenAI Client Error: {err}") from err
     except ValueError as err:
         raise OpenAIException(f"OpenAI Client Value error: {err}, {err.args}") from err
     except OpenAIException as err:
