@@ -11,7 +11,6 @@ from ..exceptions import MermaidCliError
 from ..models import LLMDefinition, MermaidDesignRequest, MermaidModel
 from ..services.llm_service import complete_text
 from ..utils.llm_utils import num_tokens_from_functions, num_tokens_from_string
-from ..utils.log_utils import print_markdown
 from ..utils.mermaid_utils import sanitize_markdown_js
 from .diagram_function_defs import DIAGRAM_FUNCTION_DEFINITIONS
 from .mermaid_generator import create_mermaid_diagram
@@ -23,36 +22,34 @@ def create_buffer(max_tokens: int, num_tokens_from_string_fn: Callable):
 
 
 def openai_mermaid_fn_callback(response) -> Union[Tuple[str, str, str], str]:
-    """Callback function for mermaid diagram generation."""
+    """Callback function for mermaid diagram generation with direct call to sanitize_markdown_js."""
     if not response.choices:
         return "Response doesn't have choices or choices have no text."
 
     response_message = response.choices[0].message
-    if response_message.get("function_call"):
-        logger.debug(f"response_message: {response_message}")
+    tool_calls = response_message.tool_calls
 
-        try:
-            sanitized_string = sanitize_markdown_js(
-                response_message["function_call"]["arguments"]
-            )
+    if tool_calls:
+        for tool_call in tool_calls:
+            if tool_call.function.name == "create_mermaid_diagram":
+                sanitized_string = sanitize_markdown_js(tool_call.function.arguments)
 
-            logger.debug(f"sanitized_string: {sanitized_string}")
-            function_args = json.loads(sanitized_string)
-        except json.JSONDecodeError as err:
-            # Log or print the JSON string to investigate further
-            print(
-                "JSON string that caused error:"
-                f" {response_message['function_call']['arguments']}"
-            )
-            raise err  # Re-raise the exception if you want it to propagate
-        mermaid_def_str = function_args.get("diagram_text_definition")
+                try:
+                    args_dict = json.loads(sanitized_string)
+                except json.JSONDecodeError as err:
+                    logger.error(f"JSONDecodeError after sanitizing: {err}")
+                    return "Error processing sanitized string."
 
-        explanation = function_args.get("explanation").strip("\n")
-        diagram_type = function_args.get("diagram_type")
-        if mermaid_def_str:
-            print_markdown(f"def str:\n\n{mermaid_def_str}")
-            return mermaid_def_str, explanation, diagram_type
-    return response_message.content.strip()
+                mermaid_def_str = args_dict.get("diagram_text_definition", "")
+                explanation = args_dict.get("explanation", "").strip("\n")
+                diagram_type = args_dict.get("diagram_type", "")
+
+                if mermaid_def_str:
+                    return mermaid_def_str, explanation, diagram_type
+    else:
+        return response_message.content.strip()
+    # Add a default return at the end
+    return "Unexpected response format."
 
 
 async def init_buffer(
